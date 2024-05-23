@@ -1,0 +1,32 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxi build --preset=cloudflare_module",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@fortawesome/free-brands-svg-icons": "^6.5.2",
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
+    "@fortawesome/vue-fontawesome": "^3.0.8",
+    "@pinia/nuxt": "^0.5.1",
+    "bulma": "^1.0.1",
+    "cfw-bindings-wrangler-bridge": "^0.11.0",
+    "drizzle-orm": "^0.29.5",
+    "nuxt": "^3.11.2",
+    "nuxt-auth-utils": "^0.0.25",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.27",
+    "vue-router": "^4.3.2"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.21.2",
+    "prisma": "^5.14.0",
+    "sass": "^1.77.2",
+    "miniflare": "^3.20240512.0"
+  }
+}

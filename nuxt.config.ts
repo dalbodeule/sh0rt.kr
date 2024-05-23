@@ -7,6 +7,12 @@ export default defineNuxtConfig({
     },
     preset: "cloudflare-module"
   },
+  build: {
+    transpile: ['Dayjs']
+  },
+  css: [
+    '@fortawesome/fontawesome-svg-core/styles.css'
+  ],
   runtimeConfig: {
     authSecret: process.env.AUTH_SECRET,
     dbid: process.env.DBID,

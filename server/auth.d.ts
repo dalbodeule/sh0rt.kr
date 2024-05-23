@@ -1,3 +1,5 @@
+import {UserRole} from "~/db/schema";
+
 declare module '#auth-utils' {
     interface User {
         id: number,
@@ -6,7 +8,8 @@ declare module '#auth-utils' {
         vendor: string,
         profile: string,
         created_at: Date,
-        updated_at: Date
+        updated_at: Date,
+        role: UserRole
     }
 }
 

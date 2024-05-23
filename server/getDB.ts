@@ -13,10 +13,5 @@ const config = useRuntimeConfig()
 }) */
 
 export default async function (event: H3Event) {
-    if(process.dev) {
-        // return await mf.getD1Database("DB")
-        return null
-    } else {
-        return event.context.cloudflare.env.DB as D1Database$
-    }
+    return event.context.cloudflare.env.DB as D1Database$
 }

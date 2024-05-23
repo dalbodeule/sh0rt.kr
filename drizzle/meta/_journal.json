@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1716384026748,
-      "tag": "0000_pretty_jamie_braddock",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1716394199914,
-      "tag": "0001_groovy_princess_powerful",
+      "when": 1716471087856,
+      "tag": "0000_square_hawkeye",
       "breakpoints": true
     }
   ]

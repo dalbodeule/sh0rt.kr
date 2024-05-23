@@ -1,9 +1,84 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "ee7c5c38-3d42-42fd-bcdc-f372f94a0e37",
+  "id": "194feaf5-1259-4a02-8351-b3d1f218c28e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "urls": {
+      "name": "urls",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "uid": {
+          "name": "uid",
+          "type": "text(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "forward": {
+          "name": "forward",
+          "type": "text(4096)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user": {
+          "name": "user",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(STRFTIME('%s'))"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(STRFTIME('%s'))"
+        },
+        "expires": {
+          "name": "expires",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(STRFTIME('%s'))"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "urls_user_users_id_fk": {
+          "name": "urls_user_users_id_fk",
+          "tableFrom": "urls",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "users": {
       "name": "users",
       "columns": {
@@ -23,6 +98,13 @@
         },
         "vendor": {
           "name": "vendor",
+          "type": "text(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
           "type": "text(20)",
           "primaryKey": false,
           "notNull": true,
@@ -48,7 +130,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "(CURRENT_TIMESTAMP)"
+          "default": "(STRFTIME('%s'))"
         },
         "updated_at": {
           "name": "updated_at",
@@ -56,7 +138,22 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "(CURRENT_TIMESTAMP)"
+          "default": "(STRFTIME('%s'))"
+        },
+        "login_limit": {
+          "name": "login_limit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "role": {
+          "name": "role",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
         }
       },
       "indexes": {},

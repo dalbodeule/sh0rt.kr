@@ -3,30 +3,37 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxi build --preset=cloudflare_module",
+    "build": "nuxt build --preset=cloudflare_module",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "create_meta": "drizzle-kit generate --dialect sqlite --schema=./db/schema.ts"
   },
   "dependencies": {
     "@fortawesome/free-brands-svg-icons": "^6.5.2",
+    "@fortawesome/free-regular-svg-icons": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/vue-fontawesome": "^3.0.8",
     "@pinia/nuxt": "^0.5.1",
+    "@vee-validate/i18n": "^4.12.8",
+    "@vee-validate/rules": "^4.12.8",
     "bulma": "^1.0.1",
     "cfw-bindings-wrangler-bridge": "^0.11.0",
+    "dayjs": "^1.11.11",
     "drizzle-orm": "^0.29.5",
     "nuxt": "^3.11.2",
     "nuxt-auth-utils": "^0.0.25",
     "pinia": "^2.1.7",
+    "vee-validate": "^4.12.8",
     "vue": "^3.4.27",
-    "vue-router": "^4.3.2"
+    "vue-router": "^4.3.2",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "drizzle-kit": "^0.21.2",
+    "miniflare": "^3.20240512.0",
     "prisma": "^5.14.0",
-    "sass": "^1.77.2",
-    "miniflare": "^3.20240512.0"
+    "sass": "^1.77.2"
   }
 }

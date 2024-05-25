@@ -1,8 +1,8 @@
 import { drizzle } from "drizzle-orm/d1";
 import getDB from "~/server/getDB";
-import { Users } from "~/db";
 import { and, eq } from "drizzle-orm";
 import { H3Event } from "h3";
+import {users} from "~/db/schema";
 
 export default async function(event: H3Event, provider: string, user: {
     accountId: string,
@@ -10,27 +10,28 @@ export default async function(event: H3Event, provider: string, user: {
     name: string,
     avatar_url: string,
 } ) {
-    const db = drizzle(await getDB(event))
+    const db = getDB(event)
 
-    let db_user = await db.select().from(Users).where(and(
-        eq(Users.token, user.accountId),
-        eq(Users.vendor, provider)
-    ))
+    let db_user = await db.query.users.findFirst({
+        where: and(
+            eq(users.token, user.accountId),
+            eq(users.vendor, provider))
+    })
 
-    if (db_user.length > 0) {
-        await db.update(Users).set({
+    if (db_user) {
+        await db.update(users).set({
             updated_at: new Date(),
             name: user.name
         }).where(and(
-            eq(Users.token, user.accountId),
-            eq(Users.vendor, provider)
+            eq(users.token, user.accountId),
+            eq(users.vendor, provider)
         ))
     } else {
         const email = user.email
         const profile = user.avatar_url
         const name = user.name
 
-        await db.insert(Users).values({
+        await db.insert(users).values({
             email,
             name,
             vendor: provider,
@@ -39,24 +40,27 @@ export default async function(event: H3Event, provider: string, user: {
         })
     }
 
-    db_user = await db.select().from(Users).where(and(
-        eq(Users.token, user.accountId),
-        eq(Users.vendor, provider)
-    ))
+    db_user = await db.query.users.findFirst({
+        where: and(
+            eq(users.token, user.accountId),
+            eq(users.vendor, provider))
+    })
 
-    if(db_user.length != 1 && (db_user[0].login_limit?.getTime() ?? 0 < new Date().getTime()))
+    if(!db_user || (db_user.login_limit?.getTime() ?? 0 > Math.round(Date.now() / 1000))) {
+        console.log("asdfs")
         return
+    }
 
     await setUserSession(event, {
         user: {
-            id: db_user[0].id,
-            email: db_user[0].email,
-            name: db_user[0].name,
-            vendor: db_user[0].vendor,
-            profile: db_user[0].profile,
-            created_at: db_user[0].created_at,
-            updated_at: db_user[0].updated_at,
-            role: db_user[0].role,
+            id: db_user!!.id,
+            email: db_user!!.email,
+            name: db_user!!.name,
+            vendor: db_user!!.vendor,
+            profile: db_user!!.profile,
+            created_at: db_user!!.created_at,
+            updated_at: db_user!!.updated_at,
+            role: db_user!!.role,
         }
     })
 }

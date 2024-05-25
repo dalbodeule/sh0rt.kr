@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "194feaf5-1259-4a02-8351-b3d1f218c28e",
+  "id": "5ea9abc2-cc51-47ef-86c2-1667e0d158ab",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "urls": {
@@ -26,13 +26,6 @@
           "type": "text(4096)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
-        },
-        "user": {
-          "name": "user",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
           "autoincrement": false
         },
         "created_at": {
@@ -61,21 +54,7 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "urls_user_users_id_fk": {
-          "name": "urls_user_users_id_fk",
-          "tableFrom": "urls",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -158,6 +137,56 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "userToUrls": {
+      "name": "userToUrls",
+      "columns": {
+        "user": {
+          "name": "user",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "url": {
+          "name": "url",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "userToUrls_user_users_id_fk": {
+          "name": "userToUrls_user_users_id_fk",
+          "tableFrom": "userToUrls",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "userToUrls_url_urls_id_fk": {
+          "name": "userToUrls_url_urls_id_fk",
+          "tableFrom": "userToUrls",
+          "tableTo": "urls",
+          "columnsFrom": [
+            "url"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     }

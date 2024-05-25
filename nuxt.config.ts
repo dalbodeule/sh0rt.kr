@@ -3,7 +3,10 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   nitro: {
     prerender: {
-      autoSubfolderIndex: false
+      autoSubfolderIndex: false,
+      crawlLinks: true,
+      routes: ['/'],
+      ignore: ['/api']
     },
     preset: "cloudflare-module"
   },
@@ -25,7 +28,13 @@ export default defineNuxtConfig({
         clientId: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       }
+    },
+    public: {
+      baseUrl: process.env.BASE_URL,
     }
   },
-  modules: ["nuxt-auth-utils"]
+  modules: [
+      "nuxt-auth-utils",
+      "nitro-cloudflare-dev"
+  ]
 })

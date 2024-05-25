@@ -19,10 +19,8 @@
     "@vee-validate/i18n": "^4.12.8",
     "@vee-validate/rules": "^4.12.8",
     "bulma": "^1.0.1",
-    "cfw-bindings-wrangler-bridge": "^0.11.0",
     "dayjs": "^1.11.11",
     "drizzle-orm": "^0.29.5",
-    "nuxt": "^3.11.2",
     "nuxt-auth-utils": "^0.0.25",
     "pinia": "^2.1.7",
     "vee-validate": "^4.12.8",
@@ -33,7 +31,10 @@
   "devDependencies": {
     "drizzle-kit": "^0.21.2",
     "miniflare": "^3.20240512.0",
+    "nitro-cloudflare-dev": "^0.1.4",
+    "nuxt": "^3.11.2",
     "prisma": "^5.14.0",
-    "sass": "^1.77.2"
+    "sass": "^1.77.2",
+    "wrangler": "^3.57.1"
   }
 }

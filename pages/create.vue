@@ -2,14 +2,22 @@
 import type {Ref} from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { ErrorMessage, Field, Form, configure, defineRule } from "vee-validate";
-import { alpha_num, min, max, min_value, required, url } from '@vee-validate/rules'
+import { alpha_num, min, max, required, url } from '@vee-validate/rules'
 import { localize, setLocale } from '@vee-validate/i18n'
 
 import ko from '@vee-validate/i18n/dist/locale/ko.json'
 import en from '@vee-validate/i18n/dist/locale/en.json'
 
+import wait from "~/common/wait"
+import { Status } from "~/common/enums"
+import dayjs from "dayjs";
+import type {IUIDPostRequest} from "~/server/routes/api/forward/index.post";
+
 const router = useRouter()
 const { loggedIn, user, session, clear } = useUserSession()
+const config = useRuntimeConfig()
+
+const status: Ref<Status> = ref(Status.DEFAULT)
 
 const banlist = ['create', 'login', 'logout', 'admin', 'root']
 
@@ -22,7 +30,26 @@ defineRule('min', min)
 defineRule('max', max)
 defineRule('required', required)
 defineRule('url', url)
+defineRule('unique', async(value: string) => {
+  if (!value) return true
+  if(banlist.includes(value)) return false
 
+  try {
+    const data = await $fetch(`${config.public.baseUrl}/api/forward/${value}`, {
+      method: 'GET',
+    })
+    return !data
+  } catch(e) {
+    return true
+  }
+})
+defineRule('after_days', (value: string, days: any[]) => {
+  if(!value) return true
+  const selectedDate = new Date(value)
+  const currentDate = getDate(days[0] ?? '7')
+
+  return selectedDate.getTime() >= currentDate.getTime()
+})
 
 configure({
   generateMessage: localize({
@@ -51,6 +78,7 @@ localize({
 const getDate = (day: number = 7): Date => {
   const date = new Date()
   date.setDate(date.getDate() + day)
+  date.setHours(0, 0, 0, 0)
 
   return date
 }
@@ -62,25 +90,40 @@ const randomAddr = () => {
 
 // https://futurestud.io/tutorials/vue-js-3-bind-a-value-to-an-html-datetime-input
 // datetime picker default value
-const addrInfo: Ref<{
-  uid: string,
-  origin: string,
-  userid: number,
-  expires_in: string
-}> = ref({ uid: '', origin: '', userid: user.value?.id ?? 0, expires_in: getDate().toISOString().substring(0, 10) })
+const addrInfo: Ref<IUIDPostRequest> = ref({ uid: '', forward: '', expires: dayjs().format('YYYY-MM-DD') })
 
 const schema = {
-  uid: { alpha_num: true, min: 3, max: 20, required: true },
+  uid: { alpha_num: true, min: 3, max: 20, required: true, unique: true },
   origin: { url: true, required: true },
-  expires_in: { required: true }
+  expires_in: { required: true, after_days: 6 }
 }
 
 setLocale('ko')
+
+const onSubmit = async() => {
+  console.log("submitted")
+  status.value = Status.PENDING
+
+  try {
+    const result = await $fetch(`${config.public.baseUrl}/api/forward`, {
+      method: "POST",
+      body: JSON.stringify(addrInfo.value)
+    })
+
+    if(result) {
+      status.value = Status.SUCCESS
+    } else {
+      status.value = Status.ERROR
+    }
+  } catch(e) {
+    status.value = Status.ERROR
+  }
+}
 </script>
 
 <template>
   <div class="container box" style="min-height: 80vh">
-    <Form @submit.prevent="" :validation-schema="schema">
+    <Form @submit="onSubmit()" :validation-schema="schema">
       <div class="field is-horizontal">
         <div class="field-label is-normal">
           <label class="label">단축주소</label>
@@ -111,7 +154,7 @@ setLocale('ko')
         <div class="field-body">
           <div class="control">
             <div class="control has-icons-left is-expanded">
-              <Field class="input" name="origin" type="text" maxlength="4096" minlength="10" v-model="addrInfo.origin"/>
+              <Field class="input" name="origin" type="text" maxlength="4096" minlength="10" v-model="addrInfo.forward"/>
               <span class="icon is-small is-left">
                 <FontAwesomeIcon :icon="['fas', 'paperclip']" />
               </span>
@@ -127,7 +170,7 @@ setLocale('ko')
         <div class="field-body is-normal">
           <div class="field">
             <div class="control">
-              <Field class="input" name="expires_in" type="date" v-model="addrInfo.expires_in"/>
+              <Field class="input" name="expires_in" type="date" v-model="addrInfo.expires" />
             </div>
             <ErrorMessage name="expires_in" as="p" class="help is-danger"/>
           </div>
@@ -135,13 +178,22 @@ setLocale('ko')
       </div>
       <div class="field is-grouped is-grouped-right">
         <div class="control">
-          <button type="submit" class="button is-link">만들기</button>
+          <button type="submit" class="button is-link" :disabled="status == Status.PENDING">만들기</button>
         </div>
         <div class="control">
-          <button type="reset" class="button is-link is-light">취소</button>
+          <button type="reset" class="button is-link is-light" :disabled="status == Status.PENDING">취소</button>
         </div>
       </div>
     </Form>
+    <div style="margin-top: 30px;" />
+    <div class="notification is-success" v-if="status == Status.SUCCESS">
+      <p><a :href="`https://sh0rt.kr/${addrInfo.uid}`">https://sh0rt.kr/{{addrInfo.uid}}</a> 생성에 성공했습니다.</p>
+      <p>만료일: {{ dayjs(addrInfo.expires).format('YYYY-MM-DD')}}</p>
+    </div>
+    <div class="notification is-warning" v-else-if="status == Status.ERROR">
+      <p>생성에 실패했습니다.</p>
+    </div>
+    <progress class="progress is-primary" v-else-if="status == Status.PENDING" max="100"></progress>
   </div>
 </template>
 

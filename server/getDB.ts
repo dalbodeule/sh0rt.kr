@@ -1,17 +1,10 @@
-import { Miniflare } from 'miniflare'
 import {H3Event} from "h3";
-import {D1Database$} from "cfw-bindings-wrangler-bridge";
+import {drizzle} from "drizzle-orm/d1";
+import * as schema from '~/db/schema'
 
-const config = useRuntimeConfig()
 
-/* const mf = new Miniflare({
-    modules: true,
-    scriptPath: ".output/server/index.mjs",
-    d1Databases: {
-        DB: config.dbid
-    }
-}) */
+export default function (event: H3Event) {
+    const { cloudflare } = event.context
 
-export default async function (event: H3Event) {
-    return event.context.cloudflare.env.DB as D1Database$
+    return drizzle(cloudflare.env.DB, {schema})
 }

@@ -1,5 +1,5 @@
-import { sqliteTable, int, text } from "drizzle-orm/sqlite-core";
-import { sql } from "drizzle-orm";
+import { sqliteTable, int, text } from "drizzle-orm/sqlite-core"
+import {sql, relations } from "drizzle-orm";
 
 export enum UserRole {
     ADMIN = 2,
@@ -7,7 +7,7 @@ export enum UserRole {
     USER = 0
 }
 
-const Users = sqliteTable('users', {
+export const users = sqliteTable('users', {
     id: int('id').primaryKey({ autoIncrement: true }),
     email: text('email', { length: 255 }).notNull(),
     vendor: text('vendor', { length: 20 }).notNull(),
@@ -20,14 +20,35 @@ const Users = sqliteTable('users', {
     role: int('role').notNull().default(UserRole.USER),
 })
 
-const Urls = sqliteTable('urls', {
+export const usersRelations = relations(users, ({ many }) => ({
+    usersToUrls: many(usersToUrls)
+}))
+
+export const urls = sqliteTable('urls', {
     id: int('id').primaryKey({ autoIncrement: true }),
     uid: text('uid', { length: 10 }).notNull(),
     forward: text('forward', { length: 4096 }).notNull(),
-    user: int('user').references(() => Users.id),
     created_at: int('created_at', { mode: "timestamp" }).notNull().default(sql`(STRFTIME('%s'))`),
     updated_at: int('updated_at', { mode: "timestamp" }).notNull().default(sql`(STRFTIME('%s'))`),
     expires: int('expires', { mode: "timestamp" }).notNull().default(sql`(STRFTIME('%s'))`),
 })
 
-export { Users, Urls }
+export const urlsRelations = relations(urls, ({ many }) => ({
+    UsersToUrls: many(usersToUrls)
+}))
+
+export const usersToUrls = sqliteTable('userToUrls', {
+    user: int('user').notNull().references(() => users.id),
+    url: int('url').notNull().references(() => urls.id),
+})
+
+export const usersToUrlsRelations = relations(usersToUrls, ({ one }) => ({
+    Users: one(users, {
+        fields: [usersToUrls.user],
+        references: [users.id]
+    }),
+    Urls: one(urls, {
+        fields: [usersToUrls.url],
+        references: [urls.id]
+    })
+}))

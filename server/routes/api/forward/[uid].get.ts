@@ -1,41 +1,63 @@
 import getDB from "~/server/getDB";
-import {drizzle} from "drizzle-orm/d1";
-import {Urls} from "~/db/schema";
-import {and, eq, gte} from "drizzle-orm";
+import { urls } from "~/db/schema";
+import { and, eq, gte } from "drizzle-orm";
 
 export interface IUIDGetResponse {
     id: number,
     uid: string,
     forward: string,
-    user: number,
+    user: {
+        id: number,
+        name: string,
+        profile: string
+    },
     created_at: Date,
     updated_at: Date,
     expires: Date
 }
 
 export default defineEventHandler(async (event) => {
-    const db = drizzle(await getDB(event))
+    const db = getDB(event)
+
     const uid = getRouterParam(event, 'uid') ?? ''
+    if(!uid) throw createError({
+        status: 404,
+        message: 'Not found',
+    })
 
-    console.log(uid)
+    const result = await db.query.urls.findFirst({
+        where: and(
+            eq(urls.uid, uid),
+            gte(urls.expires, new Date())
+        ),
+        with: {
+            UsersToUrls: {
+                with: {
+                    Users: true
+                }
+            }
+        }
+    })
 
-    const result = await db.select().from(Urls).where(and(
-        eq(Urls.uid, uid),
-        gte(Urls.expires, new Date())
-    ))
-
-    if(result.length > 0) {
+    if(result) {
         const data: IUIDGetResponse = {
-            id: result[0].id,
-            uid: result[0].uid,
-            forward: result[0].forward,
-            user: result[0].user ?? 0,
-            created_at: result[0].created_at,
-            updated_at: result[0].updated_at,
-            expires: result[0].expires,
+            id: result.id,
+            uid: result.uid,
+            forward: result.forward,
+            user: {
+                id: result.UsersToUrls[0].Users.id,
+                name: result.UsersToUrls[0].Users.name,
+                profile: result.UsersToUrls[0].Users.profile
+            },
+            created_at: result.created_at,
+            updated_at: result.updated_at,
+            expires: result.expires,
         }
 
         return data
     }
-    return null
+    throw createError({
+        status: 404,
+        message: 'Not found',
+    })
 })

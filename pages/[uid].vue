@@ -44,6 +44,7 @@ if (error.value) {
 else status.value = Status.SUCCESS
 
 if (process.client) {
+  await $fetch(`/api/forward/${uid}`, { method: 'PUT' })
   await wait(3000)
   window.location.href = data.value?.forward ?? ''
 }
@@ -51,7 +52,7 @@ if (process.client) {
 </script>
 
 <template>
-  <div class="container box content" style="min-height: 80vh">
+  <div class="box content">
     <template v-if="status == Status.SUCCESS">
       <h1>잠시 후 이동합니다.</h1>
       <br>

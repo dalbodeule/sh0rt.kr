@@ -1,6 +1,6 @@
-import getDB from "~/server/getDB";
-import { urls } from "~/db/schema";
+import { urls } from "~/server/db/schema";
 import { and, eq, gte } from "drizzle-orm";
+import { useDrizzle } from "~/server/utils/useDrizzle";
 
 export interface IUIDGetResponse {
     id: number,
@@ -17,7 +17,7 @@ export interface IUIDGetResponse {
 }
 
 export default defineEventHandler(async (event) => {
-    const db = getDB(event)
+    const db = useDrizzle()
 
     const uid = getRouterParam(event, 'uid') ?? ''
     if(!uid) throw createError({

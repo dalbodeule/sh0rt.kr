@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div class="container box" style="min-height: 80vh">
+  <div class="box content">
     <h1>Index</h1>
   </div>
 </template>

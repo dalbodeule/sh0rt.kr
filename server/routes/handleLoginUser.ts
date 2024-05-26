@@ -1,8 +1,7 @@
-import { drizzle } from "drizzle-orm/d1";
-import getDB from "~/server/getDB";
 import { and, eq } from "drizzle-orm";
 import { H3Event } from "h3";
-import {users} from "~/db/schema";
+import { users } from "~/server/db/schema";
+import { useDrizzle } from "~/server/utils/useDrizzle";
 
 export default async function(event: H3Event, provider: string, user: {
     accountId: string,
@@ -10,7 +9,7 @@ export default async function(event: H3Event, provider: string, user: {
     name: string,
     avatar_url: string,
 } ) {
-    const db = getDB(event)
+    const db = useDrizzle()
 
     let db_user = await db.query.users.findFirst({
         where: and(

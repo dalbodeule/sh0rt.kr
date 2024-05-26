@@ -19,7 +19,7 @@ const config = useRuntimeConfig()
 
 const status: Ref<Status> = ref(Status.DEFAULT)
 
-const banlist = ['create', 'login', 'logout', 'admin', 'root']
+const banlist = [ 'create', 'login', 'logout', 'admin', 'root', 'manage' ]
 
 if(!loggedIn.value) {
   router.push('/')
@@ -122,7 +122,7 @@ const onSubmit = async() => {
 </script>
 
 <template>
-  <div class="container box" style="min-height: 80vh">
+  <div class="box content">
     <Form @submit="onSubmit()" :validation-schema="schema">
       <div class="field is-horizontal">
         <div class="field-label is-normal">

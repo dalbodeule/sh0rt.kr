@@ -9,7 +9,7 @@ const methods: Array<{url: string, display: string, id: string, color: string, b
 </script>
 
 <template>
-  <div class="container box" style="min-height: 80vh">
+  <div class="box content">
     <div v-for="method in methods" style="margin-left: auto; margin-top: 20px;">
       <a v-if="method.icon" v-bind:href="method.url" class="button is-align-content-center" v-bind:style="`background: ${method.bgcolor}; color: ${method.color}; width: 180px;`">
         <FontAwesomeIcon :icon="['fab', method.id]" size="xs"/>&nbsp; {{ method.display }}

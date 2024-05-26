@@ -19,6 +19,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     authSecret: process.env.AUTH_SECRET,
     dbid: process.env.DBID,
+    analyticsAccountId: process.env.ANALYTICS_ACCOUNT_ID,
+    analyticsApiToken: process.env.ANALYTICS_API_TOKEN,
     oauth: {
       github: {
         clientId: process.env.GITHUB_CLIENT_ID,
@@ -33,8 +35,9 @@ export default defineNuxtConfig({
       baseUrl: process.env.BASE_URL,
     }
   },
-  modules: [
-      "nuxt-auth-utils",
-      "nitro-cloudflare-dev"
-  ]
+  hub: {
+    analytics: true,
+    database: true
+  },
+  modules: ["nuxt-auth-utils", "@nuxthub/core"]
 })

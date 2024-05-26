@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type {Ref} from "vue";
-import {UserRole} from "~/db/schema";
+import type { Ref } from "vue";
+import { UserRole } from "~/server/db/schema"
 
 const show: Ref<boolean> = ref(false)
 const router = useRouter()

@@ -1,9 +1,9 @@
 import { IUIDGetResponse } from "~/server/routes/api/forward/[uid].get"
 import { H3Event } from "h3";
-import getDB from "~/server/getDB";
-import {urls, usersToUrls} from "~/db/schema";
+import { urls, usersToUrls } from "~/server/db/schema";
 import { and, eq, gte } from "drizzle-orm";
 import dayjs from "dayjs";
+import { useDrizzle } from "~/server/utils/useDrizzle";
 
 export interface IUIDPostRequest {
     uid: string | null,
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event: H3Event) => {
         message: 'Body is wrong',
     })
 
-    const db = getDB(event)
+    const db = useDrizzle()
 
     const result = await db.query.urls.findFirst({
         where: and(

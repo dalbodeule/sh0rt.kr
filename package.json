@@ -22,6 +22,7 @@
     "bulma": "^1.0.1",
     "dayjs": "^1.11.11",
     "drizzle-orm": "^0.29.5",
+    "linkedom": "^0.18.0",
     "lodash": "^4.17.21",
     "nuxt-auth-utils": "^0.0.25",
     "pinia": "^2.1.7",

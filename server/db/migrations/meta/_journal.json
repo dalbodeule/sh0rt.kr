@@ -8,6 +8,20 @@
       "when": 1716631645763,
       "tag": "0000_solid_scalphunter",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1716776136842,
+      "tag": "0001_thin_sally_floyd",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1716776340215,
+      "tag": "0002_closed_peter_parker",
+      "breakpoints": true
     }
   ]
 }

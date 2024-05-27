@@ -52,8 +52,6 @@ export function arrayToObject(arr: string[]): IAnalyticObject {
 }
 
 export async function getFromAnalytics(query: string) {
-    console.log(query)
-
     const config = useRuntimeConfig()
     const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${config.analyticsAccountId}/analytics_engine/sql`, {
         method: 'POST',

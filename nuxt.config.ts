@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     preset: "cloudflare-module"
   },
   build: {
-    transpile: ['Dayjs']
+    transpile: ['Dayjs', 'linkedom']
   },
   css: [
     '@fortawesome/fontawesome-svg-core/styles.css'

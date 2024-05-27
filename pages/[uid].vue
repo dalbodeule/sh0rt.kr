@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { useAsyncData } from "#app";
+import {useAsyncData} from "#app";
 import wait from "~/common/wait";
 import {Status} from "~/common/enums";
 import type {Ref} from "vue";
 import type {IUIDGetResponse} from "~/server/routes/api/forward/[uid].get"
+import { parseHTML } from 'linkedom'
 
 const status: Ref<Status> = ref(Status.DEFAULT)
 
@@ -33,6 +34,26 @@ const {data, error } = await useAsyncData(
     }
 )
 
+async function fetchAndParseOGTags(url: string) {
+  try {
+      const response = await fetch(url);
+      const html = await response.text();
+      const dom = parseHTML(html);
+      const metas = dom.window.document.head.querySelectorAll('meta[property^="og:"]');
+
+      const ogTags: { [key: string]: string } = {};
+      metas.forEach(meta => {
+        const property = meta.getAttribute('property') ?? 'a'
+        ogTags[property] = meta.getAttribute('content') ?? ''
+      })
+
+      return ogTags;
+  } catch (error) {
+      console.error("Error fetching or parsing:", error);
+      return null;
+  }
+}
+
 if (error.value) {
   status.value = Status.ERROR
   throw createError({
@@ -43,12 +64,25 @@ if (error.value) {
 }
 else status.value = Status.SUCCESS
 
+const ogData = await fetchAndParseOGTags(data.value?.forward ?? '')
+if (ogData)
+  useSeoMeta({
+    title: ogData['og:title'] ?? '',
+    description: ogData['og:description'] ?? '',
+    robots: {all: false},
+    ogType: ogData['og:type'] ?? 'website',
+    ogSiteName: ogData['og:siteName'] ?? '',
+    ogImage: ogData['og:image'] ?? '',
+  })
+
 if (process.client) {
+  useHead({
+    title: `sh0rt.kr :: forward :: ${uid}`,
+  })
   await $fetch(`/api/forward/${uid}`, { method: 'PUT' })
   await wait(3000)
   window.location.href = data.value?.forward ?? ''
 }
-
 </script>
 
 <template>

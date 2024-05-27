@@ -1,6 +1,6 @@
 import { IUIDGetResponse } from "~/server/routes/api/forward/[uid].get"
 import { H3Event } from "h3";
-import { urls, usersToUrls } from "~/server/db/schema";
+import {analyticsCache, urls, usersToUrls} from "~/server/db/schema";
 import { and, eq, gte } from "drizzle-orm";
 import dayjs from "dayjs";
 import { useDrizzle } from "~/server/utils/useDrizzle";
@@ -60,6 +60,10 @@ export default defineEventHandler(async (event: H3Event) => {
             }
         }
     })
+
+    await db.delete(analyticsCache).where(
+        eq(analyticsCache.uid, request.uid)
+    )
 
     const responseData: IUIDGetResponse = {
         id: response!!.id,

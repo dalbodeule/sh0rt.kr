@@ -1,0 +1,1 @@
+ALTER TABLE `analyticsCache` ADD `uid` text(10) NOT NULL;

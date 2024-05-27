@@ -52,3 +52,10 @@ export const usersToUrlsRelations = relations(usersToUrls, ({ one }) => ({
         references: [urls.id]
     })
 }))
+
+export const analyticsCache = sqliteTable('analyticsCache', {
+    id: int('id').primaryKey({ autoIncrement: true }),
+    uid: text('uid', { length: 10 }).notNull(),
+    data: text('data').notNull(),
+    created_at: int('created_at', { mode: 'timestamp' }).default(sql`(STRFTIME('%s'))`),
+})

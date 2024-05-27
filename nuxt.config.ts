@@ -4,9 +4,7 @@ export default defineNuxtConfig({
   nitro: {
     prerender: {
       autoSubfolderIndex: false,
-      crawlLinks: true,
-      routes: ['/'],
-      ignore: ['/api']
+      ignore: ['/']
     },
     preset: "cloudflare-module"
   },

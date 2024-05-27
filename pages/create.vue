@@ -8,7 +8,6 @@ import { localize, setLocale } from '@vee-validate/i18n'
 import ko from '@vee-validate/i18n/dist/locale/ko.json'
 import en from '@vee-validate/i18n/dist/locale/en.json'
 
-import wait from "~/common/wait"
 import { Status } from "~/common/enums"
 import dayjs from "dayjs";
 import type {IUIDPostRequest} from "~/server/routes/api/forward/index.post";
@@ -135,7 +134,7 @@ const onSubmit = async() => {
                 <button class="button is-primary is-static" type="button">https://sh0rt.kr/</button>
               </div>
               <div class="control is-expanded">
-                <Field class="input" name="uid" type="text" maxlength="20" minlength="3" v-model="addrInfo.uid"/>
+                <Field class="input" name="uid" type="text" maxlength="20" minlength="3" v-model="addrInfo.uid" :delay="500"/>
               </div>
               <div class="control">
                 <button class="button is-info" type="button" @click="addrInfo.uid = randomAddr()">

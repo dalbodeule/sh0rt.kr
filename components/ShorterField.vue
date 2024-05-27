@@ -12,12 +12,12 @@ import type { Ref } from "vue";
 import { Status } from "~/common/enums";
 import dayjs from "dayjs";
 
-const banlist = [ 'create', 'login', 'logout', 'admin', 'root', 'manage' ]
+const banlist = [ 'create', 'login', 'logout', 'admin', 'root', 'manage', 'privacy' ]
 
 const config = useRuntimeConfig()
 
 const emit = defineEmits<{submit: []}>()
-const props = defineProps<{submitText: string, isNew: boolean}>();
+const props = defineProps<{submitText: string, isNew: boolean, lock: boolean}>();
 
 // datetime picker default value
 // https://futurestud.io/tutorials/vue-js-3-bind-a-value-to-an-html-datetime-input
@@ -99,10 +99,10 @@ const randomAddr = () => {
               <button class="button is-primary is-static" type="button">https://sh0rt.kr/</button>
             </div>
             <div class="control is-expanded">
-              <Field class="input" name="uid" type="text" maxlength="20" minlength="3" v-model="addrInfo.uid" :delay="500" :disabled="!isNew"/>
+              <Field class="input" name="uid" type="text" maxlength="20" minlength="3" v-model="addrInfo.uid" :delay="500" :disabled="!isNew || props.lock"/>
             </div>
             <div class="control">
-              <button class="button is-info" type="button" @click="addrInfo!!.uid = randomAddr()" :disabled="!isNew">
+              <button class="button is-info" type="button" @click="addrInfo!!.uid = randomAddr()" :disabled="!isNew || props.lock">
                 랜덤 생성
               </button>
             </div>
@@ -118,7 +118,7 @@ const randomAddr = () => {
       <div class="field-body">
         <div class="control">
           <div class="control has-icons-left is-expanded">
-            <Field class="input" name="origin" type="text" maxlength="4096" minlength="10" v-model="addrInfo.forward"/>
+            <Field class="input" name="origin" type="text" maxlength="4096" minlength="10" v-model="addrInfo.forward" :disabled="props.lock"/>
             <span class="icon is-small is-left">
               <FontAwesomeIcon :icon="['fas', 'paperclip']" />
             </span>
@@ -134,7 +134,7 @@ const randomAddr = () => {
       <div class="field-body is-normal">
         <div class="field">
           <div class="control">
-            <Field class="input" name="expires_in" type="date" v-model="addrInfo.expires" />
+            <Field class="input" name="expires_in" type="date" v-model="addrInfo.expires" :disabled="props.lock"/>
           </div>
           <ErrorMessage name="expires_in" as="p" class="help is-danger"/>
         </div>
@@ -142,10 +142,10 @@ const randomAddr = () => {
     </div>
     <div class="field is-grouped is-grouped-right">
       <div class="control">
-        <button type="submit" class="button is-link" :disabled="status == Status.PENDING">{{ props.submitText }}</button>
+        <button type="submit" class="button is-link" :disabled="status == Status.PENDING || props.lock">{{ props.submitText }}</button>
       </div>
       <div class="control">
-        <button type="reset" class="button is-link is-light" :disabled="status == Status.PENDING">취소</button>
+        <button type="reset" class="button is-link is-light" :disabled="status == Status.PENDING || props.lock">취소</button>
       </div>
     </div>
   </Form>

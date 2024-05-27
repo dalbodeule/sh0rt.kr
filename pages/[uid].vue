@@ -54,11 +54,11 @@ async function fetchAndParseOGTags(url: string) {
   }
 }
 
-if (error.value) {
+if (error.value || data.value && data.value.forward) {
   status.value = Status.ERROR
   throw createError({
     statusCode: 404,
-    message: error.value?.message ?? "",
+    message: "Page not found",
     fatal: true
   })
 }
@@ -76,12 +76,20 @@ if (ogData)
   })
 
 if (process.client) {
-  useHead({
-    title: `sh0rt.kr :: forward :: ${uid}`,
-  })
-  await $fetch(`/api/forward/${uid}`, { method: 'PUT' })
-  await wait(3000)
-  window.location.href = data.value?.forward ?? ''
+  if(data.value && data.value.forward) {
+    useHead({
+      title: `sh0rt.kr :: forward :: ${uid}`,
+    })
+    await $fetch(`${config.public.baseUrl}/api/forward/${uid}`, {method: 'PUT'})
+    await wait(3000)
+    router.push(data.value.forward)
+  } else {
+    throw createError({
+      statusCode: 404,
+      message: "Page not found",
+      fatal: true
+    })
+  }
 }
 </script>
 

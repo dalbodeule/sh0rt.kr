@@ -5,6 +5,8 @@ import { setLocale } from '@vee-validate/i18n'
 import { Status } from "~/common/enums"
 import dayjs from "dayjs";
 import type {IUIDPostRequest} from "~/server/routes/api/forward/index.post";
+import wait from "~/common/wait";
+import getDate from "~/common/getDate";
 
 const router = useRouter()
 const { loggedIn, user, session, clear } = useUserSession()
@@ -14,7 +16,7 @@ if(!loggedIn.value) {
   router.push('/')
 }
 
-const addrInfo: Ref<IUIDPostRequest> = ref({ uid: '', forward: '', expires: dayjs().format('YYYY-MM-DD') })
+const addrInfo: Ref<IUIDPostRequest> = ref({ uid: '', forward: '', expires: dayjs(getDate()).format('YYYY-MM-DD') })
 const status: Ref<Status> = ref(Status.DEFAULT)
 
 provide('addrInfo', addrInfo)
@@ -32,6 +34,8 @@ const onSubmit = async() => {
 
     if(result) {
       status.value = Status.SUCCESS
+
+      await wait(5000)
     } else {
       status.value = Status.ERROR
     }
@@ -54,7 +58,7 @@ setLocale('ko')
 
 <template>
   <div class="box content">
-    <ShorterField submit-text="만들기" :is-new="true"/>
+    <ShorterField submit-text="만들기" :is-new="true" @submit="onSubmit" :lock="status == Status.SUCCESS"/>
     <div style="margin-top: 30px;" />
     <div class="notification is-success" v-if="status == Status.SUCCESS">
       <p><a :href="`https://sh0rt.kr/${addrInfo.uid}`">https://sh0rt.kr/{{addrInfo.uid}}</a> 생성에 성공했습니다.</p>

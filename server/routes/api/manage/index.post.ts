@@ -1,7 +1,7 @@
 import { H3Event } from "h3"
 import { useDrizzle } from "~/server/utils/useDrizzle"
 import { eq } from 'drizzle-orm/expressions'
-import {users} from "~/server/db/schema"
+import { users } from "~/server/db/schema"
 
 export interface IListUrls {
     [key: number]: {

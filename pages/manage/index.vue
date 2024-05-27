@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {IListUrls} from "~/server/routes/api/manage/index.get";
+import type { IListUrls } from "~/server/routes/api/manage/index.post";
 import type {Ref} from "vue";
 import dayjs from "dayjs";
 

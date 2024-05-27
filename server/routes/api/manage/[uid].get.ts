@@ -2,17 +2,39 @@ import {H3Event} from "h3";
 import { AKeys, getFromAnalytics, getParams } from "~/server/utils/analyticHelper";
 import { useDrizzle } from "~/server/utils/useDrizzle";
 import { and, eq, gte } from "drizzle-orm";
-import {analyticsCache, urls} from "~/server/db/schema";
+import { analyticsCache, urls } from "~/server/db/schema";
 import { lte } from "drizzle-orm/expressions";
 
 const _30MIN = 60 * 30 * 1000
 
-export interface IAnalyticsResponse {
+export interface IAnalytics {
     meta: { name: string, type: string }[],
     data: { ip: string, country: string, region: string, city: string, colo: string, latitude: string,
         longitude: string, browser: string, device: string, language: string, timestmap: string }[],
     rows: number,
     rows_before_limit_as_least: number
+}
+
+export interface IAnalyticsResponse {
+    [key: string]: [string, string|number][]
+}
+
+const aggregateDataByField = (response: IAnalytics, field: string, fieldName: string): [string, string|number][] => {
+    const dataCount: { [key: string]: number } = {};
+    const data: [string, string|number][] = [[fieldName, field]]
+
+    response.data.forEach(item => {
+        const fieldValue = (item as any as {[key: string]: number})[field]
+        if (dataCount[fieldValue]) {
+            dataCount[fieldValue]++;
+        } else {
+            dataCount[fieldValue] = 1;
+        }
+    });
+
+    // 객체를 배열로 변환하여 반환합니다.
+    const p: [string, string|number][] = Object.entries(dataCount).map(([key, value]) => [key, value]) as [string, string|number][]
+    return data.concat(p);
 }
 
 export default defineEventHandler(async (event: H3Event) => {
@@ -69,13 +91,22 @@ export default defineEventHandler(async (event: H3Event) => {
         })`
     )
 
-    await db.insert(analyticsCache).values({
-        uid: uid,
-        data: data
-    })
-
     try {
-        return JSON.parse(data)
+        const parsedData = JSON.parse(data) as IAnalytics
+
+        const countryData = aggregateDataByField(parsedData, 'country', 'Country')
+        const browserData = aggregateDataByField(parsedData, 'browser', 'Browser')
+        const languageData = aggregateDataByField(parsedData, 'language', 'Language')
+        const deviceData = aggregateDataByField(parsedData, 'device', 'Device')
+
+        const returnData = { country: countryData, browser: browserData, language: languageData, device: deviceData }
+
+        await db.insert(analyticsCache).values({
+            uid: uid,
+            data: JSON.stringify(returnData)
+        })
+
+        return returnData
     } catch (e) {
         throw createError({
             status: 400,

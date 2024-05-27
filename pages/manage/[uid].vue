@@ -17,24 +17,6 @@ if(!loggedIn.value) {
   router.push('/')
 }
 
-const aggregateDataByField = (response: IAnalyticsResponse, field: string, fieldName: string): [string, string|number][] => {
-  const dataCount: { [key: string]: number } = {};
-  const data: [string, string|number][] = [[fieldName, field]]
-
-  response.data.forEach(item => {
-    const fieldValue = (item as any as {[key: string]: number})[field] ;
-    if (dataCount[fieldValue]) {
-      dataCount[fieldValue]++;
-    } else {
-      dataCount[fieldValue] = 1;
-    }
-  });
-
-  // 객체를 배열로 변환하여 반환합니다.
-  const p: [string, string|number][] = Object.entries(dataCount).map(([key, value]) => [key, value]) as [string, string|number][]
-  return data.concat(p);
-}
-
 const addrInfo: Ref<IUIDPostRequest> = ref({ uid: '', forward: '', expires: dayjs().format('YYYY-MM-DD') })
 const status: Ref<Status> = ref(Status.DEFAULT)
 
@@ -75,10 +57,10 @@ useSeoMeta({
   }
 
   if(analytics.value) {
-    countryData.value = aggregateDataByField(analytics.value, 'country', '국가별 접속통계')
-    browserData.value = aggregateDataByField(analytics.value, 'browser', '브라우저별 접속통계')
-    languageData.value = aggregateDataByField(analytics.value, 'language', '언어권별 접속통계')
-    deviceData.value = aggregateDataByField(analytics.value, 'device', '디바이스별 접속통계')
+    countryData.value = analytics.value.country
+    browserData.value = analytics.value.browser
+    languageData.value = analytics.value.language
+    deviceData.value = analytics.value.device
   }
 })()
 </script>
@@ -87,7 +69,7 @@ useSeoMeta({
   <div>
     <div class="box content">
       <h1>{{config.public.baseUrl}}/{{uid}} 관리</h1>
-      <ShorterField submit-text="수정하기" @submit="onSubmit" :is-new="false"/>
+      <ShorterField submit-text="수정하기" @submit="onSubmit" :is-new="false" :lock="false"/>
     </div>
     <div class="box content">
       <h1>{{config.public.baseUrl}}/{{uid}} 의 접속통계</h1>

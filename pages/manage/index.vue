@@ -26,7 +26,7 @@ const data: Ref<IListUrls | undefined> = ref()
 
 ;(async() => {
   data.value = await useRequestFetch()(`${config.public.baseUrl}/api/manage`, {
-    method: 'GET',
+    method: 'POST',
     credentials: 'include',
   })
 })()

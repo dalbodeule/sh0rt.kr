@@ -3,6 +3,7 @@ import { AKeys, getFromAnalytics, getParams } from "~/server/utils/analyticHelpe
 import { useDrizzle } from "~/server/utils/useDrizzle";
 import { and, eq, gte } from "drizzle-orm";
 import {analyticsCache, urls} from "~/server/db/schema";
+import { lte } from "drizzle-orm/expressions";
 
 const _30MIN = 60 * 30 * 1000
 
@@ -49,10 +50,14 @@ export default defineEventHandler(async (event: H3Event) => {
         })
     }
 
+    await db.delete(analyticsCache).where(
+        lte(analyticsCache.created_at, new Date(Date.now() - _30MIN))
+    )
+
     const cachedData = await db.query.analyticsCache.findFirst({
         where: eq(analyticsCache.uid, uid),
     })
-    if (cachedData && (cachedData.created_at!!).getTime() > Date.now() - _30MIN) {
+    if (cachedData) {
         return JSON.parse(cachedData.data)
     }
 

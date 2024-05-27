@@ -1,3 +1,7 @@
+import { defineCronHandler } from "#nuxt/cron";
+import {analyticsCache, urls} from "~/server/db/schema";
+import { lt } from 'drizzle-orm/expressions'
+
 export enum AKeys {
     ip = 'ip',
     country = 'country',

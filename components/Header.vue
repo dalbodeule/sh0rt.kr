@@ -25,10 +25,10 @@ const { loggedIn, user, session, clear } = useUserSession()
         <NuxtLink class="navbar-item" to="/create">단축주소 만들기</NuxtLink>
       </div>
       <div class="navbar-end" v-if="loggedIn">
-        <div class="navbar-item">
+        <NuxtLink to="/manage" class="navbar-item">
           <img v-bind:src="user?.profile" alt="user profile"/>
           <span>&nbsp; {{ user?.name}}</span>
-        </div>
+        </NuxtLink>
         <button type="button" class="navbar-item" v-if="user?.role == UserRole.ADMIN || user?.role == UserRole.MODERATOR">관리자 페이지</button>
         <button type="button" class="navbar-item" @click="clear(); router.push('/')">로그아웃</button>
       </div>

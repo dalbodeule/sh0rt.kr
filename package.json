@@ -39,6 +39,7 @@
     "@types/ua-parser-js": "^0.7.39",
     "drizzle-kit": "^0.21.2",
     "nuxt": "^3.11.2",
+    "nuxt-purgecss": "^2.0.0",
     "prisma": "^5.14.0",
     "sass": "^1.77.2",
     "wrangler": "^3.57.1"

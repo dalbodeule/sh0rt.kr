@@ -37,5 +37,8 @@ export default defineNuxtConfig({
     analytics: true,
     database: true
   },
-  modules: ["nuxt-auth-utils", "@nuxthub/core"]
+  purgecss: {
+    safelist: [/svg.*/, /fa.*/]
+  },
+  modules: ["nuxt-auth-utils", "@nuxthub/core", "nuxt-purgecss"]
 })

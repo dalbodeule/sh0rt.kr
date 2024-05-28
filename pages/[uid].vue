@@ -4,6 +4,7 @@ import wait from "~/common/wait";
 import { Status } from "~/common/enums";
 import type { Ref } from "vue";
 import type { IUIDGetResponse } from "~/server/routes/api/forward/[uid].get"
+import dayjs from "dayjs";
 
 const status: Ref<Status> = ref(Status.DEFAULT)
 
@@ -107,7 +108,22 @@ if (process.client) {
     <template v-if="status == Status.SUCCESS">
       <h1>잠시 후 이동합니다.</h1>
       <br>
-      <h3>이동할 주소: {{ forwardData?.forward }}</h3>
+      <table class="table is-fullwidth is-striped">
+        <tbody>
+          <tr>
+            <td>주소</td>
+            <td>{{ forwardData?.forward }}</td>
+          </tr>
+          <tr>
+            <td>만든사람</td>
+            <td>{{ forwardData?.user.name}}</td>
+          </tr>
+          <tr>
+            <td>만료일</td>
+            <td>{{ dayjs(forwardData?.expires).format("YYYY-MM-DD") }}</td>
+          </tr>
+        </tbody>
+      </table>
     </template>
     <template v-else-if="status == Status.ERROR">
       <h1>데이터를 찾을 수 없습니다.</h1>

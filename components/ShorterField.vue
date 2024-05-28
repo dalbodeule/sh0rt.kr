@@ -119,7 +119,7 @@ const randomAddr = () => {
         <div class="control">
           <div class="control has-icons-left is-expanded">
             <Field class="input" name="origin" type="text" maxlength="4096" minlength="10" v-model="addrInfo.forward" :disabled="props.lock"/>
-            <span class="icon is-small is-left">
+            <span class="icon is-left">
               <FontAwesomeIcon :icon="['fas', 'paperclip']" />
             </span>
           </div>

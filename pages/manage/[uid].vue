@@ -70,6 +70,14 @@ useSeoMeta({
     <div class="box content">
       <h1>{{config.public.baseUrl}}/{{uid}} 관리</h1>
       <ShorterField submit-text="수정하기" @submit="onSubmit" :is-new="false" :lock="false"/>
+      <div class="notification is-success" v-if="status == Status.SUCCESS">
+      <p><a :href="`https://sh0rt.kr/${addrInfo.uid}`">https://sh0rt.kr/{{addrInfo.uid}}</a> 수정에 성공했습니다.</p>
+      <p>만료일: {{ dayjs(addrInfo.expires).format('YYYY-MM-DD')}}</p>
+    </div>
+    <div class="notification is-warning" v-else-if="status == Status.ERROR">
+      <p>수정에 실패했습니다.</p>
+    </div>
+    <progress class="progress is-primary" v-else-if="status == Status.PENDING" max="100"></progress>
     </div>
     <div class="box content">
       <h1>{{config.public.baseUrl}}/{{uid}} 의 접속통계</h1>

@@ -94,5 +94,6 @@ export const records = sqliteTable('records', {
     domain: int('domain').references(() => domains.id),
     type: text('type', { length: 8 }).notNull(),
     name: text('name', { length: 255 }).notNull(),
-    value: text('value', { length: 1024 }).notNull()
+    value: text('value', { length: 1024 }).notNull(),
+    cfid: text('cfid', { length: 32}).notNull()
 })

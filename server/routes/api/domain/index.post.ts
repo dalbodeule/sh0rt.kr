@@ -35,7 +35,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
     if(result) throw createError({
         status: 403,
-        statusMessage: "Invalid uid"
+        statusMessage: "Invalid domain"
     })
 
     const domain_id = await db.insert(domains).values({

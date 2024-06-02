@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { Ref } from "vue";
 import { setLocale } from '@vee-validate/i18n'
 
 import { Status } from "~/common/enums"
 import dayjs from "dayjs";
-import type {IUIDPostRequest} from "~/server/routes/api/forward/index.post";
 import getDate from "~/common/getDate";
+import type { Ref } from "vue";
+import type {IDomainPostRequest} from "~/server/routes/api/domain/index.post";
 
 const router = useRouter()
 const { loggedIn, user, session, clear } = useUserSession()
@@ -15,20 +15,21 @@ if(!loggedIn.value) {
   router.push('/')
 }
 
-const addrInfo: Ref<IUIDPostRequest> = ref({ uid: '', forward: '', expires: dayjs(getDate()).format('YYYY-MM-DD') })
+const domainInfo: Ref<IDomainPostRequest> = ref({domain: '', expires: dayjs(getDate()).format('YYYY-MM-DD') })
 const status: Ref<Status> = ref(Status.DEFAULT)
 
-provide('addrInfo', addrInfo)
+provide('domainInfo', domainInfo)
 provide('status', status)
 
 const onSubmit = async () => {
   console.log("submitted")
+  console.log(domainInfo.value)
   status.value = Status.PENDING
 
   try {
-    const result = await $fetch(`${config.public.baseUrl}/api/forward`, {
+    const result = await $fetch(`${config.public.baseUrl}/api/domain`, {
       method: "POST",
-      body: JSON.stringify(addrInfo.value)
+      body: JSON.stringify(domainInfo.value)
     })
 
     if(result) {
@@ -42,7 +43,7 @@ const onSubmit = async () => {
 }
 
 useSeoMeta({
-  title: `sh0rt.kr :: create`,
+  title: `sh0rt.kr :: SRV Domain`,
   description: `sh0rt.kr :: 강력한 URL 단축기`,
   robots: { all: false },
   ogType: 'website',
@@ -50,22 +51,21 @@ useSeoMeta({
   ogImage: '/favicon.png',
 })
 
+
 setLocale('ko')
 </script>
 
 <template>
-  <div class="box content">
-    <ShorterField submit-text="만들기" :is-new="true" @submit="onSubmit" :lock="status == Status.SUCCESS"/>
-    <div style="margin-top: 30px;" />
-    <div class="notification is-success" v-if="status == Status.SUCCESS">
-      <p><a :href="`https://sh0rt.kr/${addrInfo.uid}`">https://sh0rt.kr/{{addrInfo.uid}}</a> 생성에 성공했습니다.</p>
-      <p>만료일: {{ dayjs(addrInfo.expires).format('YYYY-MM-DD')}}</p>
+  <DomainField submit-text="만들기" :is-new="true" @submit="onSubmit" :lock="status == Status.SUCCESS" />
+  <div style="margin-top: 30px;" />
+  <div class="notification is-success" v-if="status == Status.SUCCESS">
+      <p>{{domainInfo.domain}}.space-mc.com 생성에 성공했습니다.</p>
+      <p>만료일: {{ dayjs(domainInfo.expires).format('YYYY-MM-DD')}}</p>
     </div>
     <div class="notification is-warning" v-else-if="status == Status.ERROR">
       <p>생성에 실패했습니다.</p>
     </div>
     <progress class="progress is-primary" v-else-if="status == Status.PENDING" max="100"></progress>
-  </div>
 </template>
 
 <style scoped>

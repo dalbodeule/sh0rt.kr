@@ -2,6 +2,7 @@
 import type { IListUrls } from "~/server/routes/api/manage/index.post";
 import type {Ref} from "vue";
 import dayjs from "dayjs";
+import type {IListDomains} from "~/server/routes/api/domain/list.get";
 
 const route = useRoute()
 const router = useRouter()
@@ -23,17 +24,25 @@ useSeoMeta({
 })
 
 const data: Ref<IListUrls | undefined> = ref()
+const domain: Ref<IListDomains | undefined> = ref()
 
 ;(async() => {
-  data.value = await useRequestFetch()(`${config.public.baseUrl}/api/manage`, {
-    method: 'POST',
-    credentials: 'include',
-  })
+  [data.value, domain.value] = await Promise.all([
+    await useRequestFetch()(`${config.public.baseUrl}/api/manage`, {
+      method: 'POST',
+      credentials: 'include',
+    }),
+    await useRequestFetch()(`${config.public.baseUrl}/api/domain/list`, {
+      method: 'POST',
+      credentials: 'include'
+    })
+  ])
 })()
 </script>
 
 <template>
-  <div class="box">
+  <div class="box content">
+    <h1>단축주소 목록</h1>
     <div class="fixed-grid has-1-cols-mobile has-1-cols-tablet has-2-cols-desktop has-2-cols-fullhd">
       <div class="grid">
         <div class="cell" v-for="url in data" :key="`url-${url.uid}`">
@@ -63,6 +72,39 @@ const data: Ref<IListUrls | undefined> = ref()
                 </tbody>
               </table>
               <NuxtLink :to="`/manage/${url.uid}`" class="button is-primary" v-if="new Date(url.expires).getTime() > Date.now()">관리하기</NuxtLink>
+              <a href="#" class="button is-primary is-disabled" v-else>이미 만료되었습니다.</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 30px;"/>
+    <h1>도메인 목록</h1>
+    <div class="fixed-grid has-1-cols-mobile has-1-cols-tablet has-2-cols-desktop has-2-cols-fullhd">
+      <div class="grid">
+        <div class="cell" v-for="sub in domain" :key="`url-${sub.domain}`">
+          <div class="card">
+            <div class="card-header">
+              <p class="card-header-title">{{ sub.domain }}.space-mc.com</p>
+            </div>
+            <div class="card-content">
+              <table class="table is-striped is-fullwidth">
+                <tbody>
+                  <tr>
+                    <td>생성일</td>
+                    <td>{{ dayjs(sub.created_at).format('YYYY-MM-DD') }}</td>
+                  </tr>
+                  <tr>
+                    <td>수정일</td>
+                    <td>{{ dayjs(sub.updated_at).format('YYYY-MM-DD') }}</td>
+                  </tr>
+                  <tr>
+                    <td>만료</td>
+                    <td>{{ dayjs(sub.expires).format("YYYY-MM-DD") }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <NuxtLink :to="`/manage/domain/${sub.domain}`" class="button is-primary" v-if="new Date(sub.expires).getTime() > Date.now()">관리하기</NuxtLink>
               <a href="#" class="button is-primary is-disabled" v-else>이미 만료되었습니다.</a>
             </div>
           </div>

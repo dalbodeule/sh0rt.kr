@@ -74,20 +74,20 @@ useSeoMeta({
     <div class="box content">
       <h1>{{config.public.baseUrl}}/{{uid}} 의 접속통계</h1>
       <h3>지역별 통계</h3>
-      <GChart type="GeoChart" :data="countryData" :settings="{ packages: ['geochart']}"/>
+      <GChart type="GeoChart" :data="analytics?.country" :settings="{ packages: ['geochart']}"/>
       <div class="fixed-grid has-1-cols-mobile has-1-cols-tablet has-2-cols-desktop has-2-cols-fullhd">
         <div class="grid">
           <div class="cell">
             <h3>브라우저별 통계</h3>
-            <GChart type="PieChart" :data="browserData" :settings="{ packages: ['corechart']}" :options="{ width: 500 }" />
+            <GChart type="PieChart" :data="analytics?.browser" :settings="{ packages: ['corechart']}" :options="{ width: 500 }" />
           </div>
           <div class="cell">
             <h3>언어권별 통계</h3>
-            <GChart type="PieChart" :data="languageData" :settings="{ packages: ['corechart']}" :options="{ width: 500 }"/>
+            <GChart type="PieChart" :data="analytics?.language" :settings="{ packages: ['corechart']}" :options="{ width: 500 }"/>
           </div>
           <div class="cell">
             <h3>디바이스별 통계</h3>
-            <GChart type="PieChart" :data="deviceData" :settings="{ packages: ['corechart']}" :options="{ width: 500 }"/>
+            <GChart type="PieChart" :data="analytics?.device" :settings="{ packages: ['corechart']}" :options="{ width: 500 }"/>
           </div>
         </div>
       </div>

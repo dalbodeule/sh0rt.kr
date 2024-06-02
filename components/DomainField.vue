@@ -1,28 +1,26 @@
 <script setup lang="ts">
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { ErrorMessage, Field, Form, configure, defineRule } from "vee-validate";
 import { alpha_num, min, max, required, url } from '@vee-validate/rules'
-import { localize, setLocale } from '@vee-validate/i18n'
+import { localize } from '@vee-validate/i18n'
 
 import ko from '@vee-validate/i18n/dist/locale/ko.json'
 import en from '@vee-validate/i18n/dist/locale/en.json'
-import type { IUIDPostRequest } from "~/server/routes/api/forward/index.post";
-import getDate from "~/common/getDate";
+
 import type { Ref } from "vue";
 import { Status } from "~/common/enums";
+import getDate from "~/common/getDate";
 import dayjs from "dayjs";
 import randomAddr from "~/common/randomAddr";
+import type {IDomainPostRequest} from "~/server/routes/api/domain/index.post";
 
-const banlist = [ 'create', 'login', 'logout', 'admin', 'root', 'manage', 'privacy', 'domain' ]
+const banlist = [ 'create', 'login', 'logout', 'admin', 'root', 'manage', 'privacy' ]
 
 const config = useRuntimeConfig()
 
 const emit = defineEmits<{submit: []}>()
-const props = defineProps<{submitText: string, isNew: boolean, lock: boolean}>();
+const props = defineProps<{submitText: string, isNew: boolean, lock: boolean}>()
 
-// datetime picker default value
-// https://futurestud.io/tutorials/vue-js-3-bind-a-value-to-an-html-datetime-input
-const addrInfo: Ref<IUIDPostRequest> = inject('addrInfo') ?? ref({uid: '', forward: '', expires: dayjs().format("YYYY-MM-DD")})
+const domainInfo: Ref<IDomainPostRequest> = inject('domainInfo') ?? ref({domain: '', expires: dayjs(getDate()).format('YYYY-MM-DD') })
 const status: Ref<Status> = inject('status') ?? ref(Status.DEFAULT)
 
 defineRule('alpha_num', alpha_num)
@@ -35,7 +33,7 @@ defineRule('unique', async(value: string) => {
   if(banlist.includes(value)) return false
 
   try {
-    const data = await $fetch(`${config.public.baseUrl}/api/forward/${value}`, {
+    const data = await $fetch(`${config.public.baseUrl}/api/domain/${value}`, {
       method: 'GET',
     })
     return !data
@@ -68,65 +66,47 @@ configure({
 localize({
   ko: {
     names: {
-      uid: '단축주소',
-      origin: '원본주소',
+      domain: '도메인',
       expires_in: '만료일'
     }
   },
   en: {
     names: {
-      uid: 'Shorted address',
-      origin: 'Origin address',
+      domain: 'Domain',
       expires_in: 'Expire date'
     }
   }
 })
 
 const schema = {
-  uid: { alpha_num: true, min: 3, max: 20, required: true, unique: props.isNew },
-  origin: { url: true, required: true },
+  domain: { alpha_num: true, min: 3, max: 20, required: true, unique: props.isNew },
   expires_in: { required: true, after_days: 6, before_days: 366 }
 }
+
 </script>
 
 <template>
   <Form @submit="emit('submit')" :validation-schema="schema">
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">단축주소</label>
+        <label class="label">도메인</label>
       </div>
       <div class="field-body">
         <div class="field is-expanded">
           <div class="field has-addons">
-            <div class="control">
-              <button class="button is-primary is-static" type="button">https://sh0rt.kr/</button>
-            </div>
             <div class="control is-expanded">
-              <Field class="input" name="uid" type="text" maxlength="20" minlength="3" v-model="addrInfo.uid" :delay="500" :disabled="!isNew || props.lock"/>
+              <Field class="input" name="domain" type="text" maxlength="20" minlength="3" v-model="domainInfo.domain" :delay="500" :disabled="!isNew || props.lock"/>
             </div>
             <div class="control">
-              <button class="button is-info" type="button" @click="addrInfo!!.uid = randomAddr()" :disabled="!isNew || props.lock">
+              <button class="button is-primary is-static" type="button">.space-mc.com</button>
+            </div>
+            <div class="control">
+              <button class="button is-info" type="button" @click="domainInfo!!.domain = randomAddr()" :disabled="!isNew || props.lock">
                 랜덤 생성
               </button>
             </div>
           </div>
           <ErrorMessage name="uid" as="p" class="help is-danger"/>
-        </div>
-      </div>
-    </div>
-    <div class="field has-addons is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label">원본주소</label>
-      </div>
-      <div class="field-body">
-        <div class="control">
-          <div class="control has-icons-left is-expanded">
-            <Field class="input" name="origin" type="text" maxlength="4096" minlength="10" v-model="addrInfo.forward" :disabled="props.lock"/>
-            <span class="icon is-left">
-              <FontAwesomeIcon :icon="['fas', 'paperclip']" />
-            </span>
-          </div>
-          <ErrorMessage name="origin" as="p" class="help is-danger"/>
         </div>
       </div>
     </div>
@@ -137,7 +117,7 @@ const schema = {
       <div class="field-body is-normal">
         <div class="field">
           <div class="control">
-            <Field class="input" name="expires_in" type="date" v-model="addrInfo.expires" :disabled="props.lock"/>
+            <Field class="input" name="expires_in" type="date" v-model="domainInfo.expires" :disabled="props.lock"/>
           </div>
           <ErrorMessage name="expires_in" as="p" class="help is-danger"/>
         </div>

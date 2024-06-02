@@ -1,13 +1,12 @@
-import { H3Event } from "h3"
-import { useDrizzle } from "~/server/utils/useDrizzle"
-import { eq } from 'drizzle-orm/expressions'
-import { users } from "~/server/db/schema"
+import {H3Event} from "h3";
+import {useDrizzle} from "~/server/utils/useDrizzle";
+import {eq} from "drizzle-orm/expressions";
+import {users} from "~/server/db/schema";
 
-export interface IListUrls {
+export interface IListDomains {
     [key: number]: {
         id: number,
-        uid: string,
-        forward: string,
+        domain: string,
         created_at: string,
         updated_at: string,
         expires: string
@@ -26,15 +25,15 @@ export default defineEventHandler(async(event: H3Event) => {
     const result = await db.query.users.findFirst({
         where: eq(users.id, userSession.user.id),
         with: {
-            usersToUrls: {
+            usersToDomains: {
                 with: {
-                    Urls: true
+                    Domains: true
                 }
             }
         }
     })
 
-    return result?.usersToUrls.map((value) => {
-        return value.Urls
+    return result?.usersToDomains.map((value) => {
+        return value.Domains
     })
 })

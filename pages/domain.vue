@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { setLocale } from '@vee-validate/i18n'
+import {setLocale} from '@vee-validate/i18n'
 
-import { Status } from "~/common/enums"
-import dayjs from "dayjs";
-import getDate from "~/common/getDate";
-import type { Ref } from "vue";
-import type {IDomainPostRequest} from "~/server/routes/api/domain/index.post";
+import {Status} from "~/common/enums"
+import dayjs from "dayjs"
+import getDate from "~/common/getDate"
+import type {Ref} from "vue"
+import type {IDomainPostRequest} from "~/server/routes/api/domain/index.post"
+import type {IDomainLimits} from "~/server/utils/getLimits"
 
 const router = useRouter()
 const { loggedIn, user: _user, session: _session, clear: _clear } = useUserSession()
@@ -17,6 +18,7 @@ if(!loggedIn.value) {
 
 const domainInfo: Ref<IDomainPostRequest> = ref({domain: '', expires: dayjs(getDate()).format('YYYY-MM-DD'), tld: 'space-mc.com' })
 const status: Ref<Status> = ref(Status.DEFAULT)
+const domainLimit: Ref<IDomainLimits> = ref({})
 
 provide('domainInfo', domainInfo)
 provide('status', status)
@@ -42,6 +44,19 @@ const onSubmit = async () => {
   }
 }
 
+const getStatus = (available: number): string => {
+  let status = 'is-success'
+    if (available < 250) {
+      status = 'is-black'
+    } else if (available < 500) {
+      status = 'is-danger'
+    } else if (available < 750) {
+      status = 'is-warning'
+    }
+
+    return status
+}
+
 useSeoMeta({
   title: `sh0rt.kr :: SRV Domain`,
   description: `sh0rt.kr :: 강력한 URL 단축기`,
@@ -51,12 +66,17 @@ useSeoMeta({
   ogImage: '/favicon.png',
 })
 
-
 setLocale('ko')
+
+;(async() => {
+  domainLimit.value = await useRequestFetch()(`${config.public.baseUrl}/api/domain/limit`, {
+    method: "GET"
+  })
+})()
 </script>
 
 <template>
-  <div>
+  <div class="content">
     <DomainField submit-text="만들기" :is-new="true" :lock="status == Status.SUCCESS" @submit="onSubmit" />
     <div style="margin-top: 30px;" />
     <div v-if="status == Status.SUCCESS" class="notification is-success">
@@ -67,6 +87,22 @@ setLocale('ko')
       <p>생성에 실패했습니다.</p>
     </div>
     <progress v-else-if="status == Status.PENDING" class="progress is-primary" max="100"/>
+
+    <h1>도메인별 가용 레코드 개수</h1>
+    <table class="table is-striped is-fullwidth">
+      <thead>
+        <tr>
+          <th>도메인</th>
+          <th>사용된 레코드 수</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(record, domain) in domainLimit" :key="domain">
+          <td>{{ domain }}</td>
+          <td :class="getStatus(record)">{{ record }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 

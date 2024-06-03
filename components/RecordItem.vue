@@ -66,7 +66,10 @@ watch(() => props.record, (newRecord) => {
     <div class="field">
       <label class="label">레코드 타입</label>
       <div class="select">
-        <Field v-model="record.type" name="type" as="select">
+        <Field
+          v-model="
+          // eslint-disable-next-line vue/no-mutating-props
+          record.type" name="type" as="select">
           <option value="A">A</option>
           <option value="AAAA">AAAA</option>
           <option value="CNAME">CNAME</option>
@@ -79,7 +82,10 @@ watch(() => props.record, (newRecord) => {
     <div class="field">
       <label class="label">레코드 이름</label>
       <div class="control">
-        <Field v-model="record.name" class="input" name="name" as="input" type="text" placeholder="Enter record name" :disabled="record.type == 'SRV'"/>
+        <Field
+          v-model="
+          // eslint-disable-next-line vue/no-mutating-props
+          record.name" class="input" name="name" as="input" type="text" placeholder="Enter record name" :disabled="record.type == 'SRV'"/>
       </div>
       <ErrorMessage name="name" as="p" class="help is-danger" />
     </div>
@@ -87,8 +93,10 @@ watch(() => props.record, (newRecord) => {
     <div class="field">
       <label class="label">레코드 값</label>
       <div class="control">
-        // eslint-disable-next-line vue/no-mutating-props
-        <Field v-model="record.value" class="input" name="value" as="input" type="text" placeholder="Enter record value" :disabled="record.type == 'SRV'" />
+        <Field
+          v-model="
+          // eslint-disable-next-line vue/no-mutating-props
+          record.value" class="input" name="value" as="input" type="text" placeholder="Enter record value" :disabled="record.type == 'SRV'" />
       </div>
       <ErrorMessage name="value" as="p" class="help is-danger" />
     </div>

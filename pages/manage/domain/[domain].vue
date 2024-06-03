@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import type {Ref} from "vue";
-import dayjs from "dayjs";
-import {Status} from "~/common/enums";
-import type {IDomainPostRequest} from "~/server/routes/api/domain/index.post";
-import RecordItem from "~/components/RecordItem.vue";
-import {setLocale} from "@vee-validate/i18n";
-import getDomain from "~/common/getDomain";
+import type { Ref } from "vue"
+import dayjs from "dayjs"
+import { Status } from "~/common/enums"
+import type { IDomainPostRequest } from "~/server/routes/api/domain/index.post"
+import RecordItem from "~/components/RecordItem.vue"
+import { setLocale } from "@vee-validate/i18n"
+import getDomain from "~/common/getDomain"
+import type { IDomainLimits } from "~/server/utils/getLimits"
 
 const route = useRoute()
 const router = useRouter()
@@ -24,6 +25,8 @@ const status: Ref<Status> = ref(Status.DEFAULT)
 
 const records: Ref<{type: string, name: string, value: string}[]> = ref([])
 const recordStatus: Ref<Status> = ref(Status.DEFAULT)
+
+const domainLimit: Ref<IDomainLimits> = ref({})
 
 provide('domainInfo', domainInfo)
 provide('status', status)
@@ -52,6 +55,20 @@ const updateRecord = (index: number, value: { type: string, name: string, value:
   records.value[index] = value
 }
 
+const getStatus = (available: number): string => {
+  let status = 'is-success'
+    if (available < 250) {
+      status = 'is-black'
+    } else if (available < 500) {
+      status = 'is-danger'
+    } else if (available < 750) {
+      status = 'is-warning'
+    }
+
+    return status
+}
+
+
 useSeoMeta({
   title: `sh0rt.kr :: manage :: ${fullDomain}`,
   description: `sh0rt.kr :: 강력한 URL 단축기`,
@@ -61,13 +78,17 @@ useSeoMeta({
   ogImage: '/favicon.png',
 })
 
+
 ;(async() => {
-  const [p, q] = await Promise.all([
+  const [p, q, r] = await Promise.all([
     $fetch(`${config.public.baseUrl}/api/domain/${fullDomain}`, {
       method: 'GET'
     }),
     useRequestFetch()(`${config.public.baseUrl}/api/domain/record/${fullDomain}`, {
       method: 'GET'
+    }),
+    useRequestFetch()(`${config.public.baseUrl}/api/domain/limit`, {
+      method: "GET"
     })
   ])
   domainInfo.value = {
@@ -76,6 +97,7 @@ useSeoMeta({
     tld: p.tld
   }
   records.value = q
+  domainLimit.value = r
 })()
 
 setLocale('ko')
@@ -102,7 +124,7 @@ setLocale('ko')
         <RecordItem v-for="(record, index) in records" :key="`record-${index}`" :record="record" :index="index" @remove="removeRecord" @update="updateRecord"/>
         <div class="field is-grouped">
           <div class="control">
-            <button class="button is-link" type="button" :disabled="records.length < 3" @click="(records.length < 3) ? records.push({type: '', name: '', value: ''}) : ''">레코드 추가</button>
+            <button class="button is-link" type="button" :disabled="records.length >= 3" @click="(records.length < 3) ? records.push({type: '', name: '', value: ''}) : ''">레코드 추가</button>
           </div>
           <div class="control">
             <button class="button is-primary" type="submit">제출</button>
@@ -117,6 +139,24 @@ setLocale('ko')
       <p>수정에 실패했습니다.</p>
     </div>
     <progress v-else-if="recordStatus == Status.PENDING" class="progress is-primary" max="100"/>
+
+    <div class="box content">
+      <h1>도메인별 가용 레코드 개수</h1>
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>도메인</th>
+            <th>사용된 레코드 수</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(record, domain) in domainLimit" :key="domain">
+            <td>{{ domain }}</td>
+            <td :class="getStatus(record)">{{ record }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 

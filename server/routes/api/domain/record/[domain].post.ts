@@ -8,6 +8,7 @@ import {
     updateCloudflareRecord
 } from "~/server/utils/cloudflare";
 import getDomain from "~/common/getDomain";
+import getLimits from "~/server/utils/getLimits";
 
 export interface IRecordPost { [key: number]: {
         type: string,
@@ -120,6 +121,12 @@ export default defineEventHandler(async (event) => {
                 results.push({ ...record });
             }
         } else {
+            const limits = await getLimits(event)
+            if(!limits[tld]) throw createError({
+                status: 403,
+                message: 'Limit reached. Contact Administrator.'
+            })
+
             const result = await createCloudflareRecord(`${domain}.space-mc.com`, data);
             await db.insert(records).values({
                 domain: domainBody.id,

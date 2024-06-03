@@ -1,6 +1,6 @@
-import {domains} from "~/server/db/schema";
-import {gte} from "drizzle-orm";
-import getDomain from "~/common/getDomain";
+import { domains } from "~/server/db/schema"
+import { gte } from "drizzle-orm"
+import getDomain from "~/common/getDomain"
 
 export interface IDomainGetResponse {
     id: number,

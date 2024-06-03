@@ -34,7 +34,8 @@ export default defineNuxtConfig({
     },
     public: {
       baseUrl: process.env.BASE_URL,
-      domainList: process.env.DOMAIN_LIST
+      domainList: process.env.DOMAIN_LIST,
+      domainLimit: process.env.DOMAIN_LIMIT
     }
   },
   hub: {

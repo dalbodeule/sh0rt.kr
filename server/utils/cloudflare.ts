@@ -1,18 +1,34 @@
 const config = useRuntimeConfig()
 
-export async function createCloudflareRecord(domain: string, type: string, name: string, value: string) {
+export interface ICloudflareSRVRequests {
+    type: 'SRV',
+    name: string,
+    data: {
+        port: number,
+        priority: number,
+        weight: number,
+        target: string,
+    }
+}
+export interface ICloudflareRequests {
+    type: string,
+    name: string,
+    value: string
+}
+
+export async function createCloudflareRecord(domain: string, data: ICloudflareRequests | ICloudflareSRVRequests) {
     const url = `https://api.cloudflare.com/client/v4/zones/${config.domainZoneId}/dns_records`
     const body = {
-        type,
-        name: `${name}.${domain}`,
-        content: value,
+        ...data,
         ttl: 1,
         proxied: false,
         comment: 'auto generated with apis'
     }
+    body.name = `${body.name}.${domain}`
 
     if(body.name.startsWith('.'))
         body.name = body.name.slice(1)
+    body.name = body.name.replace('..', '.')
 
     const response = await fetch(url, {
         method: 'POST',
@@ -32,19 +48,21 @@ export async function createCloudflareRecord(domain: string, type: string, name:
     return await response.json()
 }
 
-export async function updateCloudflareRecord(domain: string, type: string, name: string, value: string, cfid: string) {
+export async function updateCloudflareRecord(domain: string, data: ICloudflareRequests | ICloudflareSRVRequests, cfid: string) {
     const url = `https://api.cloudflare.com/client/v4/zones/${config.domainZoneId}/dns_records/${cfid}`
     const body = {
-        type,
-        name: `${name}.${domain}`,
-        content: value,
+        ...data,
         ttl: 1,
         proxied: false,
         comment: 'auto generated with apis'
     }
+    body.name = `${body.name}.${domain}`
 
     if(body.name.startsWith('.'))
         body.name = body.name.slice(1)
+    body.name = body.name.replace(/(\.+)$/gm, '.')
+
+    console.log(body)
 
     const response = await fetch(url, {
         method: 'PUT',

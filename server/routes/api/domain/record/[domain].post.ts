@@ -1,6 +1,11 @@
 import {domains, records} from "~/server/db/schema";
 import {gte} from "drizzle-orm";
-import {createCloudflareRecord, deleteCloudflareRecord, updateCloudflareRecord} from "~/server/utils/cloudflare";
+import {
+    createCloudflareRecord,
+    deleteCloudflareRecord,
+    ICloudflareRequests, ICloudflareSRVRequests,
+    updateCloudflareRecord
+} from "~/server/utils/cloudflare";
 
 export interface IRecordPost { [key: number]: {
         type: string,
@@ -81,16 +86,37 @@ export default defineEventHandler(async (event) => {
             }
         }
 
+        let data: ICloudflareSRVRequests | ICloudflareRequests
+
+            if(record.type == 'SRV') {
+                const part2 = record.value.split(' ')
+                data = {
+                    type: 'SRV',
+                    name: record.name,
+                    data: {
+                        priority: parseInt(part2[0]),
+                        weight: parseInt(part2[1]),
+                        port: parseInt(part2[2]),
+                        target: part2[3]
+                    }
+                }
+            } else
+                data = {
+                    type,
+                    name,
+                    value
+                }
+
         if (existingRecord) {
             if (existingRecord.value !== value) {
-                await updateCloudflareRecord(`${domain}.space-mc.com`, type, name, value, existingRecord.cfid);
+                await updateCloudflareRecord(`${domain}.space-mc.com`, data, existingRecord.cfid);
                 await db.update(records).set({ value }).where(eq(records.id, existingRecord.id));
                 results.push({ ...record });
             } else {
                 results.push({ ...record });
             }
         } else {
-            const result = await createCloudflareRecord(`${domain}.space-mc.com`, type, name, value);
+            const result = await createCloudflareRecord(`${domain}.space-mc.com`, data);
             await db.insert(records).values({
                 domain: domainBody.id,
                 type,

@@ -47,6 +47,10 @@ const removeRecord = (index: number) => {
   records.value.splice(index, 1)
 }
 
+const updateRecord = (index: number, value: { type: string, name: string, value: string }) => {
+  records.value[index] = value
+}
+
 useSeoMeta({
   title: `sh0rt.kr :: manage :: ${domain}.space-mc.com`,
   description: `sh0rt.kr :: 강력한 URL 단축기`,
@@ -93,9 +97,15 @@ setLocale('ko')
       <h1>{{domain}} 레코드 관리</h1>
 
       <form @submit.prevent="onSubmit">
-        <RecordItem v-for="(record, index) in records" :record="record" :index="index" :key="`record-${index}`" @remove="removeRecord" />
-        <button class="button is-link" type="button" @click="records.push({type: '', name: '', value: ''})">레코드 추가</button>
-        <button class="button is-primary" type="submit">제출</button>
+        <RecordItem v-for="(record, index) in records" :record="record" :index="index" :key="`record-${index}`" @remove="removeRecord" @update="updateRecord"/>
+        <div class="field is-grouped">
+          <div class="control">
+            <button class="button is-link" type="button" @click="records.push({type: '', name: '', value: ''})">레코드 추가</button>
+          </div>
+          <div class="control">
+            <button class="button is-primary" type="submit">제출</button>
+          </div>
+        </div>
       </form>
     </div>
     <div class="notification is-success" v-if="recordStatus == Status.SUCCESS">

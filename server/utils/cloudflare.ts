@@ -63,3 +63,23 @@ export async function updateCloudflareRecord(domain: string, type: string, name:
 
     return await response.json()
 }
+
+export async function deleteCloudflareRecord(domain: string, cfid: string) {
+    const url = `https://api.cloudflare.com/client/v4/zones/${config.domainZoneId}/dns_records/${cfid}`
+
+    const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${config.domainApiToken}`
+        },
+    })
+
+    if (!response.ok) {
+        const errorDetails = await response.json()
+        console.log(errorDetails.errors)
+        throw new Error(`Failed to create Cloudflare record ${errorDetails.errors[0].message}`)
+    }
+
+    return await response.json()
+}

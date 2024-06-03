@@ -105,7 +105,7 @@ const domain: Ref<IListDomains | undefined> = ref()
                 </tbody>
               </table>
               <NuxtLink :to="`/manage/domain/${sub.domain}`" class="button is-primary" v-if="new Date(sub.expires).getTime() > Date.now()">관리하기</NuxtLink>
-              <a href="#" class="button is-primary is-disabled" v-else>이미 만료되었습니다.</a>
+              <button type="button" class="button is-primary" disabled v-else>이미 만료되었습니다.</button>
             </div>
           </div>
         </div>

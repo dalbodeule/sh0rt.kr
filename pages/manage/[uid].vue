@@ -5,6 +5,7 @@ import type {Ref} from "vue";
 import type {IUIDPostRequest} from "~/server/routes/api/forward/index.post";
 import dayjs from "dayjs";
 import {Status} from "~/common/enums";
+import {setLocale} from "@vee-validate/i18n";
 
 const route = useRoute()
 const router = useRouter()
@@ -63,6 +64,8 @@ useSeoMeta({
     deviceData.value = analytics.value.device
   }
 })()
+
+setLocale('ko')
 </script>
 
 <template>

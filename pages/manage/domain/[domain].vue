@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { IAnalyticsResponse } from "~/server/routes/api/manage/[uid].get";
-import {GChart} from "vue-google-charts";
 import type {Ref} from "vue";
 import dayjs from "dayjs";
 import {Status} from "~/common/enums";
 import type {IDomainPostRequest} from "~/server/routes/api/domain/index.post";
+import RecordItem from "~/components/RecordItem.vue";
+import {setLocale} from "@vee-validate/i18n";
 
 const route = useRoute()
 const router = useRouter()
@@ -35,10 +35,16 @@ const onSubmit = async() => {
       credentials: 'include',
       body: JSON.stringify(records.value)
     })
+    console.log(result)
     recordStatus.value = Status.SUCCESS
+    records.value = result
   } catch(e) {
     recordStatus.value = Status.ERROR
   }
+}
+
+const removeRecord = (index: number) => {
+  records.value.splice(index, 1)
 }
 
 useSeoMeta({
@@ -65,6 +71,8 @@ useSeoMeta({
   }
   records.value = q
 })()
+
+setLocale('ko')
 </script>
 
 <template>
@@ -84,37 +92,11 @@ useSeoMeta({
     <div class="box content">
       <h1>{{domain}} 레코드 관리</h1>
 
-      <div class="field">
-        <label class="label">Records</label>
-        <div class="control">
-          <div v-for="(record, index) in records" :key="index" class="box">
-            <div class="field">
-              <label class="label">레코드 타입</label>
-              <div class="control">
-                <input class="input" type="text" v-model="record.type" placeholder="Enter record type">
-              </div>
-            </div>
-
-            <div class="field">
-              <label class="label">레코드 이름</label>
-              <div class="control">
-                <input class="input" type="text" v-model="record.name" placeholder="Enter record name">
-              </div>
-            </div>
-
-            <div class="field">
-              <label class="label">레코드 값</label>
-              <div class="control">
-                <input class="input" type="text" v-model="record.value" placeholder="Enter record value">
-              </div>
-            </div>
-
-            <button class="button is-danger" @click="records.splice(index, 1)">Remove</button>
-          </div>
-        </div>
-      </div>
-      <button class="button is-link" @click="records.push({type: '', name: '', value: ''})">Add Record</button>
-      <button class="button is-primary" @click="onSubmit">Submit</button>
+      <form @submit.prevent="onSubmit">
+        <RecordItem v-for="(record, index) in records" :record="record" :index="index" :key="`record-${index}`" @remove="removeRecord" />
+        <button class="button is-link" type="button" @click="records.push({type: '', name: '', value: ''})">레코드 추가</button>
+        <button class="button is-primary" type="submit">제출</button>
+      </form>
     </div>
     <div class="notification is-success" v-if="recordStatus == Status.SUCCESS">
       <p>레코드 수정에 성공했습니다.</p>

@@ -23,6 +23,7 @@ const { loggedIn, user, session, clear } = useUserSession()
     <div class="navbar-menu" v-bind:class="show ? 'is-active' : ''">
       <div class="navbar-start">
         <NuxtLink class="navbar-item" to="/create" v-if="loggedIn">단축주소 만들기</NuxtLink>
+        <NuxtLink class="navbar-item" to="/domain" v-if="loggedIn">서브도메인 만들기</NuxtLink>
         <NuxtLink class="navbar-item" to="/privacy">개인정보 처리방침</NuxtLink>
       </div>
       <div class="navbar-end" v-if="loggedIn">

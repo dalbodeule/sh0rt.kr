@@ -1,7 +1,3 @@
-import { defineCronHandler } from "#nuxt/cron";
-import {analyticsCache, urls} from "~/server/db/schema";
-import { lt } from 'drizzle-orm/expressions'
-
 export enum AKeys {
     ip = 'ip',
     country = 'country',
@@ -52,7 +48,7 @@ export function arrayToObject(arr: string[]): IAnalyticObject {
         return obj
     }, object)
 
-    return (object as any) as IAnalyticObject
+    return (object as unknown) as IAnalyticObject
 }
 
 export async function getFromAnalytics(query: string) {

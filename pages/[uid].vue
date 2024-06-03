@@ -9,15 +9,16 @@ import dayjs from "dayjs";
 const status: Ref<Status> = ref(Status.DEFAULT)
 
 const route = useRoute()
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const router = useRouter()
 const uid = route.params.uid as string
 const config = useRuntimeConfig()
 
 const event = useRequestEvent()
-const cloudflare = event?.context!!.cloudflare
+const cloudflare = event?.context!.cloudflare
 
 const { data: forwardData, error: forwardError } = await useAsyncData('API_FORWARD_UID', async (): Promise<IUIDGetResponse> => {
-      if (process.client || process.dev)
+      if (import.meta.client || import.meta.dev)
         return await $fetch(`${config.public.baseUrl}/api/forward/${uid}`, {
           method: 'GET'
         })
@@ -51,8 +52,8 @@ if (forwardError.value) {
 }
 else status.value = Status.SUCCESS
 
-const { data: ogData, error: ogError } = await useAsyncData('OG_FINDING', async(): Promise<{[key: string]: string}> => {
-  if(process.client || process.dev)
+const { data: ogData, error: _ogError } = await useAsyncData('OG_FINDING', async(): Promise<{[key: string]: string}> => {
+  if(import.meta.client || import.meta.dev)
     return await $fetch(`${config.public.baseUrl}/api/opengraph`, {
       method: 'POST', body: JSON.stringify({ url: forwardData.value?.forward })
     })
@@ -84,7 +85,7 @@ if (ogData.value)
     ogImage: ogData.value['og:image'] ?? '',
   })
 
-if (process.client) {
+if (import.meta.client) {
   if(forwardData.value && forwardData.value.forward) {
     useHead({
       title: `sh0rt.kr :: forward :: ${uid}`,

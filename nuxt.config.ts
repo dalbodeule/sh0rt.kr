@@ -34,6 +34,7 @@ export default defineNuxtConfig({
     },
     public: {
       baseUrl: process.env.BASE_URL,
+      domainList: process.env.DOMAIN_LIST
     }
   },
   hub: {
@@ -43,5 +44,5 @@ export default defineNuxtConfig({
   purgecss: {
     safelist: [/svg.*/, /fa.*/]
   },
-  modules: ["nuxt-auth-utils", "@nuxthub/core", "nuxt-purgecss"]
+  modules: ["nuxt-auth-utils", "@nuxthub/core", "nuxt-purgecss", "@nuxt/eslint"]
 })

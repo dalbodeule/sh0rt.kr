@@ -1,5 +1,6 @@
 import {domains, records} from "~/server/db/schema";
 import {gte} from "drizzle-orm";
+import getDomain from "~/common/getDomain";
 
 export default defineEventHandler(async (event) => {
     const user = await requireUserSession(event)
@@ -9,16 +10,20 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Invalid authentication",
     })
 
-    const domain = getRouterParam(event, 'domain') ?? ''
-    if (!domain) throw createError({
+    const fullDomain = getRouterParam(event, 'domain') ?? ''
+    if (!fullDomain) throw createError({
         status: 404,
         message: 'Not found',
     })
 
+    const [domain, tld] = getDomain(fullDomain)
+
     const db = useDrizzle()
 
     const domainBody = await db.query.domains.findFirst({
-            where: and(eq(domains.domain, domain),
+            where: and(
+                eq(domains.domain, domain),
+                eq(domains.tld, tld),
                 gte(domains.expires, new Date())
             )
         }

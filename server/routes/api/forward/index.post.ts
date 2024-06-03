@@ -1,5 +1,5 @@
-import { IUIDGetResponse } from "~/server/routes/api/forward/[uid].get"
-import { H3Event } from "h3";
+import type { IUIDGetResponse } from "~/server/routes/api/forward/[uid].get"
+import type { H3Event } from "h3";
 import {analyticsCache, urls, usersToUrls} from "~/server/db/schema";
 import { and, eq, gte } from "drizzle-orm";
 import dayjs from "dayjs";
@@ -40,7 +40,7 @@ export default defineEventHandler(async (event: H3Event) => {
     })
 
     const url_id = await db.insert(urls).values({
-        uid: request.uid!!,
+        uid: request.uid!,
         forward: request.forward,
         expires: dayjs(request.expires).toDate()
     }).returning()
@@ -66,17 +66,17 @@ export default defineEventHandler(async (event: H3Event) => {
     )
 
     const responseData: IUIDGetResponse = {
-        id: response!!.id,
-        uid: response!!.uid,
-        forward: response!!.forward,
+        id: response!.id,
+        uid: response!.uid,
+        forward: response!.forward,
         user: {
-            id: response!!.UsersToUrls[0].Users.id,
-            name: response!!.UsersToUrls[0].Users.name,
-            profile: response!!.UsersToUrls[0].Users.profile
+            id: response!.UsersToUrls[0].Users.id,
+            name: response!.UsersToUrls[0].Users.name,
+            profile: response!.UsersToUrls[0].Users.profile
         },
-        created_at: response!!.created_at,
-        updated_at: response!!.updated_at,
-        expires: response!!.expires,
+        created_at: response!.created_at,
+        updated_at: response!.updated_at,
+        expires: response!.expires,
     }
 
     return responseData

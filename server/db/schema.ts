@@ -64,12 +64,13 @@ export const analyticsCache = sqliteTable('analyticsCache', {
 export const domains = sqliteTable('domains', {
     id: int('id').primaryKey({ autoIncrement: true }),
     domain: text('domain', { length: 20 }).notNull(),
+    tld: text('tld', { length: 20 }).notNull().default('space-mc.com'),
     created_at: int('created_at', { mode: "timestamp" }).notNull().default(sql`(STRFTIME('%s'))`),
     updated_at: int('updated_at', { mode: "timestamp" }).notNull().default(sql`(STRFTIME('%s'))`),
     expires: int('expires', { mode: "timestamp" }).notNull().default(sql`(STRFTIME('%s'))`),
 })
 
-export const domainRelations = relations(domains, ({ many, one }) => ({
+export const domainRelations = relations(domains, ({ many }) => ({
     UsersToDomains: many(usersToDomains),
 }))
 

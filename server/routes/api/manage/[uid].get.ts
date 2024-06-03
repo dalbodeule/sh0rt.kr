@@ -1,4 +1,4 @@
-import {H3Event} from "h3";
+import type {H3Event} from "h3";
 import { AKeys, getFromAnalytics, getParams } from "~/server/utils/analyticHelper";
 import { useDrizzle } from "~/server/utils/useDrizzle";
 import { and, eq, gte } from "drizzle-orm";
@@ -24,7 +24,7 @@ const aggregateDataByField = (response: IAnalytics, field: string, fieldName: st
     const data: [string, string|number][] = [[fieldName, field]]
 
     response.data.forEach(item => {
-        const fieldValue = (item as any as {[key: string]: number})[field]
+        const fieldValue = (item as unknown as {[key: string]: number})[field]
         if (dataCount[fieldValue]) {
             dataCount[fieldValue]++;
         } else {
@@ -65,7 +65,7 @@ export default defineEventHandler(async (event: H3Event) => {
         }
     })
 
-    if(userSession.user.id != currentShorten?.UsersToUrls[0].user ?? 0) {
+    if(userSession.user.id != currentShorten?.UsersToUrls[0].user) {
         throw createError({
             status: 404,
             message: 'Not found',

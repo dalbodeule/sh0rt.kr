@@ -52,7 +52,7 @@ export default interface CF_Ray {
         verifiedBot: false,
         jsDetection: { passed: false },
         staticResource: false,
-        detectionIds: {},
+        detectionIds: unknown,
         score: 99
     }
 }

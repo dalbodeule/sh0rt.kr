@@ -4,37 +4,37 @@ import { UserRole } from "~/server/db/schema"
 
 const show: Ref<boolean> = ref(false)
 const router = useRouter()
-const { loggedIn, user, session, clear } = useUserSession()
+const { loggedIn, user, session: _session, clear } = useUserSession()
 </script>
 
 <template>
   <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
       <NuxtLink class="navbar-item" to="/">
-        <img src="~/public/favicon.png" alt=""/>&nbsp; sh0rt.kr
+        <img src="~/public/favicon.png" alt="">&nbsp; sh0rt.kr
       </NuxtLink>
     </div>
     <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" @click="show = !show">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
+      <span aria-hidden="true"/>
+      <span aria-hidden="true"/>
+      <span aria-hidden="true"/>
+      <span aria-hidden="true"/>
     </a>
-    <div class="navbar-menu" v-bind:class="show ? 'is-active' : ''">
+    <div class="navbar-menu" :class="show ? 'is-active' : ''">
       <div class="navbar-start">
-        <NuxtLink class="navbar-item" to="/create" v-if="loggedIn">단축주소 만들기</NuxtLink>
-        <NuxtLink class="navbar-item" to="/domain" v-if="loggedIn">서브도메인 만들기</NuxtLink>
+        <NuxtLink v-if="loggedIn" class="navbar-item" to="/create">단축주소 만들기</NuxtLink>
+        <NuxtLink v-if="loggedIn" class="navbar-item" to="/domain">서브도메인 만들기</NuxtLink>
         <NuxtLink class="navbar-item" to="/privacy">개인정보 처리방침</NuxtLink>
       </div>
-      <div class="navbar-end" v-if="loggedIn">
+      <div v-if="loggedIn" class="navbar-end">
         <NuxtLink to="/manage" class="navbar-item">
-          <img v-bind:src="user?.profile" alt="user profile"/>
+          <img :src="user?.profile" alt="user profile">
           <span>&nbsp; {{ user?.name}}</span>
         </NuxtLink>
-        <button type="button" class="navbar-item" v-if="user?.role == UserRole.ADMIN || user?.role == UserRole.MODERATOR">관리자 페이지</button>
+        <button v-if="user?.role == UserRole.ADMIN || user?.role == UserRole.MODERATOR" type="button" class="navbar-item">관리자 페이지</button>
         <button type="button" class="navbar-item" @click="clear(); router.push('/')">로그아웃</button>
       </div>
-      <div class="navbar-end" v-else>
+      <div v-else class="navbar-end">
         <NuxtLink class="navbar-item" to="/login">로그인</NuxtLink>
       </div>
     </div>

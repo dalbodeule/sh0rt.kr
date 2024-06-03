@@ -43,6 +43,13 @@
       "when": 1717337064106,
       "tag": "0005_equal_jocasta",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1717397142617,
+      "tag": "0006_windy_human_fly",
+      "breakpoints": true
     }
   ]
 }

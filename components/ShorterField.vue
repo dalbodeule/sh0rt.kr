@@ -2,7 +2,7 @@
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { ErrorMessage, Field, Form, configure, defineRule } from "vee-validate";
 import { alpha_num, min, max, required, url } from '@vee-validate/rules'
-import { localize, setLocale } from '@vee-validate/i18n'
+import { localize } from '@vee-validate/i18n'
 
 import ko from '@vee-validate/i18n/dist/locale/ko.json'
 import en from '@vee-validate/i18n/dist/locale/en.json'
@@ -43,14 +43,14 @@ defineRule('unique', async(value: string) => {
     return true
   }
 })
-defineRule('after_days', (value: string, days: any[]) => {
+defineRule('after_days', (value: string, days: never[]) => {
   if(!value) return true
   const selectedDate = new Date(value)
   const currentDate = getDate(days[0] ?? '7')
 
   return selectedDate.getTime() >= currentDate.getTime()
 })
-defineRule('before_days', (value: string, days: any[]) => {
+defineRule('before_days', (value: string, days: never[]) => {
   if(!value) return true
   const selectedDate = new Date(value)
   const currentDate = getDate(days[0] ?? '365')
@@ -90,7 +90,7 @@ const schema = {
 </script>
 
 <template>
-  <Form @submit="emit('submit')" :validation-schema="schema">
+  <Form :validation-schema="schema" @submit="emit('submit')">
     <div class="field is-horizontal">
       <div class="field-label is-normal">
         <label class="label">단축주소</label>
@@ -102,10 +102,10 @@ const schema = {
               <button class="button is-primary is-static" type="button">https://sh0rt.kr/</button>
             </div>
             <div class="control is-expanded">
-              <Field class="input" name="uid" type="text" maxlength="20" minlength="3" v-model="addrInfo.uid" :delay="500" :disabled="!isNew || props.lock"/>
+              <Field v-model="addrInfo.uid" class="input" name="uid" type="text" maxlength="20" minlength="3" :delay="500" :disabled="!isNew || props.lock"/>
             </div>
             <div class="control">
-              <button class="button is-info" type="button" @click="addrInfo!!.uid = randomAddr()" :disabled="!isNew || props.lock">
+              <button class="button is-info" type="button" :disabled="!isNew || props.lock" @click="addrInfo!!.uid = randomAddr()">
                 랜덤 생성
               </button>
             </div>
@@ -121,7 +121,7 @@ const schema = {
       <div class="field-body">
         <div class="control">
           <div class="control has-icons-left is-expanded">
-            <Field class="input" name="origin" type="text" maxlength="4096" minlength="10" v-model="addrInfo.forward" :disabled="props.lock"/>
+            <Field v-model="addrInfo.forward" class="input" name="origin" type="text" maxlength="4096" minlength="10" :disabled="props.lock"/>
             <span class="icon is-left">
               <FontAwesomeIcon :icon="['fas', 'paperclip']" />
             </span>
@@ -137,7 +137,7 @@ const schema = {
       <div class="field-body is-normal">
         <div class="field">
           <div class="control">
-            <Field class="input" name="expires_in" type="date" v-model="addrInfo.expires" :disabled="props.lock"/>
+            <Field v-model="addrInfo.expires" class="input" name="expires_in" type="date" :disabled="props.lock"/>
           </div>
           <ErrorMessage name="expires_in" as="p" class="help is-danger"/>
         </div>

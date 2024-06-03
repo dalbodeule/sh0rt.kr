@@ -1,5 +1,4 @@
-import {H3Event} from "h3";
-import {getUserSession} from "#imports";
+import type {H3Event} from "h3"
 
 
 export default defineEventHandler(async (event: H3Event) => {

@@ -1,8 +1,9 @@
-import { H3Event } from "h3"
+import type { H3Event } from "h3"
 import putAccessLog from "~/server/utils/putAccessLog"
 import UAParser from 'ua-parser-js'
 import parser from 'accept-language-parser'
-import {IAnalyticObject, objectToArray} from "~/server/utils/analyticHelper";
+import type {IAnalyticObject} from "~/server/utils/analyticHelper";
+import { objectToArray} from "~/server/utils/analyticHelper";
 
 export default defineEventHandler(async(event: H3Event) => {
     const uid = getRouterParam(event, 'uid') ?? ''
@@ -31,7 +32,7 @@ export default defineEventHandler(async(event: H3Event) => {
     }
 
 
-    if(process.dev)
+    if(import.meta.dev)
         console.log([...objectToArray(objects)])
     else {
         return hubAnalytics().put({

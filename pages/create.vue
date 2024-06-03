@@ -8,7 +8,7 @@ import type {IUIDPostRequest} from "~/server/routes/api/forward/index.post";
 import getDate from "~/common/getDate";
 
 const router = useRouter()
-const { loggedIn, user, session, clear } = useUserSession()
+const { loggedIn, user: _user, session: _session, clear: _clear } = useUserSession()
 const config = useRuntimeConfig()
 
 if(!loggedIn.value) {
@@ -55,16 +55,16 @@ setLocale('ko')
 
 <template>
   <div class="box content">
-    <ShorterField submit-text="만들기" :is-new="true" @submit="onSubmit" :lock="status == Status.SUCCESS"/>
+    <ShorterField submit-text="만들기" :is-new="true" :lock="status == Status.SUCCESS" @submit="onSubmit"/>
     <div style="margin-top: 30px;" />
-    <div class="notification is-success" v-if="status == Status.SUCCESS">
+    <div v-if="status == Status.SUCCESS" class="notification is-success">
       <p><a :href="`https://sh0rt.kr/${addrInfo.uid}`">https://sh0rt.kr/{{addrInfo.uid}}</a> 생성에 성공했습니다.</p>
       <p>만료일: {{ dayjs(addrInfo.expires).format('YYYY-MM-DD')}}</p>
     </div>
-    <div class="notification is-warning" v-else-if="status == Status.ERROR">
+    <div v-else-if="status == Status.ERROR" class="notification is-warning">
       <p>생성에 실패했습니다.</p>
     </div>
-    <progress class="progress is-primary" v-else-if="status == Status.PENDING" max="100"></progress>
+    <progress v-else-if="status == Status.PENDING" class="progress is-primary" max="100"/>
   </div>
 </template>
 

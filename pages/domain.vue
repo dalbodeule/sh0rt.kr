@@ -8,14 +8,14 @@ import type { Ref } from "vue";
 import type {IDomainPostRequest} from "~/server/routes/api/domain/index.post";
 
 const router = useRouter()
-const { loggedIn, user, session, clear } = useUserSession()
+const { loggedIn, user: _user, session: _session, clear: _clear } = useUserSession()
 const config = useRuntimeConfig()
 
 if(!loggedIn.value) {
   router.push('/')
 }
 
-const domainInfo: Ref<IDomainPostRequest> = ref({domain: '', expires: dayjs(getDate()).format('YYYY-MM-DD') })
+const domainInfo: Ref<IDomainPostRequest> = ref({domain: '', expires: dayjs(getDate()).format('YYYY-MM-DD'), tld: 'space-mc.com' })
 const status: Ref<Status> = ref(Status.DEFAULT)
 
 provide('domainInfo', domainInfo)
@@ -56,16 +56,18 @@ setLocale('ko')
 </script>
 
 <template>
-  <DomainField submit-text="만들기" :is-new="true" @submit="onSubmit" :lock="status == Status.SUCCESS" />
-  <div style="margin-top: 30px;" />
-  <div class="notification is-success" v-if="status == Status.SUCCESS">
+  <div>
+    <DomainField submit-text="만들기" :is-new="true" :lock="status == Status.SUCCESS" @submit="onSubmit" />
+    <div style="margin-top: 30px;" />
+    <div v-if="status == Status.SUCCESS" class="notification is-success">
       <p>{{domainInfo.domain}}.space-mc.com 생성에 성공했습니다.</p>
       <p>만료일: {{ dayjs(domainInfo.expires).format('YYYY-MM-DD')}}</p>
     </div>
-    <div class="notification is-warning" v-else-if="status == Status.ERROR">
+    <div v-else-if="status == Status.ERROR" class="notification is-warning">
       <p>생성에 실패했습니다.</p>
     </div>
-    <progress class="progress is-primary" v-else-if="status == Status.PENDING" max="100"></progress>
+    <progress v-else-if="status == Status.PENDING" class="progress is-primary" max="100"/>
+  </div>
 </template>
 
 <style scoped>

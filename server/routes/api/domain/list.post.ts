@@ -1,4 +1,4 @@
-import {H3Event} from "h3";
+import type {H3Event} from "h3";
 import {useDrizzle} from "~/server/utils/useDrizzle";
 import {eq} from "drizzle-orm/expressions";
 import {users} from "~/server/db/schema";
@@ -7,6 +7,7 @@ export interface IListDomains {
     [key: number]: {
         id: number,
         domain: string,
+        tld: string,
         created_at: string,
         updated_at: string,
         expires: string

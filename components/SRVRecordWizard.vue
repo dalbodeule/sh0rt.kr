@@ -158,11 +158,11 @@ setValues(props.modalValue)
 
 <template>
   <div class="modal" :class="isActive ? 'is-active' : ''">
-    <div class="modal-background"></div>
+    <div class="modal-background"/>
     <div class="modal-card">
       <header class="modal-card-head">
         <p class="modal-card-title">SRV 레코드 마법사</p>
-        <button class="delete" aria-label="close" type="button" @click="emit('close')"></button>
+        <button class="delete" aria-label="close" type="button" @click="emit('close')"/>
       </header>
       <section class="modal-card-body">
         <Form :validation-schema="schema" @submit="saveChanges">
@@ -182,7 +182,7 @@ setValues(props.modalValue)
           <div class="field">
             <label class="label">서비스</label>
             <div class="control">
-              <Field name="service" class="input" type="text" placeholder="Enter service" v-model="srvDetails.service" />
+              <Field v-model="srvDetails.service" name="service" class="input" type="text" placeholder="Enter service" />
               <ErrorMessage name="service" class="help is-danger" />
             </div>
           </div>
@@ -190,7 +190,7 @@ setValues(props.modalValue)
           <div class="field">
             <label class="label">프로토콜</label>
             <div class="control">
-              <Field name="protocol" class="input" type="text" placeholder="Enter protocol" v-model="srvDetails.protocol" />
+              <Field v-model="srvDetails.protocol" name="protocol" class="input" type="text" placeholder="Enter protocol" />
               <ErrorMessage name="protocol" class="help is-danger" />
             </div>
           </div>
@@ -198,7 +198,7 @@ setValues(props.modalValue)
           <div class="field">
             <label class="label">서브도메인</label>
             <div class="control">
-              <Field name="name" class="input" type="text" placeholder="Enter name" v-model="srvDetails.name" />
+              <Field v-model="srvDetails.name" name="name" class="input" type="text" placeholder="Enter name" />
               <ErrorMessage name="name" class="help is-danger" />
             </div>
           </div>
@@ -206,7 +206,7 @@ setValues(props.modalValue)
           <div class="field">
             <label class="label">Priority</label>
             <div class="control">
-              <Field name="priority" class="input" type="number" placeholder="Enter priority" v-model="srvDetails.priority" />
+              <Field v-model="srvDetails.priority" name="priority" class="input" type="number" placeholder="Enter priority" />
               <ErrorMessage name="priority" class="help is-danger" />
             </div>
           </div>
@@ -214,7 +214,7 @@ setValues(props.modalValue)
           <div class="field">
             <label class="label">Weight</label>
             <div class="control">
-              <Field name="weight" class="input" type="number" placeholder="Enter weight" v-model="srvDetails.weight" />
+              <Field v-model="srvDetails.weight" name="weight" class="input" type="number" placeholder="Enter weight" />
               <ErrorMessage name="weight" class="help is-danger" />
             </div>
           </div>
@@ -222,7 +222,7 @@ setValues(props.modalValue)
           <div class="field">
             <label class="label">포트</label>
             <div class="control">
-              <Field name="port" class="input" type="number" placeholder="Enter port" v-model="srvDetails.port" />
+              <Field v-model="srvDetails.port" name="port" class="input" type="number" placeholder="Enter port" />
               <ErrorMessage name="port" class="help is-danger" />
             </div>
           </div>
@@ -230,7 +230,7 @@ setValues(props.modalValue)
           <div class="field">
             <label class="label">포워딩 주소</label>
             <div class="control">
-              <Field name="target" class="input" type="text" placeholder="Enter target" v-model="srvDetails.target" />
+              <Field v-model="srvDetails.target" name="target" class="input" type="text" placeholder="Enter target" />
               <ErrorMessage name="target" class="help is-danger" />
             </div>
           </div>

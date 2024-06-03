@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { IListUrls } from "~/server/routes/api/manage/index.post";
-import type {Ref} from "vue";
-import dayjs from "dayjs";
-import type {IListDomains} from "~/server/routes/api/domain/list.get";
+import type { IListUrls } from "~/server/routes/api/manage/index.post"
+import type { IListDomains } from "~/server/routes/api/domain/list.post"
+import type { Ref } from "vue"
+import dayjs from "dayjs"
 
-const route = useRoute()
+const _route = useRoute()
 const router = useRouter()
 const config = useRuntimeConfig()
 
-const { loggedIn, user, session, clear } = useUserSession()
+const { loggedIn, user: _user, session: _session, clear: _clear } = useUserSession()
 
 if(!loggedIn.value) {
   router.push('/')
@@ -45,7 +45,7 @@ const domain: Ref<IListDomains | undefined> = ref()
     <h1>단축주소 목록</h1>
     <div class="fixed-grid has-1-cols-mobile has-1-cols-tablet has-2-cols-desktop has-2-cols-fullhd">
       <div class="grid">
-        <div class="cell" v-for="url in data" :key="`url-${url.uid}`">
+        <div v-for="url in data" :key="`url-${url.uid}`" class="cell">
           <div class="card">
             <div class="card-header">
               <a class="card-header-title" :href="`${config.public.baseUrl}/${url.uid}`">{{ config.public.baseUrl }}/{{ url.uid }}</a>
@@ -71,8 +71,8 @@ const domain: Ref<IListDomains | undefined> = ref()
                   </tr>
                 </tbody>
               </table>
-              <NuxtLink :to="`/manage/${url.uid}`" class="button is-primary" v-if="new Date(url.expires).getTime() > Date.now()">관리하기</NuxtLink>
-              <a href="#" class="button is-primary is-disabled" v-else>이미 만료되었습니다.</a>
+              <NuxtLink v-if="new Date(url.expires).getTime() > Date.now()" :to="`/manage/${url.uid}`" class="button is-primary">관리하기</NuxtLink>
+              <a v-else href="#" class="button is-primary is-disabled">이미 만료되었습니다.</a>
             </div>
           </div>
         </div>
@@ -82,10 +82,10 @@ const domain: Ref<IListDomains | undefined> = ref()
     <h1>도메인 목록</h1>
     <div class="fixed-grid has-1-cols-mobile has-1-cols-tablet has-2-cols-desktop has-2-cols-fullhd">
       <div class="grid">
-        <div class="cell" v-for="sub in domain" :key="`url-${sub.domain}`">
+        <div v-for="sub in domain" :key="`url-${sub.domain}`" class="cell">
           <div class="card">
             <div class="card-header">
-              <p class="card-header-title">{{ sub.domain }}.space-mc.com</p>
+              <p class="card-header-title">{{ sub.domain }}.{{ sub.tld }}</p>
             </div>
             <div class="card-content">
               <table class="table is-striped is-fullwidth">
@@ -104,8 +104,8 @@ const domain: Ref<IListDomains | undefined> = ref()
                   </tr>
                 </tbody>
               </table>
-              <NuxtLink :to="`/manage/domain/${sub.domain}`" class="button is-primary" v-if="new Date(sub.expires).getTime() > Date.now()">관리하기</NuxtLink>
-              <button type="button" class="button is-primary" disabled v-else>이미 만료되었습니다.</button>
+              <NuxtLink v-if="new Date(sub.expires).getTime() > Date.now()" :to="`/manage/domain/${sub.domain}.${sub.tld}`" class="button is-primary">관리하기</NuxtLink>
+              <button v-else type="button" class="button is-primary" disabled>이미 만료되었습니다.</button>
             </div>
           </div>
         </div>

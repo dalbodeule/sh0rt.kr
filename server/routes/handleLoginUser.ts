@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { H3Event } from "h3";
+import type { H3Event } from "h3";
 import { users } from "~/server/db/schema";
 import { useDrizzle } from "~/server/utils/useDrizzle";
 
@@ -52,14 +52,14 @@ export default async function(event: H3Event, provider: string, user: {
 
     await setUserSession(event, {
         user: {
-            id: db_user!!.id,
-            email: db_user!!.email,
-            name: db_user!!.name,
-            vendor: db_user!!.vendor,
-            profile: db_user!!.profile,
-            created_at: db_user!!.created_at,
-            updated_at: db_user!!.updated_at,
-            role: db_user!!.role,
+            id: db_user!.id,
+            email: db_user!.email,
+            name: db_user!.name,
+            vendor: db_user!.vendor,
+            profile: db_user!.profile,
+            created_at: db_user!.created_at,
+            updated_at: db_user!.updated_at,
+            role: db_user!.role,
         }
     })
 }

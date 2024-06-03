@@ -1,9 +1,11 @@
 import {domains} from "~/server/db/schema";
 import {gte} from "drizzle-orm";
+import getDomain from "~/common/getDomain";
 
 export interface IDomainGetResponse {
     id: number,
     domain: string,
+    tld: string,
     user: {
         id: number,
         name: string,
@@ -17,15 +19,17 @@ export interface IDomainGetResponse {
 export default defineEventHandler(async (event) => {
     const db = useDrizzle()
 
-    const domain = getRouterParam(event, 'domain') ?? ''
-    if(!domain) throw createError({
+    const fullDomain = getRouterParam(event, 'domain') ?? ''
+    if(!fullDomain) throw createError({
         status: 404,
         message: 'Not found',
     })
+    const [domain, tld] = getDomain(fullDomain)
 
     const result = await db.query.domains.findFirst({
         where: and(
             eq(domains.domain, domain),
+            eq(domains.tld, tld),
             gte(domains.expires, new Date())
         ),
         with: {
@@ -41,6 +45,7 @@ export default defineEventHandler(async (event) => {
         const data: IDomainGetResponse = {
             id: result.id,
             domain: result.domain,
+            tld: result.tld,
             user: {
                 id: result.UsersToDomains[0].Users.id,
                 name: result.UsersToDomains[0].Users.name,

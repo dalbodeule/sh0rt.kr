@@ -1,4 +1,4 @@
-import { H3Event } from "h3"
+import type { H3Event } from "h3"
 import { parse } from 'node-html-parser'
 
 async function fetchAndParseOGTags(url: string) {
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
     try {
         return await fetchAndParseOGTags(body.url)
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw createError({
             status: 403,
             statusMessage: "Error",

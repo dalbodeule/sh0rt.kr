@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ErrorMessage, Field, Form, configure, defineRule } from "vee-validate";
+import { ErrorMessage, Field, Form, configure, defineRule } from "vee-validate"
 import { alpha_num, min, max, required, url } from '@vee-validate/rules'
 import { localize } from '@vee-validate/i18n'
 
@@ -13,14 +13,17 @@ import dayjs from "dayjs";
 import randomAddr from "~/common/randomAddr";
 import type {IDomainPostRequest} from "~/server/routes/api/domain/index.post";
 
-const banlist = [ 'create', 'login', 'logout', 'admin', 'root', 'manage', 'privacy' ]
-
 const config = useRuntimeConfig()
+
+const banlist = [ 'create', 'login', 'logout', 'admin', 'root', 'manage', 'privacy', 'www' ]
+const domainlist = config.public.domainList.split(',')
 
 const emit = defineEmits<{submit: []}>()
 const props = defineProps<{submitText: string, isNew: boolean, lock: boolean}>()
 
-const domainInfo: Ref<IDomainPostRequest> = inject('domainInfo') ?? ref({domain: '', expires: dayjs(getDate()).format('YYYY-MM-DD') })
+const domainInfo: Ref<IDomainPostRequest> = inject('domainInfo') ?? ref({
+  domain: '', expires: dayjs(getDate()).format('YYYY-MM-DD'), tld: 'space-mc.com'
+})
 const status: Ref<Status> = inject('status') ?? ref(Status.DEFAULT)
 
 defineRule('alpha_num', alpha_num)
@@ -41,14 +44,14 @@ defineRule('unique', async(value: string) => {
     return true
   }
 })
-defineRule('after_days', (value: string, days: any[]) => {
+defineRule('after_days', (value: string, days: never[]) => {
   if(!value) return true
   const selectedDate = new Date(value)
   const currentDate = getDate(days[0] ?? '7')
 
   return selectedDate.getTime() >= currentDate.getTime()
 })
-defineRule('before_days', (value: string, days: any[]) => {
+defineRule('before_days', (value: string, days: never[]) => {
   if(!value) return true
   const selectedDate = new Date(value)
   const currentDate = getDate(days[0] ?? '365')
@@ -86,7 +89,7 @@ const schema = {
 </script>
 
 <template>
-  <Form @submit="emit('submit')" :validation-schema="schema">
+  <Form :validation-schema="schema" @submit="emit('submit')">
     <div class="field is-horizontal">
       <div class="field-label is-normal">
         <label class="label">도메인</label>
@@ -95,13 +98,17 @@ const schema = {
         <div class="field is-expanded">
           <div class="field has-addons">
             <div class="control is-expanded">
-              <Field class="input" name="domain" type="text" maxlength="20" minlength="3" v-model="domainInfo.domain" :delay="500" :disabled="!isNew || props.lock"/>
+              <Field v-model="domainInfo.domain" class="input" name="domain" type="text" maxlength="20" minlength="3" :delay="500" :disabled="!isNew || props.lock"/>
             </div>
             <div class="control">
-              <button class="button is-primary is-static" type="button">.space-mc.com</button>
+              <div class="select">
+                <Field v-model="domainInfo.tld" name="type" as="select" :disabled="!isNew || props.lock">
+                  <option v-for="value in domainlist" :key="`tld-${value}`" :value="value">.{{ value }}</option>
+                </Field>
+              </div>
             </div>
             <div class="control">
-              <button class="button is-info" type="button" @click="domainInfo!!.domain = randomAddr()" :disabled="!isNew || props.lock">
+              <button class="button is-info" type="button" :disabled="!isNew || props.lock" @click="domainInfo!!.domain = randomAddr()">
                 랜덤 생성
               </button>
             </div>
@@ -117,7 +124,7 @@ const schema = {
       <div class="field-body is-normal">
         <div class="field">
           <div class="control">
-            <Field class="input" name="expires_in" type="date" v-model="domainInfo.expires" :disabled="props.lock"/>
+            <Field v-model="domainInfo.expires" class="input" name="expires_in" type="date" :disabled="props.lock"/>
           </div>
           <ErrorMessage name="expires_in" as="p" class="help is-danger"/>
         </div>

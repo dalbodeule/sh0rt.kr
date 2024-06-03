@@ -1,4 +1,4 @@
-import {UserRole} from "~/db/schema";
+import type {UserRole} from "~/db/schema";
 
 declare module '#auth-utils' {
     interface User {

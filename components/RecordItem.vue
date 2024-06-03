@@ -66,7 +66,7 @@ watch(() => props.record, (newRecord) => {
     <div class="field">
       <label class="label">레코드 타입</label>
       <div class="select">
-        <Field name="type" as="select" v-model="record.type">
+        <Field v-model="record.type" name="type" as="select">
           <option value="A">A</option>
           <option value="AAAA">AAAA</option>
           <option value="CNAME">CNAME</option>
@@ -79,7 +79,7 @@ watch(() => props.record, (newRecord) => {
     <div class="field">
       <label class="label">레코드 이름</label>
       <div class="control">
-        <Field class="input" name="name" as="input" type="text" v-model="record.name" placeholder="Enter record name" :disabled="record.type == 'SRV'"/>
+        <Field v-model="record.name" class="input" name="name" as="input" type="text" placeholder="Enter record name" :disabled="record.type == 'SRV'"/>
       </div>
       <ErrorMessage name="name" as="p" class="help is-danger" />
     </div>
@@ -87,12 +87,13 @@ watch(() => props.record, (newRecord) => {
     <div class="field">
       <label class="label">레코드 값</label>
       <div class="control">
-        <Field class="input" name="value" as="input" type="text" v-model="record.value" placeholder="Enter record value" :disabled="record.type == 'SRV'" />
+        // eslint-disable-next-line vue/no-mutating-props
+        <Field v-model="record.value" class="input" name="value" as="input" type="text" placeholder="Enter record value" :disabled="record.type == 'SRV'" />
       </div>
       <ErrorMessage name="value" as="p" class="help is-danger" />
     </div>
     <div class="field is-grouped">
-      <div class="control" v-if="record.type == 'SRV'">
+      <div v-if="record.type == 'SRV'" class="control">
         <button class="button is-primary" type="button" @click="isSRVWizardActive = true">SRV 레코드 설정</button>
       </div>
       <div class="control">
@@ -101,7 +102,7 @@ watch(() => props.record, (newRecord) => {
     </div>
     <SRVRecordWizard
       :modal-value="record"
-      :isActive="isSRVWizardActive"
+      :is-active="isSRVWizardActive"
       @update="updateRecord"
       @close="isSRVWizardActive = false"
     />

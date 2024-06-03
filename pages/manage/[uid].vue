@@ -12,7 +12,7 @@ const router = useRouter()
 const config = useRuntimeConfig()
 
 const uid = route.params.uid as string
-const { loggedIn, user, session, clear } = useUserSession()
+const { loggedIn, user: _user, session: _session, clear:_clear } = useUserSession()
 
 if(!loggedIn.value) {
   router.push('/')
@@ -72,15 +72,15 @@ setLocale('ko')
   <div>
     <div class="box content">
       <h1>{{config.public.baseUrl}}/{{uid}} 관리</h1>
-      <ShorterField submit-text="수정하기" @submit="onSubmit" :is-new="false" :lock="false"/>
-      <div class="notification is-success" v-if="status == Status.SUCCESS">
+      <ShorterField submit-text="수정하기" :is-new="false" :lock="false" @submit="onSubmit"/>
+      <div v-if="status == Status.SUCCESS" class="notification is-success">
       <p><a :href="`https://sh0rt.kr/${addrInfo.uid}`">https://sh0rt.kr/{{addrInfo.uid}}</a> 수정에 성공했습니다.</p>
       <p>만료일: {{ dayjs(addrInfo.expires).format('YYYY-MM-DD')}}</p>
     </div>
-    <div class="notification is-warning" v-else-if="status == Status.ERROR">
+    <div v-else-if="status == Status.ERROR" class="notification is-warning">
       <p>수정에 실패했습니다.</p>
     </div>
-    <progress class="progress is-primary" v-else-if="status == Status.PENDING" max="100"></progress>
+    <progress v-else-if="status == Status.PENDING" class="progress is-primary" max="100"/>
     </div>
     <div class="box content">
       <h1>{{config.public.baseUrl}}/{{uid}} 의 접속통계</h1>

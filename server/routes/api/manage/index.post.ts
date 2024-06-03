@@ -1,4 +1,4 @@
-import { H3Event } from "h3"
+import type { H3Event } from "h3"
 import { useDrizzle } from "~/server/utils/useDrizzle"
 import { eq } from 'drizzle-orm/expressions'
 import { users } from "~/server/db/schema"

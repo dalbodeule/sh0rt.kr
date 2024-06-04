@@ -16,8 +16,15 @@ export interface ICloudflareRequests {
     value: string
 }
 
+const domains: { [key: string]: string } = {}
+const zoneIds = config.domainZoneId.split(',')
+
+config.domainZoneId.split(',').forEach((value, idx) => {
+    domains[value] = zoneIds[idx];
+})
+
 export async function createCloudflareRecord(domain: string, data: ICloudflareRequests | ICloudflareSRVRequests) {
-    const url = `https://api.cloudflare.com/client/v4/zones/${config.domainZoneId}/dns_records`
+    const url = `https://api.cloudflare.com/client/v4/zones/${domains[domain]}/dns_records`
     const body = {
         ...data,
         ttl: 1,
@@ -49,7 +56,7 @@ export async function createCloudflareRecord(domain: string, data: ICloudflareRe
 }
 
 export async function updateCloudflareRecord(domain: string, data: ICloudflareRequests | ICloudflareSRVRequests, cfid: string) {
-    const url = `https://api.cloudflare.com/client/v4/zones/${config.domainZoneId}/dns_records/${cfid}`
+    const url = `https://api.cloudflare.com/client/v4/zones/${domains[domain]}/dns_records/${cfid}`
     const body = {
         ...data,
         ttl: 1,
@@ -83,7 +90,7 @@ export async function updateCloudflareRecord(domain: string, data: ICloudflareRe
 }
 
 export async function deleteCloudflareRecord(domain: string, cfid: string) {
-    const url = `https://api.cloudflare.com/client/v4/zones/${config.domainZoneId}/dns_records/${cfid}`
+    const url = `https://api.cloudflare.com/client/v4/zones/${domains[domain]}/dns_records/${cfid}`
 
     const response = await fetch(url, {
         method: 'DELETE',

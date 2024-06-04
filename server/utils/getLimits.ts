@@ -16,9 +16,12 @@ const getLimits = async (event: H3Event) => {
     for (const domain of domainList) {
         const idx = domainList.indexOf(domain);
         const domainRes = await db.query.domains.findFirst({ where: eq(domains.tld, domain)})
-        const countRes = await db.select({ count: count() }).from(records).where(eq(records.domain, domainRes?.id))
+        if(domainRes) {
+            const countRes = await db.select({count: count()}).from(records).where(eq(records.domain, domainRes?.id))
 
-        results[domain] = limitList[idx] - countRes[0].count
+            results[domain] = limitList[idx] - countRes[0].count
+        } else
+            results[domain] = limitList[idx]
     }
 
     return results

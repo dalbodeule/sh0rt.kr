@@ -1,15 +1,5 @@
 const config = useRuntimeConfig()
 
-export interface ICloudflareSRVRequests {
-    type: 'SRV',
-    name: string,
-    data: {
-        port: number,
-        priority: number,
-        weight: number,
-        target: string,
-    }
-}
 export interface ICloudflareRequests {
     type: string,
     name: string,
@@ -23,8 +13,8 @@ config.domainZoneId.split(',').forEach((value, idx) => {
     domains[value] = zoneIds[idx];
 })
 
-export async function createCloudflareRecord(domain: string, data: ICloudflareRequests | ICloudflareSRVRequests) {
-    const url = `https://api.cloudflare.com/client/v4/zones/${domains[domain]}/dns_records`
+export async function createCloudflareRecord(domain: string, data: ICloudflareRequests) {
+    const url = `https://api.sh0rt.kr/zones/${domains[domain]}/dns_records`
     const body = {
         ...data,
         ttl: 1,
@@ -55,8 +45,8 @@ export async function createCloudflareRecord(domain: string, data: ICloudflareRe
     return await response.json()
 }
 
-export async function updateCloudflareRecord(domain: string, data: ICloudflareRequests | ICloudflareSRVRequests, cfid: string) {
-    const url = `https://api.cloudflare.com/client/v4/zones/${domains[domain]}/dns_records/${cfid}`
+export async function updateCloudflareRecord(domain: string, data: ICloudflareRequests, cfid: string) {
+    const url = `https://api.sh0rt.kr/zones/${domains[domain]}/dns_records/${cfid}`
     const body = {
         ...data,
         ttl: 1,
@@ -90,7 +80,7 @@ export async function updateCloudflareRecord(domain: string, data: ICloudflareRe
 }
 
 export async function deleteCloudflareRecord(domain: string, cfid: string) {
-    const url = `https://api.cloudflare.com/client/v4/zones/${domains[domain]}/dns_records/${cfid}`
+    const url = `https://api.sh0rt.kr/zones/${domains[domain]}/dns_records/${cfid}`
 
     const response = await fetch(url, {
         method: 'DELETE',

@@ -16,7 +16,7 @@ if(!loggedIn.value) {
   router.push('/')
 }
 
-const domainInfo: Ref<IDomainPostRequest> = ref({domain: '', expires: dayjs(getDate()).format('YYYY-MM-DD'), tld: 'space-mc.com' })
+const domainInfo: Ref<IDomainPostRequest> = ref({domain: '', expires: dayjs(getDate()).format('YYYY-MM-DD'), tld: 'sh0rt.store' })
 const status: Ref<Status> = ref(Status.DEFAULT)
 const domainLimit: Ref<IDomainLimits> = ref({})
 
@@ -80,7 +80,7 @@ setLocale('ko')
     <DomainField submit-text="만들기" :is-new="true" :lock="status == Status.SUCCESS" @submit="onSubmit" />
     <div style="margin-top: 30px;" />
     <div v-if="status == Status.SUCCESS" class="notification is-success">
-      <p>{{domainInfo.domain}}.space-mc.com 생성에 성공했습니다.</p>
+      <p>{{ domainInfo.domain }}.{{ domainInfo.tld }} 생성에 성공했습니다.</p>
       <p>만료일: {{ dayjs(domainInfo.expires).format('YYYY-MM-DD')}}</p>
     </div>
     <div v-else-if="status == Status.ERROR" class="notification is-warning">
@@ -93,7 +93,7 @@ setLocale('ko')
       <thead>
         <tr>
           <th>도메인</th>
-          <th>사용된 레코드 수</th>
+          <th>남은 레코드 수</th>
         </tr>
       </thead>
       <tbody>

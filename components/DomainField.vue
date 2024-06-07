@@ -22,7 +22,7 @@ const emit = defineEmits<{submit: []}>()
 const props = defineProps<{submitText: string, isNew: boolean, lock: boolean}>()
 
 const domainInfo: Ref<IDomainPostRequest> = inject('domainInfo') ?? ref({
-  domain: '', expires: dayjs(getDate()).format('YYYY-MM-DD'), tld: 'space-mc.com'
+  domain: '', expires: dayjs(getDate()).format('YYYY-MM-DD'), tld: '.sh0rt.store'
 })
 const status: Ref<Status> = inject('status') ?? ref(Status.DEFAULT)
 

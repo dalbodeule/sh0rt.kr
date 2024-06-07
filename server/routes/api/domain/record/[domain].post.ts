@@ -91,26 +91,11 @@ export default defineEventHandler(async (event) => {
             }
         }
 
-        let data: ICloudflareSRVRequests | ICloudflareRequests
-
-            if(record.type == 'SRV') {
-                const part2 = record.value.split(' ')
-                data = {
-                    type: 'SRV',
-                    name: record.name,
-                    data: {
-                        priority: parseInt(part2[0]),
-                        weight: parseInt(part2[1]),
-                        port: parseInt(part2[2]),
-                        target: part2[3]
-                    }
-                }
-            } else
-                data = {
-                    type,
-                    name,
-                    value
-                }
+        const data: ICloudflareRequests = {
+            type,
+            name,
+            value
+        }
 
         if (existingRecord) {
             if (existingRecord.value !== value) {

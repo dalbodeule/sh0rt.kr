@@ -41,11 +41,12 @@ export default defineEventHandler(async (event: H3Event) => {
     })
 
     const domain_id = await db.insert(domains).values({
-        domain: request.domain!,
-        expires: dayjs(request.expires).toDate()
+        domain: request.domain,
+        expires: dayjs(request.expires).toDate(),
+        tld: request.tld
     }).returning()
 
-    await db.insert(usersToDomains).values({ user: user.user.id, domain: domain_id[0].id})
+    await db.insert(usersToDomains).values({ user: user.user.id, domain: domain_id[0].id })
 
     const response = await db.query.domains.findFirst({
         where: and(

@@ -146,7 +146,7 @@ setLocale('ko')
         <thead>
           <tr>
             <th>도메인</th>
-            <th>사용된 레코드 수</th>
+            <th>남은 레코드 수</th>
           </tr>
         </thead>
         <tbody>

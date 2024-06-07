@@ -99,7 +99,7 @@ export default defineEventHandler(async (event) => {
 
         if (existingRecord) {
             if (existingRecord.value !== value) {
-                await updateCloudflareRecord(`${domain}.space-mc.com`, data, existingRecord.cfid);
+                await updateCloudflareRecord(tld, data, existingRecord.cfid);
                 await db.update(records).set({ value }).where(eq(records.id, existingRecord.id));
                 results.push({ ...record });
             } else {
@@ -112,7 +112,7 @@ export default defineEventHandler(async (event) => {
                 message: 'Limit reached. Contact Administrator.'
             })
 
-            const result = await createCloudflareRecord(`${domain}.space-mc.com`, data);
+            const result = await createCloudflareRecord(tld, data);
             await db.insert(records).values({
                 domain: domainBody.id,
                 type,
@@ -127,7 +127,7 @@ export default defineEventHandler(async (event) => {
     // Identify and delete records that are not in the new record list
     for (const [key, record] of existingRecordMap.entries()) {
         if (!newRecordMap.has(key)) {
-            await deleteCloudflareRecord(`${domain}.space-mc.com`, record.cfid);
+            await deleteCloudflareRecord(tld, record.cfid);
             await db.delete(records).where(eq(records.id, record.id));
         }
     }

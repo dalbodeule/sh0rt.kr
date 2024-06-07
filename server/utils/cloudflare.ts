@@ -9,11 +9,12 @@ export interface ICloudflareRequests {
 const domains: { [key: string]: string } = {}
 const zoneIds = config.domainZoneId.split(',')
 
-config.domainZoneId.split(',').forEach((value, idx) => {
-    domains[value] = zoneIds[idx];
+config.public.domainList.split(',').forEach((value, idx) => {
+    domains[value.replaceAll('\'', '')] = zoneIds[idx].replaceAll('\'', '');
 })
 
 export async function createCloudflareRecord(domain: string, data: ICloudflareRequests) {
+    console.log(domain, domains[domain])
     const url = `https://api.sh0rt.kr/zones/${domains[domain]}/dns_records`
     const body = {
         ...data,
@@ -37,7 +38,8 @@ export async function createCloudflareRecord(domain: string, data: ICloudflareRe
     })
 
     if (!response.ok) {
-        const errorDetails = await response.json()
+        const errors = await response.text()
+        const errorDetails = JSON.parse(errors)
         console.log(errorDetails.errors[0])
         throw new Error(`Failed to create Cloudflare record ${errorDetails.errors[0].message}`)
     }
@@ -71,7 +73,8 @@ export async function updateCloudflareRecord(domain: string, data: ICloudflareRe
     })
 
     if (!response.ok) {
-        const errorDetails = await response.json()
+        const errors = await response.text()
+        const errorDetails = JSON.parse(errors)
         console.log(errorDetails.errors)
         throw new Error(`Failed to create Cloudflare record ${errorDetails.errors[0].message}`)
     }
@@ -91,7 +94,8 @@ export async function deleteCloudflareRecord(domain: string, cfid: string) {
     })
 
     if (!response.ok) {
-        const errorDetails = await response.json()
+        const errors = await response.text()
+        const errorDetails = JSON.parse(errors)
         console.log(errorDetails.errors)
         throw new Error(`Failed to create Cloudflare record ${errorDetails.errors[0].message}`)
     }

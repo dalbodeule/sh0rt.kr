@@ -40,7 +40,7 @@ export async function createCloudflareRecord(domain: string, data: ICloudflareRe
     if (!response.ok) {
         const errors = await response.text()
         const errorDetails = JSON.parse(errors)
-        console.log(errorDetails.errors[0])
+        console.log(errorDetails)
         throw new Error(`Failed to create Cloudflare record ${errorDetails.errors[0].message}`)
     }
 

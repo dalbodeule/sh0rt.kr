@@ -60,10 +60,16 @@ const onSubmit = async () => {
       credentials: 'include'
     })
   ])
-  isDDNSAvailable.value = await useRequestFetch()(`${config.public.baseUrl}/api/domain/ddns`, {
+  try {
+    const p: { success: boolean } = await useRequestFetch()(`${config.public.baseUrl}/api/domain/ddns`, {
       method: 'GET',
       credentials: 'include'
     })
+    if(p.success)
+      isDDNSAvailable.value = true
+  } catch(e) {
+    isDDNSAvailable.value = false
+  }
 })()
 </script>
 
@@ -145,6 +151,13 @@ const onSubmit = async () => {
         <p class="card-header-title">DDNS 설정</p>
       </div>
       <div class="card-content">
+        <div v-if="isDDNSAvailable" class="notification is-success">
+          <p>DDNS 비밀번호가 설정되어 있습니다.</p>
+        </div>
+        <div v-else class="notification is-warning">
+          <p>DDNS 비밀번호를 설정해주세요. 설정하지 않으면 DDNS를 사용할 수 없습니다.</p>
+        </div>
+        <div style="margin-top: 30px;" />
         <DDNSKeyField :lock="DDNSStatus == Status.SUCCESS" @submit="onSubmit"/>
         <div style="margin-top: 30px;" />
         <div v-if="DDNSStatus == Status.SUCCESS" class="notification is-success">

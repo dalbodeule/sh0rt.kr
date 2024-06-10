@@ -10,12 +10,12 @@ export default defineEventHandler(async (event) => {
     const db = useDrizzle()
 
     const userDB = await db.query.users.findFirst({
-        where: eq(users, user.user.id)
+        where: eq(users.id, user.user.id)
     })
 
-    if(!userDB?.ddns_key) throw createError({
+    if(!userDB || !userDB.ddns_key) throw createError({
         statusCode: 404,
         statusMessage: 'DDNS Key is not created'
     })
-    return ''
+    return { success: true }
 })

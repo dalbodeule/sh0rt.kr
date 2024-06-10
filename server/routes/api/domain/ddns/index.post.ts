@@ -21,11 +21,12 @@ export default defineEventHandler(async (event) => {
     })
 
     const db = useDrizzle()
-    const hashedPassword = await bcrypt.hash(await sha256(body.password), 10)
+    const salt = await bcrypt.genSalt()
+    const hashedPassword = await bcrypt.hash(await sha256(body.password), salt)
 
     await db.update(users).set({
         ddns_key: hashedPassword
-    })
+    }).where(eq(users.id, user.user.id))
 
     return { success: true }
 })

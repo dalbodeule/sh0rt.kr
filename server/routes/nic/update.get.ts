@@ -8,8 +8,6 @@ import type {ICloudflareRequests} from "~/server/utils/cloudflare";
 import { updateCloudflareRecord} from "~/server/utils/cloudflare";
 
 interface IUpdateDNSQuery {
-    username: string,
-    password: string,
     hostname: string,
     myip: string,
     type: 'A' | 'AAAA' | undefined
@@ -18,9 +16,19 @@ interface IUpdateDNSQuery {
 export default defineEventHandler(async (event) => {
     const query = getQuery(event) as IUpdateDNSQuery
 
-    const { username, password, hostname, myip, type } = query
+    const { hostname, myip, type } = query
+    const base64Credentials = getHeaders(event).authorization?.split(" ")?.[1];
 
-    if(!username || !password || !hostname || !myip)
+    if (!base64Credentials) throw createError({
+        statusCode: 403,
+        statusMessage: 'badauth',
+    })
+
+    const credentials = Buffer.from(base64Credentials, "base64").toString("ascii");
+
+    const [username, password] = credentials.split(":");
+
+    if(!hostname || !myip)
         throw createError({
             statusCode: 400,
             statusMessage: 'missing parameter'

@@ -114,6 +114,7 @@ const schema = {
             </div>
           </div>
           <ErrorMessage name="uid" as="p" class="help is-danger"/>
+          <p v-if="domainInfo.tld?.endsWith('.dev')" class="help is-warning">.dev TLD는 웹서비스에서 반드시 HTTPS로 접속되는 도메인입니다. 사용하실 때 주의가 필요합니다.</p>
         </div>
       </div>
     </div>

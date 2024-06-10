@@ -3,6 +3,8 @@ import type { IListUrls } from "~/server/routes/api/manage/index.post"
 import type { IListDomains } from "~/server/routes/api/domain/list.post"
 import type { Ref } from "vue"
 import dayjs from "dayjs"
+import { Status } from "~/common/enums"
+import type {IDDNSKeyPost} from "~/server/routes/api/domain/ddns/index.post";
 
 const _route = useRoute()
 const router = useRouter()
@@ -25,6 +27,27 @@ useSeoMeta({
 
 const data: Ref<IListUrls | undefined> = ref()
 const domain: Ref<IListDomains | undefined> = ref()
+const isDDNSAvailable = ref(false)
+const DDNSStatus: Ref<Status> = ref(Status.DEFAULT)
+const DDNSPassword: Ref<IDDNSKeyPost> = ref({ password: '', password2: '' })
+provide('ddns', DDNSPassword)
+
+const onSubmit = async () => {
+  try {
+    const result = await useRequestFetch()(`${config.public.baseUrl}/api/domain/ddns`, {
+      method: 'POST',
+      credentials: 'include',
+      body: JSON.stringify(DDNSPassword.value)
+    })
+    if(result) {
+      DDNSStatus.value = Status.SUCCESS
+    } else {
+      DDNSStatus.value = Status.ERROR
+    }
+  } catch(e) {
+    DDNSStatus.value = Status.ERROR
+  }
+}
 
 ;(async() => {
   [data.value, domain.value] = await Promise.all([
@@ -37,6 +60,10 @@ const domain: Ref<IListDomains | undefined> = ref()
       credentials: 'include'
     })
   ])
+  isDDNSAvailable.value = await useRequestFetch()(`${config.public.baseUrl}/api/domain/ddns`, {
+      method: 'GET',
+      credentials: 'include'
+    })
 })()
 </script>
 
@@ -109,6 +136,24 @@ const domain: Ref<IListDomains | undefined> = ref()
             </div>
           </div>
         </div>
+      </div>
+    </div>
+    <div style="margin-top: 30px;"/>
+    <h1>DDNS 설정</h1>
+    <div class="card">
+      <div class="card-header">
+        <p class="card-header-title">DDNS 설정</p>
+      </div>
+      <div class="card-content">
+        <DDNSKeyField :lock="DDNSStatus == Status.SUCCESS" @submit="onSubmit"/>
+        <div style="margin-top: 30px;" />
+        <div v-if="DDNSStatus == Status.SUCCESS" class="notification is-success">
+          <p>DDNS 비밀번호 설정에 성공했습니다.</p>
+        </div>
+        <div v-else-if="DDNSStatus == Status.ERROR" class="notification is-warning">
+          <p>DDNS 비밀번호 설정에 실패했습니다.</p>
+        </div>
+        <progress v-else-if="DDNSStatus == Status.PENDING" class="progress is-primary" max="100"/>
       </div>
     </div>
   </div>

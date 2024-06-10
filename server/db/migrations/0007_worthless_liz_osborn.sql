@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD `ddns_key` text(64);

@@ -18,6 +18,7 @@ export const users = sqliteTable('users', {
     updated_at: int('updated_at', { mode: "timestamp" }).notNull().default(sql`(STRFTIME('%s'))`),
     login_limit: int('login_limit', { mode: "timestamp" }),
     role: int('role').notNull().default(UserRole.USER),
+    ddns_key: text('ddns_key', { length: 64 })
 })
 
 export const usersRelations = relations(users, ({ many }) => ({

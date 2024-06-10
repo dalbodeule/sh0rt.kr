@@ -1,7 +1,6 @@
 import {domains, records} from "~/server/db/schema";
 import {gte} from "drizzle-orm";
-import type {
-    ICloudflareRequests, ICloudflareSRVRequests} from "~/server/utils/cloudflare";
+import type { ICloudflareRequests } from "~/server/utils/cloudflare";
 import {
     createCloudflareRecord,
     deleteCloudflareRecord,
@@ -99,7 +98,7 @@ export default defineEventHandler(async (event) => {
 
         if (existingRecord) {
             if (existingRecord.value !== value) {
-                await updateCloudflareRecord(tld, data, existingRecord.cfid);
+                await updateCloudflareRecord(fullDomain, data, existingRecord.cfid);
                 await db.update(records).set({ value }).where(eq(records.id, existingRecord.id));
                 results.push({ ...record });
             } else {
@@ -112,7 +111,7 @@ export default defineEventHandler(async (event) => {
                 message: 'Limit reached. Contact Administrator.'
             })
 
-            const result = await createCloudflareRecord(tld, data);
+            const result = await createCloudflareRecord(fullDomain, data);
             await db.insert(records).values({
                 domain: domainBody.id,
                 type,

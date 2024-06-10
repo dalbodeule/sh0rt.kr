@@ -50,7 +50,7 @@ useSeoMeta({
             <ul>
               <li><FontAwesomeIcon icon="fas fa-tags" />&nbsp;<strong>브랜드 인지도</strong>: 비즈니스나 개인 프로젝트를 위한 고유한 서브도메인으로 전문 이미지를 구축할 수 있습니다.</li>
               <li><FontAwesomeIcon icon="fas fa-lock" />&nbsp;<strong>보안</strong>: 안전하고 전용 서브도메인을 통해 온라인 존재를 유지할 수 있습니다.</li>
-              <li><FontAwesomeIcon icon="fas fa-shield-alt" />&nbsp;<strong>Let's Encrypt 지원</strong>: 무료 SSL 인증서를 통해 보안을 강화할 수 있습니다.</li>
+              <li><FontAwesomeIcon icon="fas fa-shield-alt" />&nbsp;<strong>Let's Encrypt 지원</strong>: 무료 SSL 인증서를 통해 보안을 강화할 수 있습니다. (별도 작업 필요)</li>
               <li><FontAwesomeIcon icon="fas fa-globe" />&nbsp;<strong>DDNS 지원</strong>: 동적 DNS 기능을 통해 IP 주소가 변경되어도 항상 같은 도메인 이름을 사용할 수 있습니다.</li>
             </ul>
           </div>

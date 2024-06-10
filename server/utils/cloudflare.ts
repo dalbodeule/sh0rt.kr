@@ -1,3 +1,5 @@
+import getDomain from "~/common/getDomain";
+
 const config = useRuntimeConfig()
 
 export interface ICloudflareRequests {
@@ -14,19 +16,20 @@ config.public.domainList.split(',').forEach((value, idx) => {
 })
 
 export async function createCloudflareRecord(domain: string, data: ICloudflareRequests) {
-    console.log(domain, domains[domain])
-    const url = `https://api.sh0rt.kr/zones/${domains[domain]}/dns_records`
+    const [ _subdomain, tld ] = getDomain(domain)
+    console.log(tld, domains[tld])
+
+    const url = `https://api.sh0rt.kr/zones/${domains[tld]}/dns_records`
     const body = {
         ...data,
         ttl: 1,
         proxied: false,
         comment: 'auto generated with apis'
     }
-    body.name = `${body.name}.${domain}`
-
+    body.name = `${body.name}.${domain}.`
+    body.name = body.name.replace('..', '.')
     if(body.name.startsWith('.'))
         body.name = body.name.slice(1)
-    body.name = body.name.replace('..', '.')
 
     const response = await fetch(url, {
         method: 'POST',
@@ -48,18 +51,20 @@ export async function createCloudflareRecord(domain: string, data: ICloudflareRe
 }
 
 export async function updateCloudflareRecord(domain: string, data: ICloudflareRequests, cfid: string) {
-    const url = `https://api.sh0rt.kr/zones/${domains[domain]}/dns_records/${cfid}`
+    const [ _subdomain, tld ] = getDomain(domain)
+    console.log(tld, domains[tld])
+
+    const url = `https://api.sh0rt.kr/zones/${domains[tld]}/dns_records/${cfid}`
     const body = {
         ...data,
         ttl: 1,
         proxied: false,
         comment: 'auto generated with apis'
     }
-    body.name = `${body.name}.${domain}`
-
+    body.name = `${body.name}.${domain}.`
+    body.name = body.name.replace('..', '.')
     if(body.name.startsWith('.'))
         body.name = body.name.slice(1)
-    body.name = body.name.replace(/(\.+)$/gm, '.')
 
     console.log(body)
 
@@ -83,7 +88,10 @@ export async function updateCloudflareRecord(domain: string, data: ICloudflareRe
 }
 
 export async function deleteCloudflareRecord(domain: string, cfid: string) {
-    const url = `https://api.sh0rt.kr/zones/${domains[domain]}/dns_records/${cfid}`
+    const [ _subdomain, tld ] = getDomain(domain)
+    console.log(tld, domains[tld])
+
+    const url = `https://api.sh0rt.kr/zones/${domains[tld]}/dns_records/${cfid}`
 
     const response = await fetch(url, {
         method: 'DELETE',

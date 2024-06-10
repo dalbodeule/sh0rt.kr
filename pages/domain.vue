@@ -58,7 +58,7 @@ const getStatus = (available: number): string => {
 }
 
 useSeoMeta({
-  title: `sh0rt.kr :: SRV Domain`,
+  title: `sh0rt.kr :: 서브도메인 생성`,
   description: `sh0rt.kr :: 강력한 URL 단축기`,
   robots: { all: false },
   ogType: 'website',

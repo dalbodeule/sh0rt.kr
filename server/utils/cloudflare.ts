@@ -19,7 +19,7 @@ export async function createCloudflareRecord(domain: string, data: ICloudflareRe
     const [ _subdomain, tld ] = getDomain(domain)
     console.log(tld, domains[tld])
 
-    const url = `https://api.sh0rt.kr/zones/${domains[tld]}/dns_records`
+    const url = `http://localhost:8080/zones/${domains[tld]}/dns_records`
     const body = {
         ...data,
         ttl: 1,
@@ -54,7 +54,7 @@ export async function updateCloudflareRecord(domain: string, data: ICloudflareRe
     const [ _subdomain, tld ] = getDomain(domain)
     console.log(tld, domains[tld])
 
-    const url = `https://api.sh0rt.kr/zones/${domains[tld]}/dns_records/${cfid}`
+    const url = `http://localhost:8080/zones/${domains[tld]}/dns_records/${cfid}`
     const body = {
         ...data,
         ttl: 1,
@@ -91,7 +91,7 @@ export async function deleteCloudflareRecord(domain: string, cfid: string) {
     const [ _subdomain, tld ] = getDomain(domain)
     console.log(tld, domains[tld])
 
-    const url = `https://api.sh0rt.kr/zones/${domains[tld]}/dns_records/${cfid}`
+    const url = `http://localhost:8080/zones/${domains[tld]}/dns_records/${cfid}`
 
     const response = await fetch(url, {
         method: 'DELETE',

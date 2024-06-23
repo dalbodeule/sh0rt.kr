@@ -22,7 +22,8 @@ const props = defineProps<{submitText: string, isNew: boolean, lock: boolean}>()
 
 // datetime picker default value
 // https://futurestud.io/tutorials/vue-js-3-bind-a-value-to-an-html-datetime-input
-const addrInfo: Ref<IUIDPostRequest> = inject('addrInfo') ?? ref({uid: '', forward: '', expires: dayjs().format("YYYY-MM-DD")})
+const addrInfo: Ref<IUIDPostRequest> = inject('addrInfo') ??
+    ref({ uid: '', forward: '', expires: dayjs().format("YYYY-MM-DD"), token: '' })
 const status: Ref<Status> = inject('status') ?? ref(Status.DEFAULT)
 
 defineRule('alpha_num', alpha_num)
@@ -145,7 +146,12 @@ const schema = {
     </div>
     <div class="field is-grouped is-grouped-right">
       <div class="control">
-        <button type="submit" class="button is-link" :disabled="status == Status.PENDING || props.lock">{{ props.submitText }}</button>
+        <NuxtTurnstile v-model="addrInfo.token" :options="{theme: 'light'}"/>
+      </div>
+    </div>
+    <div class="field is-grouped is-grouped-right">
+      <div class="control">
+        <button type="submit" class="button is-link" :disabled="status == Status.PENDING || props.lock || !addrInfo.token">{{ props.submitText }}</button>
       </div>
       <div class="control">
         <button type="reset" class="button is-link is-light" :disabled="status == Status.PENDING || props.lock">취소</button>

@@ -6,9 +6,10 @@ import dayjs from "dayjs";
 import type { IDomainGetResponse } from "~/server/routes/api/domain/[domain].get";
 
 export interface IDomainPostRequest {
-    domain: string | null,
-    tld: string | null,
-    expires: string | null
+    domain: string | undefined,
+    tld: string | undefined,
+    expires: string | undefined,
+    token: string | undefined
 }
 
 export default defineEventHandler(async (event: H3Event) => {
@@ -20,9 +21,15 @@ export default defineEventHandler(async (event: H3Event) => {
     })
 
     const request = await readBody(event) as IDomainPostRequest
-    if(!request.domain || !request.expires || !request.tld) throw createError({
+    if(!request.domain || !request.expires || !request.tld || !request.token) throw createError({
         status: 403,
         message: 'Body is wrong',
+    })
+
+    const verify = await verifyTurnstileToken(request.token)
+    if(!verify.success) throw createError({
+        status: 403,
+        message: 'Captcha is wrong',
     })
 
     const db = useDrizzle()

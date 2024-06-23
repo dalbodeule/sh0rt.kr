@@ -35,8 +35,12 @@ export default defineNuxtConfig({
     public: {
       baseUrl: process.env.BASE_URL,
       domainList: process.env.DOMAIN_LIST,
-      domainLimit: process.env.DOMAIN_LIMIT
+      domainLimit: process.env.DOMAIN_LIMIT,
     }
+  },
+  turnstile: {
+    secretKey: process.env.TURNSTILE_SITE_KEY,
+    siteKey: process.env.TURNSTILE_SECRET_KEY,
   },
   hub: {
     analytics: true,
@@ -45,5 +49,11 @@ export default defineNuxtConfig({
   purgecss: {
     safelist: [/svg.*/, /fa.*/]
   },
-  modules: ["nuxt-auth-utils", "@nuxthub/core", "nuxt-purgecss", "@nuxt/eslint"]
+  modules: [
+    "nuxt-auth-utils",
+    "@nuxthub/core",
+    "nuxt-purgecss",
+    "@nuxt/eslint",
+    "@nuxtjs/turnstile"
+  ]
 })

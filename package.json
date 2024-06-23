@@ -38,6 +38,7 @@
   "devDependencies": {
     "@nuxt/eslint": "^0.3.13",
     "@nuxthub/core": "^0.5.18",
+    "@nuxtjs/turnstile": "^0.8.0",
     "@types/accept-language-parser": "^1.5.6",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsdom": "^21.1.6",

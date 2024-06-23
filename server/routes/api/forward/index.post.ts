@@ -6,9 +6,10 @@ import dayjs from "dayjs";
 import { useDrizzle } from "~/server/utils/useDrizzle";
 
 export interface IUIDPostRequest {
-    uid: string | null,
-    forward: string | null,
-    expires: string | null
+    uid: string | undefined,
+    forward: string | undefined,
+    expires: string | undefined,
+    token: string | undefined
 }
 
 export default defineEventHandler(async (event: H3Event) => {
@@ -20,9 +21,15 @@ export default defineEventHandler(async (event: H3Event) => {
     })
 
     const request = await readBody(event) as IUIDPostRequest
-    if(!request.uid || !request.forward || !request.expires) throw createError({
+    if(!request.uid || !request.forward || !request.expires || !request.token) throw createError({
         status: 403,
         message: 'Body is wrong',
+    })
+
+    const verify = await verifyTurnstileToken(request.token)
+    if(!verify.success) throw createError({
+        status: 403,
+        message: 'Captcha is wrong',
     })
 
     const db = useDrizzle()

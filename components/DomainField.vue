@@ -22,7 +22,10 @@ const emit = defineEmits<{submit: []}>()
 const props = defineProps<{submitText: string, isNew: boolean, lock: boolean}>()
 
 const domainInfo: Ref<IDomainPostRequest> = inject('domainInfo') ?? ref({
-  domain: '', expires: dayjs(getDate()).format('YYYY-MM-DD'), tld: '.sh0rt.store'
+  domain: '',
+  expires: dayjs(getDate()).format('YYYY-MM-DD'),
+  tld: '',
+  token: ''
 })
 const status: Ref<Status> = inject('status') ?? ref(Status.DEFAULT)
 
@@ -114,7 +117,7 @@ const schema = {
             </div>
           </div>
           <ErrorMessage name="uid" as="p" class="help is-danger"/>
-          <p v-if="domainInfo.tld?.endsWith('.dev')" class="help is-warning">.dev TLD는 웹서비스에서 반드시 HTTPS로 접속되는 도메인입니다. 사용하실 때 주의가 필요합니다.</p>
+          <p v-if="domainInfo.tld?.endsWith('.dev') || domainInfo.tld?.endsWith('.day')" class="help is-warning">이 주소는 웹서비스에서 반드시 HTTPS로 접속되는 도메인입니다. 사용하실 때 주의가 필요합니다.</p>
         </div>
       </div>
     </div>
@@ -133,7 +136,12 @@ const schema = {
     </div>
     <div class="field is-grouped is-grouped-right">
       <div class="control">
-        <button type="submit" class="button is-link" :disabled="status == Status.PENDING || props.lock">{{ props.submitText }}</button>
+        <NuxtTurnstile v-model="domainInfo.token" :options="{theme: 'light'}"/>
+      </div>
+    </div>
+    <div class="field is-grouped is-grouped-right">
+      <div class="control">
+        <button type="submit" class="button is-link" :disabled="status == Status.PENDING || props.lock || !domainInfo.token">{{ props.submitText }}</button>
       </div>
       <div class="control">
         <button type="reset" class="button is-link is-light" :disabled="status == Status.PENDING || props.lock">취소</button>

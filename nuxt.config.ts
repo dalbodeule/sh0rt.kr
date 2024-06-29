@@ -39,8 +39,8 @@ export default defineNuxtConfig({
     }
   },
   turnstile: {
-    secretKey: process.env.TURNSTILE_SITE_KEY,
-    siteKey: process.env.TURNSTILE_SECRET_KEY,
+    secretKey: process.env.TURNSTILE_SECRET_KEY,
+    siteKey: process.env.TURNSTILE_SITE_KEY,
   },
   hub: {
     analytics: true,

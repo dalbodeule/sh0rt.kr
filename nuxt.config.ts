@@ -22,6 +22,7 @@ export default defineNuxtConfig({
     domainZoneId: process.env.DOMAIN_ZONE_ID,
     domainApiToken: process.env.DOMAIN_API_TOKEN,
     domainApiEmail: process.env.DOMAIN_API_EMAIL,
+    apiBackend: process.env.API_BACKEND,
     oauth: {
       github: {
         clientId: process.env.GITHUB_CLIENT_ID,

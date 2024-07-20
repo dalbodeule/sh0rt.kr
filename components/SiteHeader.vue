@@ -26,6 +26,7 @@ const { loggedIn, user, session: _session, clear } = useUserSession()
         <NuxtLink v-if="loggedIn" class="navbar-item" to="/domain">서브도메인 만들기</NuxtLink>
         <NuxtLink class="navbar-item" to="/ddns">DDNS 설정</NuxtLink>
         <NuxtLink class="navbar-item" to="/privacy">개인정보 처리방침</NuxtLink>
+        <NuxtLink class="navbar-item" to="/policy">이용약관</NuxtLink>
       </div>
       <div v-if="loggedIn" class="navbar-end">
         <NuxtLink to="/manage" class="navbar-item">

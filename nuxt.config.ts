@@ -6,11 +6,15 @@ export default defineNuxtConfig({
       autoSubfolderIndex: false,
       ignore: ['/']
     },
+    experimental: {
+      tasks: true
+    },
     preset: "cloudflare-module"
   },
   build: {
     transpile: ['Dayjs', 'linkedom']
   },
+  compatibilityDate: "2024-07-04",
   css: [
     '@fortawesome/fontawesome-svg-core/styles.css'
   ],

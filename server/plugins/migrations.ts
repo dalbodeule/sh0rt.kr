@@ -1,6 +1,6 @@
 import { consola } from 'consola'
 import { migrate } from 'drizzle-orm/d1/migrator'
-import {useDrizzle} from "~/server/utils/useDrizzle";
+import { useDrizzle } from "~/server/utils/useDrizzle"
 
 export default defineNitroPlugin(async () => {
   if (!import.meta.dev) return

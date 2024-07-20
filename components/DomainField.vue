@@ -15,7 +15,7 @@ import type {IDomainPostRequest} from "~/server/routes/api/domain/index.post";
 
 const config = useRuntimeConfig()
 
-const banlist = [ 'create', 'login', 'logout', 'admin', 'root', 'manage', 'privacy', 'www' ]
+const banlist = [ 'create', 'login', 'logout', 'admin', 'root', 'manage', 'privacy', 'www', 'policy' ]
 const domainlist = config.public.domainList.split(',')
 
 const emit = defineEmits<{submit: []}>()

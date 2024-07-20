@@ -7,9 +7,6 @@ import ko from '@vee-validate/i18n/dist/locale/ko.json'
 import en from '@vee-validate/i18n/dist/locale/en.json'
 
 import type { Ref } from "vue";
-import { Status } from "~/common/enums";
-
-const config = useRuntimeConfig()
 
 const emit = defineEmits<{submit: []}>()
 const props = defineProps<{lock: boolean}>()

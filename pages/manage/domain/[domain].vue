@@ -150,8 +150,8 @@ setLocale('ko')
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(record, domain) in domainLimit" :key="domain">
-            <td>{{ domain }}</td>
+          <tr v-for="(record, key) in domainLimit" :key="key">
+            <td>{{ key }}</td>
             <td :class="getStatus(record)">{{ record }}</td>
           </tr>
         </tbody>

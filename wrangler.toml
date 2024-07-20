@@ -1,0 +1,42 @@
+name = "sh0rt-kr"
+main = ".output/server/index.mjs"
+workers_dev = true
+compatibility_date = "2024-07-12"
+services = [
+    { binding = "SELF", service = "sh0rt-kr" }
+]
+
+[site]
+bucket = ".output/public"
+
+[vars]
+NUXT_OAUTH_GITHUB_CLIENT_ID = "Ov23liTsdN0bOgaldNIM"
+NUXT_OAUTH_GOOGLE_CLIENT_ID = "963112485410-ll8cb0642a68olkr3m3o10nmddq1j4sv.apps.googleusercontent.com"
+NUXT_PUBLIC_BASE_URL = "https://sh0rt.kr"
+NUXT_ANALYTICS_ACCOUNT_ID="4dd202da6929c93d22e57a3dc6e5b2a0"
+NUXT_DOMAIN_API_EMAIL="jioo0224@naver.com"
+NUXT_PUBLIC_DOMAIN_LIST = "sh0rt.online,sh0rt.store,sh0r.dev,sh0r.xyz,s-h.day"
+NUXT_PUBLIC_DOMAIN_LIMIT = "5000,5000,5000,5000,5000"
+
+NUXT_API_BACKEND="https://api.sh0rt.kr"
+
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "prod-sh0rt-kr"
+database_id = "<DATABASE_ID>"
+
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+
+# Bind a Queue producer. Use this binding to schedule an arbitrary task that may be processed later by a Queue consumer.
+# Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#queues
+[[queues.producers]]
+binding = "EMAIL_QUEUE"
+queue = "sh0rt-kr-email-worker"
+
+[[queues.producers]]
+binding = "REMOVE_QUEUE"
+queue = "sh0rt-kr-removedns-queue"
+
+[[queues.consumers]]
+queue = "sh0rt-kr-removedns-queue"

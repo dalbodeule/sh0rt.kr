@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
+  compatibilityDate: "2024-07-20",
   nitro: {
     prerender: {
       autoSubfolderIndex: false,
@@ -14,7 +15,6 @@ export default defineNuxtConfig({
   build: {
     transpile: ['Dayjs', 'linkedom']
   },
-  compatibilityDate: "2024-07-04",
   css: [
     '@fortawesome/fontawesome-svg-core/styles.css'
   ],

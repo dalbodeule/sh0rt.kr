@@ -1,5 +1,5 @@
-/* export default defineNitroPlugin(nitro => {
-    nitro.hooks.hook("cloudflare:queue", (_event) =>  {
+export default defineNitroPlugin(_nitro => {
+    /* nitro.hooks.hook("cloudflare:queue", (_event) =>  {
 
-    })
-}) */
+    }) */
+})

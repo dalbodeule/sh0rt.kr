@@ -48,6 +48,6 @@
     "nuxt-purgecss": "^2.0.0",
     "prisma": "^5.14.0",
     "sass": "^1.77.2",
-    "wrangler": "^3.57.1"
+    "wrangler": "^3.65.1"
   }
 }

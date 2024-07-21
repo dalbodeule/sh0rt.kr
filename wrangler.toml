@@ -23,7 +23,7 @@ NUXT_API_BACKEND="https://api.sh0rt.kr"
 [[d1_databases]]
 binding = "DB" # i.e. available in your Worker on env.DB
 database_name = "prod-sh0rt-kr"
-database_id = "<DATABASE_ID>"
+database_id = "00601374-c95b-4447-865b-554e20434e5d"
 
 [[analytics_engine_datasets]]
 binding = "ANALYTICS"

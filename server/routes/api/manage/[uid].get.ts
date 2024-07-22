@@ -90,10 +90,9 @@ export default defineEventHandler(async (event: H3Event) => {
             Math.round((currentShorten?.created_at ?? new Date()).getTime() / 1000)
         })`
     )
-    let type = ""
+
     try {
         const parsedData = JSON.parse(data) as IAnalytics
-        type = typeof parsedData
 
         const countryData = aggregateDataByField(parsedData, 'country', 'Country')
         const browserData = aggregateDataByField(parsedData, 'browser', 'Browser')
@@ -111,7 +110,7 @@ export default defineEventHandler(async (event: H3Event) => {
     } catch (e) {
         throw createError({
             status: 400,
-            message: `Could not parse analytics | ${e?.message || "none"} / ${e?.stack || "none" } // ${type}`,
+            message: `Could not parse analytics`,
         })
     }
 })

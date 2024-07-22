@@ -38,5 +38,5 @@ queue = "sh0rt-kr-email-worker"
 binding = "REMOVE_QUEUE"
 queue = "sh0rt-kr-removedns-queue"
 
-[[queues.consumers]]
-queue = "sh0rt-kr-removedns-queue"
+#[[queues.consumers]]
+#queue = "sh0rt-kr-removedns-queue"

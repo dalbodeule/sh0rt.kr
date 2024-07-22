@@ -60,7 +60,6 @@ export async function getFromAnalytics(query: string) {
         },
         body: query
     })
-
     return await response.text()
 }
 

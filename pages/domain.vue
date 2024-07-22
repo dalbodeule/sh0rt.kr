@@ -16,7 +16,7 @@ if(!loggedIn.value) {
   router.push('/')
 }
 
-const domainInfo: Ref<IDomainPostRequest> = ref({domain: '', expires: dayjs(getDate()).format('YYYY-MM-DD'), tld: 'sh0rt.store' })
+const domainInfo: Ref<IDomainPostRequest> = ref({domain: '', expires: dayjs(getDate()).format('YYYY-MM-DD'), tld: 'sh0rt.store', token: '' })
 const status: Ref<Status> = ref(Status.DEFAULT)
 const domainLimit: Ref<IDomainLimits> = ref({})
 

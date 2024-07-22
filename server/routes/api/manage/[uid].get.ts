@@ -110,7 +110,7 @@ export default defineEventHandler(async (event: H3Event) => {
     } catch (e) {
         throw createError({
             status: 400,
-            message: `Could not parse analytics`,
+            message: `Could not parse analytics \n ${data}`,
         })
     }
 })

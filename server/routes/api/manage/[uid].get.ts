@@ -38,6 +38,7 @@ const aggregateDataByField = (response: IAnalytics, field: string, fieldName: st
 }
 
 export default defineEventHandler(async (event: H3Event) => {
+    const config = useRuntimeConfig()
     const uid = getRouterParam(event, 'uid') ?? ''
     if(!uid) throw createError({
         status: 404,
@@ -110,7 +111,7 @@ export default defineEventHandler(async (event: H3Event) => {
     } catch (e) {
         throw createError({
             status: 400,
-            message: `Could not parse analytics \n ${data}`,
+            message: `Could not parse analytics \n ${data} ${config.analyticsAccountId}`,
         })
     }
 })

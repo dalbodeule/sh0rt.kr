@@ -47,7 +47,7 @@ localize({
 const schema = {
   type: { required: true },
   name: { max: 20 },
-  value: { required: true, min:7, max:1024 }
+  value: { required: true, min:3, max:1024 }
 }
 
 const updateRecord = (newRecord: { type: string, name: string, value: string }) => {
@@ -105,7 +105,7 @@ watch(() => props.record, (newRecord) => {
         <button class="button is-primary" type="button" @click="isSRVWizardActive = true">SRV 레코드 설정</button>
       </div>
       <div class="control">
-        <button class="button is-danger" @click="emit('remove', index)">제거</button>
+        <button class="button is-danger" type="button" @click="emit('remove', index)">제거</button>
       </div>
     </div>
     <SRVRecordWizard

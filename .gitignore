@@ -65,6 +65,8 @@ node_modules
 
 .wrangler
 .env
+.env.nuxt
+.dev.vars
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,linux,nuxtjs
 .data

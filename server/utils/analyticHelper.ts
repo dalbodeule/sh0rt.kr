@@ -1,3 +1,5 @@
+import {H3Event} from "h3";
+
 export enum AKeys {
     ip = 'ip',
     country = 'country',
@@ -51,8 +53,8 @@ export function arrayToObject(arr: string[]): IAnalyticObject {
     return (object as unknown) as IAnalyticObject
 }
 
-export async function getFromAnalytics(query: string) {
-    const config = useRuntimeConfig()
+export async function getFromAnalytics(query: string, event: H3Event) {
+    const config = useRuntimeConfig(event)
     const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${config.analyticsAccountId}/analytics_engine/sql`, {
         method: 'POST',
         headers: {

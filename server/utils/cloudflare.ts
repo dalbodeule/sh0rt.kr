@@ -8,9 +8,9 @@ export interface ICloudflareRequests {
     value: string
 }
 
-const backend = config.apiBackend
+const backend = config.apiBackend ?? ""
 const domains: { [key: string]: string } = {}
-const zoneIds = config.domainZoneId.split(',')
+const zoneIds = (config.domainZoneId ?? "").split(',')
 
 config.public.domainList.split(',').forEach((value, idx) => {
     domains[value.replaceAll('\'', '')] = zoneIds[idx].replaceAll('\'', '');
@@ -48,7 +48,7 @@ export async function createCloudflareRecord(domain: string, data: ICloudflareRe
         const errors = await response.text()
         const errorDetails = JSON.parse(errors)
         console.log(errorDetails)
-        throw new Error(`Failed to create Cloudflare record ${errorDetails.errors[0].message}`)
+        throw new Error(`Failed to create Cloudflare record ${errorDetails.errors[0].message} / ${backend} ${domains[tld]}`)
     }
 
     return await response.json()
@@ -85,7 +85,7 @@ export async function updateCloudflareRecord(domain: string, data: ICloudflareRe
         const errors = await response.text()
         const errorDetails = JSON.parse(errors)
         console.log(errorDetails.errors)
-        throw new Error(`Failed to create Cloudflare record ${errorDetails.errors[0].message}`)
+        throw new Error(`Failed to create Cloudflare record ${errorDetails.errors[0].message} / ${backend} ${domains[tld]}`)
     }
 
     return await response.json()
@@ -109,7 +109,7 @@ export async function deleteCloudflareRecord(domain: string, cfid: string) {
         const errors = await response.text()
         const errorDetails = JSON.parse(errors)
         console.log(errorDetails.errors)
-        throw new Error(`Failed to create Cloudflare record ${errorDetails.errors[0].message}`)
+        throw new Error(`Failed to create Cloudflare record ${errorDetails.errors[0].message} / ${backend} ${domains[tld]}`)
     }
 
     return await response.json()

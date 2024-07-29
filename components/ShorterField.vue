@@ -151,7 +151,7 @@ const schema = {
     </div>
     <div class="field is-grouped is-grouped-right">
       <div class="control">
-        <button type="submit" class="button is-link" :disabled="status == Status.PENDING || props.lock || !addrInfo.token">{{ props.submitText }}</button>
+        <button type="submit" class="button is-link" :disabled="status == Status.PENDING  && !addrInfo.token || props.lock">{{ props.submitText }}</button>
       </div>
       <div class="control">
         <button type="reset" class="button is-link is-light" :disabled="status == Status.PENDING || props.lock">취소</button>

@@ -18,7 +18,7 @@ if(!loggedIn.value) {
   router.push('/')
 }
 
-const addrInfo: Ref<IUIDPostRequest> = ref({ uid: '', forward: '', expires: dayjs().format('YYYY-MM-DD') })
+const addrInfo: Ref<IUIDPostRequest> = ref({ uid: '', forward: '', expires: dayjs().format('YYYY-MM-DD'), token: "" })
 const status: Ref<Status> = ref(Status.DEFAULT)
 
 provide('addrInfo', addrInfo)
@@ -31,7 +31,18 @@ const languageData: Ref<[string, string|number][]> = ref([])
 const deviceData: Ref<[string, string|number][]> = ref([])
 
 const onSubmit = async() => {
-
+  status.value = Status.PENDING
+  try {
+    const result = await $fetch(`${config.public.baseUrl}/api/forward/${uid}`, {
+      method: 'POST',
+      credentials: 'include',
+      body: JSON.stringify(addrInfo.value)
+    })
+    console.log(result)
+    status.value = Status.SUCCESS
+  } catch(e) {
+    status.value = Status.ERROR
+  }
 }
 
 useSeoMeta({
@@ -44,17 +55,20 @@ useSeoMeta({
 })
 
 ;(async() => {
-  analytics.value = await useRequestFetch()(`${config.public.baseUrl}/api/manage/${uid}`, {
-    method: 'GET',
-    credentials: 'include',
-  })
+  try {
+    analytics.value = await useRequestFetch()(`${config.public.baseUrl}/api/manage/${uid}`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+  } catch { console.log("No analytics") }
   const p = await $fetch(`${config.public.baseUrl}/api/forward/${uid}`, {
     method: 'GET'
   })
   addrInfo.value = {
+    token: addrInfo.value.token ?? "",
     uid: p.uid,
     forward: p.forward,
-    expires: dayjs(p.expires).format('YYYY-MM-DD'),
+    expires: dayjs(p.expires).format('YYYY-MM-DD')
   }
 
   if(analytics.value) {

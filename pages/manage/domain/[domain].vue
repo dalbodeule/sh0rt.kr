@@ -20,7 +20,7 @@ if(!loggedIn.value) {
   router.push('/')
 }
 
-const domainInfo: Ref<IDomainPostRequest> = ref({ domain, expires: dayjs().format('YYYY-MM-DD'), tld })
+const domainInfo: Ref<IDomainPostRequest> = ref({ domain, expires: dayjs().format('YYYY-MM-DD'), tld, token:"" })
 const status: Ref<Status> = ref(Status.DEFAULT)
 
 const records: Ref<{type: string, name: string, value: string}[]> = ref([])

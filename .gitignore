@@ -70,3 +70,5 @@ node_modules
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,linux,nuxtjs
 .data
+# Sentry Config File
+.sentryclirc

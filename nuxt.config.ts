@@ -1,4 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
   compatibilityDate: "2024-07-20",
@@ -13,7 +14,7 @@ export default defineNuxtConfig({
     preset: "cloudflare-module"
   },
   build: {
-    transpile: ['Dayjs', 'linkedom']
+    transpile: ['Dayjs', 'linkedom'],
   },
   css: [
     '@fortawesome/fontawesome-svg-core/styles.css'
@@ -42,6 +43,7 @@ export default defineNuxtConfig({
       baseUrl: process.env.BASE_URL,
       domainList: process.env.DOMAIN_LIST,
       domainLimit: process.env.DOMAIN_LIMIT,
+      sentryDsnPublic: process.env.SENTRY_DSN,
     }
   },
   turnstile: {

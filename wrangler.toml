@@ -5,6 +5,7 @@ compatibility_date = "2024-07-12"
 services = [
     { binding = "SELF", service = "sh0rt-kr" }
 ]
+tail_consumers = [{service = "sh0rt-kr-tail"}]
 
 [site]
 bucket = ".output/public"

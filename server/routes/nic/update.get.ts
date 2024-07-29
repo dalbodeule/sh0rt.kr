@@ -119,7 +119,7 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    await updateCloudflareRecord(tld, record, recordCfid);
+    await updateCloudflareRecord(tld, record, recordCfid, event);
     await db.update(records).set({ value: record.value }).where(eq(records.id, id));
 
     return `good ${myip}`

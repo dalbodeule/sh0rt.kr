@@ -121,7 +121,9 @@ setLocale('ko')
       <h1>{{ domain }}.{{ tld }} 레코드 관리</h1>
 
       <form @submit.prevent="onSubmit">
-        <RecordItem v-for="(record, index) in records" :key="`record-${index}`" :record="record" :index="index" @remove="removeRecord" @update="updateRecord"/>
+        <template v-for="(record, index) in records" :key="`record-${index}`">
+          <RecordItem :record="record" :index="index" @remove="removeRecord" @update="updateRecord"/>
+        </template>
         <div class="field is-grouped">
           <div class="control">
             <button class="button is-link" type="button" :disabled="records.length >= 3" @click="(records.length < 3) ? records.push({type: '', name: '', value: ''}) : ''">레코드 추가</button>

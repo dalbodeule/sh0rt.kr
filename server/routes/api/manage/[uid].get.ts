@@ -89,7 +89,8 @@ export default defineEventHandler(async (event: H3Event) => {
             AKeys.ip, AKeys.country, AKeys.region, AKeys.city, AKeys.colo, AKeys.latitude, AKeys.longitude, AKeys.browser, AKeys.device, AKeys.language
         ])}, timestamp from ANALYTICS WHERE index1 = '${uid}' and timestamp >= toDateTime(${
             Math.round((currentShorten?.created_at ?? new Date()).getTime() / 1000)
-        })`
+        })`,
+        event
     )
 
     try {

@@ -26,7 +26,7 @@ export default defineEventHandler(async (event: H3Event) => {
         message: 'Body is wrong',
     })
 
-    const verify = await verifyTurnstileToken(request.token)
+    const verify = await verifyTurnstileToken(request.token, event)
     if(!verify.success) throw createError({
         status: 403,
         message: 'Captcha is wrong',

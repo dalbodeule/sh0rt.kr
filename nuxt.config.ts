@@ -2,7 +2,11 @@
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  compatibilityDate: "2024-07-20",
+  compatibilityDate: "2024-11-27",
+  srcDir: ".",
+  dir: {
+    app: "app"
+  },
   nitro: {
     prerender: {
       autoSubfolderIndex: false,

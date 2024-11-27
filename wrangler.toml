@@ -1,11 +1,8 @@
 name = "sh0rt-kr"
 main = ".output/server/index.mjs"
 workers_dev = true
-compatibility_date = "2024-07-12"
-services = [
-    { binding = "SELF", service = "sh0rt-kr" }
-]
-tail_consumers = [{service = "sh0rt-kr-tail"}]
+compatibility_date = "2024-11-27"
+compatibility_flags = ["nodejs_compat"]
 
 [site]
 bucket = ".output/public"

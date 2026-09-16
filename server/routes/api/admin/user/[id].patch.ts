@@ -6,7 +6,7 @@ import { requireRole } from '~/server/utils/requireRole'
 export default defineEventHandler(async (event) => {
     const admin = await requireRole(event, UserRole.ADMIN)
     const id = Number(getRouterParam(event, 'id'))
-    const body = await readBody<{ role?: number, suspended?: boolean }>(event)
+    const body = await readBody<{ role?: number, suspendedUntil?: string | null, permanent?: boolean }>(event)
     if (!Number.isInteger(id) || id <= 0) throw createError({ statusCode: 400, statusMessage: 'Invalid user id' })
     if (id === admin.id) throw createError({ statusCode: 400, statusMessage: 'You cannot modify your own account' })
 
@@ -17,8 +17,18 @@ export default defineEventHandler(async (event) => {
         }
         updates.role = body.role
     }
-    if (body.suspended !== undefined) {
-        updates.login_limit = body.suspended ? new Date('2099-12-31T23:59:59.000Z') : null
+    if (body.permanent === true) {
+        updates.login_limit = new Date('9999-12-31T23:59:59.000Z')
+    } else if (body.suspendedUntil !== undefined) {
+        if (body.suspendedUntil === null) {
+            updates.login_limit = null
+        } else {
+            const suspendedUntil = new Date(body.suspendedUntil)
+            if (Number.isNaN(suspendedUntil.getTime()) || suspendedUntil.getTime() <= Date.now()) {
+                throw createError({ statusCode: 400, statusMessage: 'Suspension must end in the future' })
+            }
+            updates.login_limit = suspendedUntil
+        }
     }
 
     const db = useDrizzle(event.context.cloudflare.env.DB)

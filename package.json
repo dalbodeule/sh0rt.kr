@@ -26,6 +26,7 @@
     "dayjs": "^1.11.23",
     "drizzle-orm": "^0.45.2",
     "nuxt-auth-utils": "^0.5.30",
+    "postal-mime": "^3.0.0",
     "qrcode": "^1.5.4",
     "ua-parser-js": "^2.0.10",
     "vee-validate": "^4.15.1",

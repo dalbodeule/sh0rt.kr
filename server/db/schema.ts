@@ -67,3 +67,31 @@ export const analyticsCache = sqliteTable('analyticsCache', {
 }, (table) => [
     uniqueIndex('analytics_cache_uid_unique').on(table.uid),
 ])
+
+export const reports = sqliteTable('reports', {
+    id: int('id').primaryKey({ autoIncrement: true }),
+    url_id: int('url_id'),
+    uid: text('uid', { length: 20 }),
+    forward: text('forward', { length: 4096 }),
+    reporter_email: text('reporter_email', { length: 255 }),
+    reason: text('reason', { length: 50 }).notNull(),
+    details: text('details', { length: 5000 }).notNull().default(''),
+    source: text('source', { length: 10 }).notNull().default('web'),
+    sender: text('sender', { length: 255 }),
+    subject: text('subject', { length: 500 }),
+    body_text: text('body_text', { length: 20000 }),
+    status: text('status', { length: 20 }).notNull().default('open'),
+    created_at: int('created_at', { mode: 'timestamp' }).notNull().default(sql`(STRFTIME('%s'))`),
+    updated_at: int('updated_at', { mode: 'timestamp' }).notNull().default(sql`(STRFTIME('%s'))`),
+}, (table) => [
+    index('reports_status_idx').on(table.status),
+    index('reports_uid_idx').on(table.uid),
+    index('reports_created_at_idx').on(table.created_at),
+    index('reports_url_id_idx').on(table.url_id),
+])
+
+export const globalStats = sqliteTable('globalStats', {
+    id: int('id').primaryKey(),
+    data: text('data').notNull(),
+    updated_at: int('updated_at', { mode: 'timestamp' }).notNull().default(sql`(STRFTIME('%s'))`),
+})

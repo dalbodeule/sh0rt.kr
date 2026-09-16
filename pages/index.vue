@@ -2,6 +2,8 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faChartColumn, faLink, faQrcode } from '@fortawesome/free-solid-svg-icons'
 const { loggedIn } = useUserSession()
+interface PublicStats { users: number, urls: number, activeUrls: number, updatedAt: string }
+const { data: globalStats } = await useFetch<PublicStats>('/api/stats')
 useSeoMeta({ title: 'sh0rt.kr', description: '빠르고 안전한 URL 단축 서비스', robots: { all: true }, ogType: 'website', ogSiteName: 'sh0rt.kr', ogImage: '/favicon.png' })
 const features = [
   { icon: faLink, title: '간단한 공유', description: '길고 복잡한 주소를 기억하고 공유하기 쉬운 링크로 바꿉니다.' },
@@ -21,6 +23,9 @@ const features = [
         <p class="mx-auto mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">안전한 리다이렉트와 방문 통계, QR코드까지 한 번에 제공하는 URL 단축 서비스입니다.</p>
         <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row"><NuxtLink :to="loggedIn ? '/create' : '/login'" class="rounded-xl bg-blue-500 px-6 py-3 text-base font-bold text-white shadow-lg shadow-blue-500/25 transition hover:-translate-y-0.5 hover:bg-blue-400">{{ loggedIn ? '새 링크 만들기' : '무료로 시작하기' }}</NuxtLink><NuxtLink v-if="loggedIn" to="/manage" class="rounded-xl border border-white/20 bg-white/10 px-6 py-3 text-base font-semibold text-white hover:bg-white/15">내 링크 관리</NuxtLink></div>
       </div>
+    </section>
+    <section v-if="globalStats" aria-label="서비스 현황" class="grid gap-4 rounded-3xl bg-blue-50 p-6 sm:grid-cols-3 sm:p-8">
+      <article v-for="item in [['가입 사용자', globalStats.users], ['생성된 링크', globalStats.urls], ['현재 활성 링크', globalStats.activeUrls]]" :key="String(item[0])" class="text-center"><p class="text-3xl font-black text-blue-700">{{ Number(item[1]).toLocaleString() }}</p><p class="mt-1 text-sm font-semibold text-slate-600">{{ item[0] }}</p></article>
     </section>
     <section>
       <div class="mx-auto max-w-2xl text-center"><p class="text-sm font-semibold text-blue-600">WHY SH0RT.KR</p><h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">링크 관리에 필요한 핵심만 담았습니다</h2></div>

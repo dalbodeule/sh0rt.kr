@@ -37,7 +37,7 @@ const onSubmit = async () => {
   status.value = Status.PENDING
   errorMessage.value = ''
   try {
-    await $fetch(`/api/manage/${manageId}`, { method: 'PATCH', body: addrInfo.value })
+    await $fetch(`/api/manage/${manageId}` as string, { method: 'PATCH', body: addrInfo.value })
     status.value = Status.SUCCESS
   } catch (error: unknown) {
     status.value = Status.ERROR

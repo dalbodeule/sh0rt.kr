@@ -2,7 +2,7 @@
 import { UserRole } from '~/common/userRole';
 const show = ref(false);
 const router = useRouter();
-const { loggedIn, user, clear } = useUserSession();
+const { loggedIn, user, ready, clear, fetch: fetchUser } = useUserSession();
 watch(
   () => router.currentRoute.value.fullPath,
   () => {
@@ -13,6 +13,8 @@ const logout = async () => {
   await clear();
   await navigateTo('/');
 };
+
+if (!ready.value) await fetchUser();
 </script>
 
 <template>

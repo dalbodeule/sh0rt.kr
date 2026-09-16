@@ -1,7 +1,7 @@
 export default defineNuxtPlugin((nuxtApp) => {
   const session = useUserSession();
   nuxtApp.hook('app:mounted', async () => {
-    await session.fetch();
+    if (!session.ready.value) await session.fetch();
     if (!session.loggedIn.value) return;
     try {
       await $fetch('/api/session/status');

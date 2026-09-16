@@ -9,39 +9,53 @@ export default async function(event: H3Event, provider: string, user: {
     name: string,
     avatar_url: string,
 } ) {
+    if (!['google', 'github'].includes(provider) || !user.accountId.trim()) {
+        throw createError({ statusCode: 400, statusMessage: 'Invalid OAuth profile' })
+    }
+
+    const accountId = user.accountId.trim().slice(0, 255)
+    const email = user.email.trim().toLowerCase().slice(0, 255)
+    const name = user.name.trim().slice(0, 20)
+    let profile = '/favicon.png'
+    try {
+        const avatar = new URL(user.avatar_url)
+        if (avatar.protocol === 'https:') profile = avatar.toString().slice(0, 4096)
+    } catch {
+        // Keep the local fallback image for malformed provider data.
+    }
+    if (!email || !name) throw createError({ statusCode: 400, statusMessage: 'Incomplete OAuth profile' })
+
     const db = useDrizzle(event.context.cloudflare.env.DB)
 
     let db_user = await db.query.users.findFirst({
         where: and(
-            eq(users.token, user.accountId),
+            eq(users.token, accountId),
             eq(users.vendor, provider))
     })
 
     if (db_user) {
         await db.update(users).set({
             updated_at: new Date(),
-            name: user.name
+            email,
+            name,
+            profile,
         }).where(and(
-            eq(users.token, user.accountId),
+            eq(users.token, accountId),
             eq(users.vendor, provider)
         ))
     } else {
-        const email = user.email
-        const profile = user.avatar_url
-        const name = user.name
-
         await db.insert(users).values({
             email,
             name,
             vendor: provider,
-            token: user.accountId,
+            token: accountId,
             profile
-        })
+        }).onConflictDoNothing({ target: [users.vendor, users.token] })
     }
 
     db_user = await db.query.users.findFirst({
         where: and(
-            eq(users.token, user.accountId),
+            eq(users.token, accountId),
             eq(users.vendor, provider))
     })
 

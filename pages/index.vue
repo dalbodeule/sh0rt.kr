@@ -1,91 +1,30 @@
 <script setup lang="ts">
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-
-const { loggedIn, user: _user, session: _session, clear: _clear } = useUserSession()
-
-useSeoMeta({
-  title: `sh0rt.kr`,
-  description: `sh0rt.kr :: 강력한 URL 단축기`,
-  robots: { all: true },
-  ogType: 'website',
-  ogSiteName: 'sh0rt.kr',
-  ogImage: '/favicon.png',
-})
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faChartColumn, faLink, faQrcode } from '@fortawesome/free-solid-svg-icons'
+const { loggedIn } = useUserSession()
+useSeoMeta({ title: 'sh0rt.kr', description: '빠르고 안전한 URL 단축 서비스', robots: { all: true }, ogType: 'website', ogSiteName: 'sh0rt.kr', ogImage: '/favicon.png' })
+const features = [
+  { icon: faLink, title: '간단한 공유', description: '길고 복잡한 주소를 기억하고 공유하기 쉬운 링크로 바꿉니다.' },
+  { icon: faChartColumn, title: '링크 분석', description: '국가, 브라우저, 언어, 기기별 방문 통계를 한눈에 확인합니다.' },
+  { icon: faQrcode, title: 'QR 이미지', description: '만든 단축주소를 QR코드 이미지로 바로 내려받을 수 있습니다.' },
+]
 </script>
 
 <template>
-  <div>
-    <section class="hero is-primary">
-      <div class="hero-body">
-        <div class="container has-text-centered">
-          <h1 class="title is-white">
-            sh0rt.kr에 오신 것을 환영합니다
-          </h1>
-          <h2 class="subtitle">
-            신뢰할 수 있는 URL 단축기 <!--와 서브도메인 기능 -->제공
-          </h2>
-
-          <div class="buttons is-centered">
-            <nuxt-link v-if="!loggedIn" to="/login" class="button is-light">로그인</nuxt-link>
-            <nuxt-link v-if="loggedIn" to="/create" class="button is-info">URL 단축</nuxt-link>
-          </div>
-        </div>
+  <main class="space-y-16 pb-10 pt-4 sm:pt-8">
+    <section class="relative overflow-hidden rounded-[2rem] bg-slate-950 px-6 py-16 text-white shadow-xl sm:px-12 sm:py-24">
+      <div class="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-blue-500/30 blur-3xl" />
+      <div class="absolute -bottom-28 left-1/4 h-64 w-64 rounded-full bg-cyan-400/20 blur-3xl" />
+      <div class="relative mx-auto max-w-3xl text-center">
+        <p class="mb-4 text-sm font-semibold uppercase tracking-[0.25em] text-blue-300">Short links, clear insights</p>
+        <h1 class="text-4xl font-black tracking-tight sm:text-6xl">긴 주소는 짧게,<br class="hidden sm:block"> 공유는 더 간단하게.</h1>
+        <p class="mx-auto mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">안전한 리다이렉트와 방문 통계, QR코드까지 한 번에 제공하는 URL 단축 서비스입니다.</p>
+        <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row"><NuxtLink :to="loggedIn ? '/create' : '/login'" class="rounded-xl bg-blue-500 px-6 py-3 text-base font-bold text-white shadow-lg shadow-blue-500/25 transition hover:-translate-y-0.5 hover:bg-blue-400">{{ loggedIn ? '새 링크 만들기' : '무료로 시작하기' }}</NuxtLink><NuxtLink v-if="loggedIn" to="/manage" class="rounded-xl border border-white/20 bg-white/10 px-6 py-3 text-base font-semibold text-white hover:bg-white/15">내 링크 관리</NuxtLink></div>
       </div>
     </section>
-    <section class="section">
-      <div class="container">
-        <h2 class="title has-text-centered">sh0rt.kr를 사용해야 하는 이유</h2>
-        <div class="columns is-vcentered">
-          <div class="column is-half">
-            <h3 class="title is-4">URL 단축기를 사용해야 하는 이유</h3>
-            <ul>
-              <li><FontAwesomeIcon icon="fas fa-link" />&nbsp;<strong>쉽게 공유</strong>: 복잡한 URL을 단순화하여 쉽게 공유하고 기억할 수 있습니다.</li>
-              <li><FontAwesomeIcon icon="fas fa-chart-bar" />&nbsp;<strong>분석 기능</strong>: 링크 클릭 수와 사용자 참여도를 분석할 수 있는 상세한 분석 정보를 제공합니다.</li>
-              <li><FontAwesomeIcon icon="fas fa-bullhorn" />&nbsp;<strong>브랜딩</strong>: 사용자 맞춤형 짧은 URL로 브랜드 아이덴티티를 강화할 수 있습니다.</li>
-            </ul>
-          </div>
-          <!-- <div class="column is-half">
-            <h3 class="title is-4">서브도메인을 사용해야 하는 이유</h3>
-            <ul>
-              <li><FontAwesomeIcon icon="fas fa-tags" />&nbsp;<strong>브랜드 인지도</strong>: 비즈니스나 개인 프로젝트를 위한 고유한 서브도메인으로 전문 이미지를 구축할 수 있습니다.</li>
-              <li><FontAwesomeIcon icon="fas fa-lock" />&nbsp;<strong>보안</strong>: 안전하고 전용 서브도메인을 통해 온라인 존재를 유지할 수 있습니다.</li>
-              <li><FontAwesomeIcon icon="fas fa-shield-alt" />&nbsp;<strong>Let's Encrypt 지원</strong>: 무료 SSL 인증서를 통해 보안을 강화할 수 있습니다. (별도 작업 필요)</li>
-            </ul>
-          </div> -->
-        </div>
-      </div>
+    <section>
+      <div class="mx-auto max-w-2xl text-center"><p class="text-sm font-semibold text-blue-600">WHY SH0RT.KR</p><h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">링크 관리에 필요한 핵심만 담았습니다</h2></div>
+      <div class="mt-8 grid gap-5 md:grid-cols-3"><article v-for="feature in features" :key="feature.title" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"><div class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600"><FontAwesomeIcon :icon="feature.icon" class="h-5 w-5" /></div><h3 class="mt-5 text-lg font-bold text-slate-950">{{ feature.title }}</h3><p class="mt-2 text-sm leading-6 text-slate-600">{{ feature.description }}</p></article></div>
     </section>
-  </div>
+  </main>
 </template>
-
-<style scoped>
-.hero {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 2rem;
-}
-
-.section {
-  padding: 2rem 1.5rem;
-}
-
-.columns {
-  margin-top: 2rem;
-}
-
-ul {
-  list-style-type: none;
-  padding-left: 0;
-}
-
-li {
-  margin-bottom: 1rem;
-}
-
-li i {
-  color: #3273dc; /* Bulma primary color */
-  margin-right: 0.5em;
-}
-</style>

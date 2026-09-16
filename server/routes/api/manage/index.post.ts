@@ -2,29 +2,25 @@ import type { H3Event } from "h3"
 import { useDrizzle } from "~/server/utils/useDrizzle"
 import { eq } from 'drizzle-orm'
 import { users } from "~/server/db/schema"
+import { requireActiveUser } from '~/server/utils/requireRole'
 
-export interface IListUrls {
-    [key: number]: {
-        id: number,
-        uid: string,
-        forward: string,
-        created_at: string,
-        updated_at: string,
-        expires: string
-    }
+export interface IListUrl {
+    id: number,
+    uid: string,
+    manage_id: string,
+    forward: string,
+    created_at: Date,
+    updated_at: Date,
+    expires: Date
 }
 
 export default defineEventHandler(async(event: H3Event) => {
     const db = useDrizzle(event.context.cloudflare.env.DB)
 
-    const userSession = await requireUserSession(event)
-    if(!userSession.user) throw createError({
-        status: 403,
-        message: 'Unauthorized',
-    })
+    const activeUser = await requireActiveUser(event)
 
     const result = await db.query.users.findFirst({
-        where: eq(users.id, userSession.user.id),
+        where: eq(users.id, activeUser.id),
         with: {
             usersToUrls: {
                 with: {

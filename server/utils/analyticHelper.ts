@@ -11,6 +11,12 @@ export enum AKeys {
     browser = 'browser',
     device = 'device',
     language = 'language',
+    os = 'os',
+    browserVersion = 'browserVersion',
+    sourceDomain = 'sourceDomain',
+    sourcePath = 'sourcePath',
+    requestDomain = 'requestDomain',
+    requestPath = 'requestPath',
 }
 
 const keys = [
@@ -24,6 +30,12 @@ const keys = [
     AKeys.browser,
     AKeys.device,
     AKeys.language,
+    AKeys.os,
+    AKeys.browserVersion,
+    AKeys.sourceDomain,
+    AKeys.sourcePath,
+    AKeys.requestDomain,
+    AKeys.requestPath,
 ]
 
 export interface IAnalyticObject {
@@ -37,6 +49,12 @@ export interface IAnalyticObject {
     browser: string | undefined,
     device: string | undefined,
     language: string | undefined,
+    os: string | undefined,
+    browserVersion: string | undefined,
+    sourceDomain: string | undefined,
+    sourcePath: string | undefined,
+    requestDomain: string | undefined,
+    requestPath: string | undefined,
 }
 
 export function objectToArray(object: IAnalyticObject): string[] {
@@ -46,7 +64,7 @@ export function objectToArray(object: IAnalyticObject): string[] {
 export function arrayToObject(arr: string[]): IAnalyticObject {
     const object: IAnalyticObject | {[key: string]: string} = {}
     keys.reduce((obj, key, index) => {
-        obj[key] = arr[index]
+        obj[key] = arr[index] ?? 'unknown'
         return obj
     }, object)
 
@@ -62,6 +80,9 @@ export async function getFromAnalytics(query: string, event: H3Event) {
         },
         body: query
     })
+    if (!response.ok) {
+        throw createError({ statusCode: 502, statusMessage: 'Analytics provider request failed' })
+    }
     return await response.text()
 }
 

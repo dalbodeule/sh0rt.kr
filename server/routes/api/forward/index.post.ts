@@ -1,9 +1,11 @@
 import type { IUIDGetResponse } from "~/server/routes/api/forward/[uid].get"
 import type { H3Event } from "h3";
 import {analyticsCache, urls, usersToUrls} from "~/server/db/schema";
-import { and, eq, gte } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import dayjs from "dayjs";
 import { useDrizzle } from "~/server/utils/useDrizzle";
+import { reservedPaths } from '~/common/reservedPaths'
+import { requireActiveUser } from '~/server/utils/requireRole'
 
 export interface IUIDPostRequest {
     uid: string | undefined,
@@ -12,16 +14,15 @@ export interface IUIDPostRequest {
     token: string | undefined
 }
 
-export default defineEventHandler(async (event: H3Event) => {
-    const user = await requireUserSession(event)
+export interface IUIDPostResponse extends IUIDGetResponse {
+    manage_id: string
+}
 
-    if(!user) throw createError({
-        status: 403,
-        statusMessage: "Invalid authentication",
-    })
+export default defineEventHandler(async (event: H3Event) => {
+    const user = await requireActiveUser(event)
 
     const request = await readBody(event) as IUIDPostRequest
-    if(!request.uid || !/^[a-zA-Z0-9]{3,20}$/.test(request.uid) || !request.forward || !request.expires || !request.token) throw createError({
+    if(!request.uid || !/^[a-zA-Z0-9]{3,20}$/.test(request.uid) || reservedPaths.has(request.uid.toLowerCase()) || !request.forward || !request.expires || !request.token) throw createError({
         status: 403,
         message: 'Body is wrong',
     })
@@ -42,54 +43,50 @@ export default defineEventHandler(async (event: H3Event) => {
     })
 
     const expires = dayjs(request.expires).endOf('day')
-    if (!expires.isValid() || !expires.isAfter(dayjs())) throw createError({ status: 400, message: 'Invalid expiration date' })
+    if (!expires.isValid() || !expires.isAfter(dayjs()) || expires.isAfter(dayjs().add(366, 'day'))) {
+        throw createError({ status: 400, message: 'Invalid expiration date' })
+    }
 
     let parsedForward: URL
     try {
         parsedForward = new URL(request.forward)
-        if (!['http:', 'https:'].includes(parsedForward.protocol)) throw new Error('unsupported protocol')
+        if (!['http:', 'https:'].includes(parsedForward.protocol) || parsedForward.toString().length > 4096) throw new Error('unsupported URL')
     } catch {
         throw createError({ status: 400, message: 'Invalid forward URL' })
     }
 
-    const url_id = await db.insert(urls).values({
-        uid: request.uid!,
-        forward: parsedForward.toString(),
-        expires: expires.toDate()
-    }).returning()
-
-    await db.insert(usersToUrls).values({ user: user.user.id, url: url_id[0].id})
-
-    const response = await db.query.urls.findFirst({
-        where: and(
-            eq(urls.uid, request.uid),
-            gte(urls.expires, new Date())
-        ),
-        with: {
-            UsersToUrls: {
-                with: {
-                    Users: true
-                }
-            }
+    let inserted: (typeof urls.$inferSelect)[]
+    try {
+        inserted = await db.insert(urls).values({
+            uid: request.uid,
+            manage_id: crypto.randomUUID(),
+            forward: parsedForward.toString(),
+            expires: expires.toDate()
+        }).returning()
+    } catch (error) {
+        if (error instanceof Error && /unique/i.test(error.message)) {
+            throw createError({ statusCode: 409, statusMessage: 'UID already exists' })
         }
-    })
+        throw error
+    }
+
+    const created = inserted[0]
+    if (!created) throw createError({ statusCode: 500, statusMessage: 'Could not create URL' })
+
+    await db.insert(usersToUrls).values({ user: user.id, url: created.id})
 
     await db.delete(analyticsCache).where(
         eq(analyticsCache.uid, request.uid)
     )
 
-    const responseData: IUIDGetResponse = {
-        id: response!.id,
-        uid: response!.uid,
-        forward: response!.forward,
-        user: {
-            id: response!.UsersToUrls[0].Users.id,
-            name: response!.UsersToUrls[0].Users.name,
-            profile: response!.UsersToUrls[0].Users.profile
-        },
-        created_at: response!.created_at,
-        updated_at: response!.updated_at,
-        expires: response!.expires,
+    const responseData: IUIDPostResponse = {
+        id: created.id,
+        uid: created.uid,
+        manage_id: created.manage_id,
+        forward: created.forward,
+        created_at: created.created_at,
+        updated_at: created.updated_at,
+        expires: created.expires,
     }
 
     return responseData

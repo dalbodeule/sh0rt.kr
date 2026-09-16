@@ -18,17 +18,13 @@ export default defineNuxtConfig({
     },
     preset: "cloudflare_module",
   },
-  build: {
-    transpile: ['Dayjs', 'linkedom'],
-  },
-  css: ['~/assets/css/main.css'],
+  css: ['@fortawesome/fontawesome-svg-core/styles.css', '~/assets/css/main.css'],
   vite: {
     plugins: [tailwindcss()],
   },
   runtimeConfig: {
     analyticsAccountId: process.env.ANALYTICS_ACCOUNT_ID,
     analyticsApiToken: process.env.ANALYTICS_API_TOKEN,
-    apiBackend: process.env.API_BACKEND,
     session: {
       password: process.env.SESSION_PASSWORD ?? "",
     },
@@ -54,7 +50,6 @@ export default defineNuxtConfig({
     "nuxt-auth-utils",
     "@nuxt/eslint",
     "@nuxtjs/turnstile",
-    "@pinia/nuxt",
     "nitro-cloudflare-dev"
   ]
 })

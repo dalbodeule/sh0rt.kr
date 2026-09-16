@@ -10,7 +10,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="box content">
+  <main class="box content mx-auto max-w-4xl leading-7 text-slate-700">
     <h1>서비스 이용약관 (상품, 서비스 등 이용 일반 회원용)</h1>
     <br>
     <br>
@@ -278,7 +278,7 @@ useSeoMeta({
     <h3>제1조(시행일)</h3>
 
     <p>본 약관은 2024.07.13.부터 적용합니다.</p>
-  </div>
+  </main>
 </template>
 
 <style scoped>

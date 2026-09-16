@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import QRCode from 'qrcode'
-
 const props = defineProps<{ value: string }>()
 const canvas = ref<HTMLCanvasElement | null>(null)
 const ready = ref(false)
 const error = ref(false)
 
 const render = async () => {
+  if (import.meta.server) return
   if (!canvas.value || !props.value) return
   try {
+    const { default: QRCode } = await import('qrcode')
     await QRCode.toCanvas(canvas.value, props.value, { width: 256, margin: 2, errorCorrectionLevel: 'M' })
     ready.value = true
     error.value = false
@@ -35,7 +35,7 @@ onMounted(render)
     <p class="mt-1 break-all text-sm text-slate-500">{{ value }}</p>
     <div class="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-end">
       <div class="rounded-xl border border-slate-200 bg-white p-2">
-        <canvas ref="canvas" width="256" height="256" aria-label="단축주소 QR코드" />
+        <canvas ref="canvas" class="h-auto max-w-full" width="256" height="256" aria-label="단축주소 QR코드" />
       </div>
       <button type="button" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50" :disabled="!ready" @click="download">이미지 다운로드</button>
     </div>

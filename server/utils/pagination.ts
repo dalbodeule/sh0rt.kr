@@ -1,9 +1,8 @@
 export function getPagination(query: Record<string, unknown>) {
-    const requestedPage = Number(query.page)
-    const requestedSize = Number(query.pageSize)
-    const page = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1
-    const pageSize = Number.isInteger(requestedSize) && requestedSize > 0
-        ? Math.min(requestedSize, 100)
-        : 20
-    return { page, pageSize, offset: (page - 1) * pageSize }
+  const requestedPage = Number(query.page);
+  const requestedSize = Number(query.pageSize);
+  const page = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const pageSize =
+    Number.isInteger(requestedSize) && requestedSize > 0 ? Math.min(requestedSize, 100) : 20;
+  return { page, pageSize, offset: (page - 1) * pageSize };
 }

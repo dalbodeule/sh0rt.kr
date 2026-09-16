@@ -26,7 +26,7 @@ binding = "ASSETS"
 NUXT_OAUTH_GITHUB_CLIENT_ID = "Ov23liTsdN0bOgaldNIM"
 NUXT_OAUTH_GOOGLE_CLIENT_ID = "963112485410-ll8cb0642a68olkr3m3o10nmddq1j4sv.apps.googleusercontent.com"
 NUXT_PUBLIC_BASE_URL = "https://sh0rt.kr"
-NUXT_REPORT_EMAILS = "report@sh0rt.kr"
+NUXT_REPORT_DOMAINS = "sh0rt.kr"
 
 [[d1_databases]]
 binding = "DB" # i.e. available in your Worker on env.DB

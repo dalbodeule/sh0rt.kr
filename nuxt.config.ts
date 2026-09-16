@@ -41,7 +41,7 @@ export default defineNuxtConfig({
     public: {
       baseUrl: process.env.BASE_URL,
     },
-    reportEmails: process.env.NUXT_REPORT_EMAILS ?? ""
+    reportDomains: process.env.NUXT_REPORT_DOMAINS ?? ""
   },
   turnstile: {
     secretKey: process.env.TURNSTILE_SECRET_KEY,

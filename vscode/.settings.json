@@ -1,0 +1,16 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "[javascript]": {
+    "tabSize": 2
+  },
+  "[typescript]": {
+    "tabSize": 2
+  },
+  "[json]": {
+    "tabSize": 4
+  }
+}

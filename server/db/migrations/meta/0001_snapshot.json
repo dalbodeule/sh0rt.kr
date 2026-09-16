@@ -195,12 +195,8 @@
           "name": "userToUrls_user_users_id_fk",
           "tableFrom": "userToUrls",
           "tableTo": "users",
-          "columnsFrom": [
-            "user"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -208,12 +204,8 @@
           "name": "userToUrls_url_urls_id_fk",
           "tableFrom": "userToUrls",
           "tableTo": "urls",
-          "columnsFrom": [
-            "url"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["url"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

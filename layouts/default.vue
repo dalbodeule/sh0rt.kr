@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import SiteFooter from "~/components/SiteFooter.vue";
-import SiteHeader from "~/components/SiteHeader.vue";
+import SiteFooter from '~/components/SiteFooter.vue';
+import SiteHeader from '~/components/SiteHeader.vue';
 
-useHead({ htmlAttrs: { lang: 'ko' } })
+useHead({ htmlAttrs: { lang: 'ko' } });
 </script>
 
 <template>

@@ -1,16 +1,16 @@
-import type { UserRole } from "~/common/userRole";
+import type { UserRole } from '~/common/userRole';
 
 declare module '#auth-utils' {
-    interface User {
-        id: number,
-        email: string,
-        name: string,
-        vendor: string,
-        profile: string,
-        created_at: Date,
-        updated_at: Date,
-        role: UserRole
-    }
+  interface User {
+    id: number;
+    email: string;
+    name: string;
+    vendor: string;
+    profile: string;
+    created_at: Date;
+    updated_at: Date;
+    role: UserRole;
+  }
 }
 
-export {}
+export {};

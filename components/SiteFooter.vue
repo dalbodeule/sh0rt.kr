@@ -1,10 +1,8 @@
 <template>
-  <footer class="footer" style="margin-top: 40px;">
-    <div class="content has-text-centered">
-      <p>sh0rt.kr. The source code is licensed <a href="https://opensource.org/license/agpl-v3" target="_blank">AGPL-3.0</a></p>
-      <p>Copyright 2024. <a href="https://mori.space/">dalbodeule</a> all rights reserved.</p>
-      <p>Mail: webmaster@sh0rt.kr</p>
-      <p>Fax: +82-504-480-6498</p>
+  <footer class="mt-12 border-t border-slate-200 bg-white px-4 py-8 text-sm text-slate-500">
+    <div class="mx-auto flex max-w-7xl flex-col gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
+      <p><strong class="text-slate-700">sh0rt.kr</strong> · AGPL-3.0 · © {{ new Date().getFullYear() }} dalbodeule</p>
+      <div class="flex justify-center gap-4"><NuxtLink class="hover:text-slate-900" to="/privacy">개인정보 처리방침</NuxtLink><NuxtLink class="hover:text-slate-900" to="/policy">이용약관</NuxtLink></div>
     </div>
   </footer>
 </template>

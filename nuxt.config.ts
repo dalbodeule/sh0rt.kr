@@ -1,8 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  compatibilityDate: "2024-07-20",
+  srcDir: ".",
+  compatibilityDate: '2026-09-16',
+  dir: {
+    app: "app"
+  },
   nitro: {
     prerender: {
       autoSubfolderIndex: false,
@@ -11,23 +16,17 @@ export default defineNuxtConfig({
     experimental: {
       tasks: true
     },
-    preset: "cloudflare-module"
+    preset: "cloudflare_module",
   },
-  build: {
-    transpile: ['Dayjs', 'linkedom'],
+  css: ['@fortawesome/fontawesome-svg-core/styles.css', '~/assets/css/main.css'],
+  vite: {
+    plugins: [tailwindcss()],
   },
-  css: [
-    '@fortawesome/fontawesome-svg-core/styles.css'
-  ],
   runtimeConfig: {
     analyticsAccountId: process.env.ANALYTICS_ACCOUNT_ID,
     analyticsApiToken: process.env.ANALYTICS_API_TOKEN,
-    domainZoneId: process.env.DOMAIN_ZONE_ID,
-    domainApiToken: process.env.DOMAIN_API_TOKEN,
-    domainApiEmail: process.env.DOMAIN_API_EMAIL,
-    apiBackend: process.env.API_BACKEND,
     session: {
-      password: process.env.SESSION_PASSWORD
+      password: process.env.SESSION_PASSWORD ?? "",
     },
     oauth: {
       github: {
@@ -41,27 +40,16 @@ export default defineNuxtConfig({
     },
     public: {
       baseUrl: process.env.BASE_URL,
-      domainList: process.env.DOMAIN_LIST,
-      domainLimit: process.env.DOMAIN_LIMIT,
-      sentryDsnPublic: process.env.SENTRY_DSN,
     }
   },
   turnstile: {
     secretKey: process.env.TURNSTILE_SECRET_KEY,
     siteKey: process.env.TURNSTILE_SITE_KEY,
   },
-  hub: {
-    analytics: true,
-    database: true
-  },
-  purgecss: {
-    safelist: [/svg.*/, /fa.*/]
-  },
   modules: [
     "nuxt-auth-utils",
-    "@nuxthub/core",
-    "nuxt-purgecss",
     "@nuxt/eslint",
-    "@nuxtjs/turnstile"
+    "@nuxtjs/turnstile",
+    "nitro-cloudflare-dev"
   ]
 })

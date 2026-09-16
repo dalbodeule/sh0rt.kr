@@ -1,177 +1,41 @@
 <script setup lang="ts">
-import type { IListUrls } from "~/server/routes/api/manage/index.post"
-import type { IListDomains } from "~/server/routes/api/domain/list.post"
-import type { Ref } from "vue"
+import type { IListUrl } from "~/server/routes/api/manage/index.post"
 import dayjs from "dayjs"
-import { Status } from "~/common/enums"
-import type {IDDNSKeyPost} from "~/server/routes/api/domain/ddns/index.post";
 
-const _route = useRoute()
 const router = useRouter()
 const config = useRuntimeConfig()
+const { loggedIn } = useUserSession()
 
-const { loggedIn, user: _user, session: _session, clear: _clear } = useUserSession()
+if (!loggedIn.value) router.push('/')
 
-if(!loggedIn.value) {
-  router.push('/')
+useSeoMeta({ title: 'sh0rt.kr :: manage', description: 'sh0rt.kr :: 강력한 URL 단축기', robots: { all: false } })
+
+const data = ref<IListUrl[]>()
+const error = ref(false)
+
+try {
+  data.value = await useRequestFetch()<IListUrl[]>('/api/manage', { method: 'POST', credentials: 'include' })
+} catch {
+  error.value = true
 }
-
-useSeoMeta({
-  title: `sh0rt.kr :: manage`,
-  description: `sh0rt.kr :: 강력한 URL 단축기`,
-  robots: { all: false },
-  ogType: 'website',
-  ogSiteName: 'sh0rt.kr',
-  ogImage: '/favicon.png',
-})
-
-const data: Ref<IListUrls | undefined> = ref()
-const domain: Ref<IListDomains | undefined> = ref()
-const isDDNSAvailable = ref(false)
-const DDNSStatus: Ref<Status> = ref(Status.DEFAULT)
-const DDNSPassword: Ref<IDDNSKeyPost> = ref({ password: '', password2: '' })
-provide('ddns', DDNSPassword)
-
-const onSubmit = async () => {
-  try {
-    const result = await useRequestFetch()(`${config.public.baseUrl}/api/domain/ddns`, {
-      method: 'POST',
-      credentials: 'include',
-      body: JSON.stringify(DDNSPassword.value)
-    })
-    if(result) {
-      DDNSStatus.value = Status.SUCCESS
-    } else {
-      DDNSStatus.value = Status.ERROR
-    }
-  } catch(e) {
-    DDNSStatus.value = Status.ERROR
-  }
-}
-
-;(async() => {
-  [data.value, domain.value] = await Promise.all([
-    await useRequestFetch()(`${config.public.baseUrl}/api/manage`, {
-      method: 'POST',
-      credentials: 'include',
-    }),
-    await useRequestFetch()(`${config.public.baseUrl}/api/domain/list`, {
-      method: 'POST',
-      credentials: 'include'
-    })
-  ])
-  try {
-    const p: { success: boolean } = await useRequestFetch()(`${config.public.baseUrl}/api/domain/ddns`, {
-      method: 'GET',
-      credentials: 'include'
-    })
-    if(p.success)
-      isDDNSAvailable.value = true
-  } catch(e) {
-    isDDNSAvailable.value = false
-  }
-})()
 </script>
 
 <template>
-  <div class="box content">
-    <h1>단축주소 목록</h1>
-    <div class="fixed-grid has-1-cols-mobile has-1-cols-tablet has-2-cols-desktop has-2-cols-fullhd">
-      <div class="grid">
-        <div v-for="url in data" :key="`url-${url.uid}`" class="cell">
-          <div class="card">
-            <div class="card-header">
-              <a class="card-header-title" :href="`${config.public.baseUrl}/${url.uid}`">{{ config.public.baseUrl }}/{{ url.uid }}</a>
-            </div>
-            <div class="card-content">
-              <table class="table is-striped is-fullwidth">
-                <tbody>
-                  <tr>
-                    <td>연결주소</td>
-                    <td>{{ url.forward }}</td>
-                  </tr>
-                  <tr>
-                    <td>생성일</td>
-                    <td>{{ dayjs(url.created_at).format('YYYY-MM-DD') }}</td>
-                  </tr>
-                  <tr>
-                    <td>수정일</td>
-                    <td>{{ dayjs(url.updated_at).format('YYYY-MM-DD') }}</td>
-                  </tr>
-                  <tr>
-                    <td>만료</td>
-                    <td>{{ dayjs(url.expires).format("YYYY-MM-DD") }}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <NuxtLink v-if="new Date(url.expires).getTime() > Date.now()" :to="`/manage/${url.uid}`" class="button is-primary">관리하기</NuxtLink>
-              <a v-else href="#" class="button is-primary is-disabled">이미 만료되었습니다.</a>
-            </div>
-          </div>
-        </div>
-      </div>
+  <main class="mx-auto max-w-6xl px-4 py-8">
+    <h1 class="mb-6 text-2xl font-bold text-slate-900">단축주소 목록</h1>
+    <p v-if="error" class="rounded-xl bg-red-50 p-4 text-red-700">목록을 불러오지 못했습니다.</p>
+    <p v-else-if="!data?.length" class="rounded-xl bg-slate-100 p-6 text-slate-600">아직 만든 단축주소가 없습니다.</p>
+    <div v-else class="grid gap-5 md:grid-cols-2">
+      <article v-for="url in data" :key="url.manage_id" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <a class="break-all font-semibold text-blue-600 hover:underline" :href="`${config.public.baseUrl}/${url.uid}`">{{ config.public.baseUrl }}/{{ url.uid }}</a>
+        <dl class="mt-4 space-y-2 text-sm text-slate-600">
+          <div class="flex gap-3"><dt class="w-16 shrink-0 font-medium text-slate-900">연결주소</dt><dd class="break-all">{{ url.forward }}</dd></div>
+          <div class="flex gap-3"><dt class="w-16 shrink-0 font-medium text-slate-900">생성일</dt><dd>{{ dayjs(url.created_at).format('YYYY-MM-DD') }}</dd></div>
+          <div class="flex gap-3"><dt class="w-16 shrink-0 font-medium text-slate-900">만료일</dt><dd>{{ dayjs(url.expires).format('YYYY-MM-DD') }}</dd></div>
+        </dl>
+        <NuxtLink v-if="new Date(url.expires).getTime() > Date.now()" :to="`/manage/${url.manage_id}`" class="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">관리하기</NuxtLink>
+        <span v-else class="mt-5 inline-flex rounded-lg bg-slate-200 px-4 py-2 text-sm text-slate-500">만료됨</span>
+      </article>
     </div>
-    <div style="margin-top: 30px;"/>
-    <h1>도메인 목록</h1>
-    <div class="fixed-grid has-1-cols-mobile has-1-cols-tablet has-2-cols-desktop has-2-cols-fullhd">
-      <div class="grid">
-        <div v-for="sub in domain" :key="`url-${sub.domain}`" class="cell">
-          <div class="card">
-            <div class="card-header">
-              <p class="card-header-title">{{ sub.domain }}.{{ sub.tld }}</p>
-            </div>
-            <div class="card-content">
-              <table class="table is-striped is-fullwidth">
-                <tbody>
-                  <tr>
-                    <td>생성일</td>
-                    <td>{{ dayjs(sub.created_at).format('YYYY-MM-DD') }}</td>
-                  </tr>
-                  <tr>
-                    <td>수정일</td>
-                    <td>{{ dayjs(sub.updated_at).format('YYYY-MM-DD') }}</td>
-                  </tr>
-                  <tr>
-                    <td>만료</td>
-                    <td>{{ dayjs(sub.expires).format("YYYY-MM-DD") }}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <NuxtLink v-if="new Date(sub.expires).getTime() > Date.now()" :to="`/manage/domain/${sub.domain}.${sub.tld}`" class="button is-primary">관리하기</NuxtLink>
-              <button v-else type="button" class="button is-primary" disabled>이미 만료되었습니다.</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div style="margin-top: 30px;"/>
-    <h1>DDNS 설정</h1>
-    <div class="card">
-      <div class="card-header">
-        <p class="card-header-title">DDNS 설정</p>
-      </div>
-      <div class="card-content">
-        <div v-if="isDDNSAvailable" class="notification is-success">
-          <p>DDNS 비밀번호가 설정되어 있습니다.</p>
-        </div>
-        <div v-else class="notification is-warning">
-          <p>DDNS 비밀번호를 설정해주세요. 설정하지 않으면 DDNS를 사용할 수 없습니다.</p>
-        </div>
-        <div style="margin-top: 30px;" />
-        <DDNSKeyField :lock="DDNSStatus == Status.SUCCESS" @submit="onSubmit"/>
-        <div style="margin-top: 30px;" />
-        <div v-if="DDNSStatus == Status.SUCCESS" class="notification is-success">
-          <p>DDNS 비밀번호 설정에 성공했습니다.</p>
-        </div>
-        <div v-else-if="DDNSStatus == Status.ERROR" class="notification is-warning">
-          <p>DDNS 비밀번호 설정에 실패했습니다.</p>
-        </div>
-        <progress v-else-if="DDNSStatus == Status.PENDING" class="progress is-primary" max="100"/>
-      </div>
-    </div>
-  </div>
+  </main>
 </template>
-
-<style scoped>
-
-</style>

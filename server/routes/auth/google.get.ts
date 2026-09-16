@@ -1,9 +1,8 @@
 import handleLoginUser from "~/server/routes/handleLoginUser";
 
-export default oauthGoogleEventHandler({
+export default defineOAuthGoogleEventHandler({
     config: {
         scope: ['email', 'openid', 'profile'],
-        redirectURL: "http://localhost:3000/auth/google",
     },
     async onSuccess(event, { user }) {
         await handleLoginUser(event, "google", {

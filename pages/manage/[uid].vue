@@ -40,7 +40,7 @@ const onSubmit = async() => {
     })
     console.log(result)
     status.value = Status.SUCCESS
-  } catch(e) {
+  } catch {
     status.value = Status.ERROR
   }
 }
@@ -96,6 +96,7 @@ setLocale('ko')
     </div>
     <progress v-else-if="status == Status.PENDING" class="progress is-primary" max="100"/>
     </div>
+    <QRCodeGenerator :value="`${config.public.baseUrl}/${uid}`" />
     <div class="box content">
       <h1>{{config.public.baseUrl}}/{{uid}} 의 접속통계</h1>
       <h3>지역별 통계</h3>

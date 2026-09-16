@@ -13,7 +13,7 @@ import { Status } from "~/common/enums";
 import dayjs from "dayjs";
 import randomAddr from "~/common/randomAddr";
 
-const banlist = [ 'create', 'login', 'logout', 'admin', 'root', 'manage', 'privacy', 'domain' ]
+const banlist = [ 'create', 'login', 'logout', 'admin', 'root', 'manage', 'privacy' ]
 
 const config = useRuntimeConfig()
 
@@ -40,7 +40,7 @@ defineRule('unique', async(value: string) => {
       method: 'GET',
     })
     return !data
-  } catch(e) {
+  } catch {
     return true
   }
 })

@@ -1,6 +1,6 @@
 import type { H3Event } from "h3"
 import putAccessLog from "~/server/utils/putAccessLog"
-import UAParser from 'ua-parser-js'
+import { UAParser } from 'ua-parser-js'
 import parser from 'accept-language-parser'
 import type {IAnalyticObject} from "~/server/utils/analyticHelper";
 import { objectToArray} from "~/server/utils/analyticHelper";
@@ -28,14 +28,16 @@ export default defineEventHandler(async(event: H3Event) => {
         longitude: accessLog.longitude,
         browser: userAgent.getBrowser().name,
         device: userAgent.getDevice().model,
-        language: language[0].code
+        language: language[0]?.code
     }
 
 
     if(import.meta.dev)
         console.log([...objectToArray(objects)])
     else {
-        return hubAnalytics().put({
+        const analytics = event.context.cloudflare.env.ANALYTICS as AnalyticsEngineDataset
+
+        return analytics.writeDataPoint({
             indexes: [uid],
             blobs: [...objectToArray(objects)],
         })

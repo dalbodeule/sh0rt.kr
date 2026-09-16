@@ -1,6 +1,6 @@
 import type { H3Event } from "h3"
 import { useDrizzle } from "~/server/utils/useDrizzle"
-import { eq } from 'drizzle-orm/expressions'
+import { eq } from 'drizzle-orm'
 import { users } from "~/server/db/schema"
 
 export interface IListUrls {
@@ -15,7 +15,7 @@ export interface IListUrls {
 }
 
 export default defineEventHandler(async(event: H3Event) => {
-    const db = useDrizzle()
+    const db = useDrizzle(event.context.cloudflare.env.DB)
 
     const userSession = await requireUserSession(event)
     if(!userSession.user) throw createError({

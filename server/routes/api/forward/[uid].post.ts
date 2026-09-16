@@ -20,13 +20,23 @@ export default defineEventHandler(async (event: H3Event) => {
         message: 'Body is wrong',
     })
 
+    let parsedForward: URL
+    try {
+        parsedForward = new URL(request.forward)
+        if (!['http:', 'https:'].includes(parsedForward.protocol)) throw new Error('unsupported protocol')
+    } catch {
+        throw createError({ status: 400, message: 'Invalid forward URL' })
+    }
+    const expires = dayjs(request.expires).endOf('day')
+    if (!expires.isValid() || !expires.isAfter(dayjs())) throw createError({ status: 400, message: 'Invalid expiration date' })
+
     const verify = await verifyTurnstileToken(request.token, event)
     if(!verify.success) throw createError({
         status: 403,
         message: 'Captcha is wrong',
     })
 
-    const db = useDrizzle()
+    const db = useDrizzle(event.context.cloudflare.env.DB)
 
     const result = await db.query.urls.findFirst({
         where: and(
@@ -42,18 +52,18 @@ export default defineEventHandler(async (event: H3Event) => {
         }
     })
 
-    if(!result) throw createError({
+    if(!result || result.UsersToUrls[0]?.user !== user.user.id) throw createError({
         status: 403,
         statusMessage: "Invalid uid"
     })
 
-    await db.update(urls).set({ forward: request.forward, expires: dayjs(request.expires).toDate() })
+    await db.update(urls).set({ forward: parsedForward.toString(), expires: expires.toDate(), updated_at: new Date() })
         .where(eq(urls.id, result.id))
 
     const responseData: IUIDGetResponse = {
         id: result!.id,
         uid: result!.uid,
-        forward: request.forward,
+        forward: parsedForward.toString(),
         user: {
             id: result!.UsersToUrls[0].Users.id,
             name: result!.UsersToUrls[0].Users.name,
@@ -61,7 +71,7 @@ export default defineEventHandler(async (event: H3Event) => {
         },
         created_at: result!.created_at,
         updated_at: result!.updated_at,
-        expires: dayjs(request.expires).toDate(),
+        expires: expires.toDate(),
     }
 
     return responseData

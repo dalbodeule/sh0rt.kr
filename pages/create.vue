@@ -36,7 +36,7 @@ const onSubmit = async () => {
     } else {
       status.value = Status.ERROR
     }
-  } catch(e) {
+  } catch {
     status.value = Status.ERROR
   }
 }
@@ -58,9 +58,10 @@ setLocale('ko')
     <ShorterField submit-text="만들기" :is-new="true" :lock="status == Status.SUCCESS" @submit="onSubmit"/>
     <div style="margin-top: 30px;" />
     <div v-if="status == Status.SUCCESS" class="notification is-success">
-      <p><a :href="`https://sh0rt.kr/${addrInfo.uid}`">https://sh0rt.kr/{{addrInfo.uid}}</a> 생성에 성공했습니다.</p>
+      <p><a :href="`${config.public.baseUrl}/${addrInfo.uid}`">{{ config.public.baseUrl }}/{{addrInfo.uid}}</a> 생성에 성공했습니다.</p>
       <p>만료일: {{ dayjs(addrInfo.expires).format('YYYY-MM-DD')}}</p>
     </div>
+    <QRCodeGenerator v-if="status == Status.SUCCESS" :value="`${config.public.baseUrl}/${addrInfo.uid}`" class="mt-5" />
     <div v-else-if="status == Status.ERROR" class="notification is-warning">
       <p>생성에 실패했습니다.</p>
     </div>

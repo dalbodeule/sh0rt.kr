@@ -43,8 +43,8 @@ const { data: forwardData, error: forwardError } = await useAsyncData('API_FORWA
 
 if (forwardError.value) {
   status.value = Status.ERROR
-  throw createError({
-    statusCode: 403,
+    throw createError({
+    statusCode: 404,
     message: "Fatal error on fetch",
     stack: Object.values(forwardError.value).join('/'),
     fatal: true
@@ -90,8 +90,8 @@ if (import.meta.client) {
     useHead({
       title: `sh0rt.kr :: forward :: ${uid}`,
     })
-    await $fetch(`${config.public.baseUrl}/api/forward/${uid}`, {method: 'PUT'})
-    await wait(3000)
+    void $fetch(`${config.public.baseUrl}/api/forward/${uid}`, {method: 'PUT'})
+    await wait(1000)
     window.location.href = forwardData.value.forward
   } else {
     throw createError({

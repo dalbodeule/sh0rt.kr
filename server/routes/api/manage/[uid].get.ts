@@ -1,9 +1,8 @@
 import type {H3Event} from "h3";
 import { AKeys, getFromAnalytics, getParams } from "~/server/utils/analyticHelper";
 import { useDrizzle } from "~/server/utils/useDrizzle";
-import { and, eq, gte } from "drizzle-orm";
+import { and, eq, gte, lte } from "drizzle-orm";
 import { analyticsCache, urls } from "~/server/db/schema";
-import { lte } from "drizzle-orm/expressions";
 
 const _30MIN = 60 * 30 * 1000
 
@@ -25,6 +24,9 @@ const aggregateDataByField = (response: IAnalytics, field: string, fieldName: st
 
     response.data.forEach(item => {
         const fieldValue = (item as unknown as {[key: string]: number})[field]
+        if (fieldValue === undefined || fieldValue === null) {
+            return; // Skip if the field value is undefined, null, or empty
+        }
         if (dataCount[fieldValue]) {
             dataCount[fieldValue]++;
         } else {
@@ -51,7 +53,7 @@ export default defineEventHandler(async (event: H3Event) => {
         message: 'Unauthorized',
     })
 
-    const db = useDrizzle()
+    const db = useDrizzle(event.context.cloudflare.env.DB)
     const currentShorten = await db.query.urls.findFirst({
         where: and(
             eq(urls.uid, uid),
@@ -84,10 +86,11 @@ export default defineEventHandler(async (event: H3Event) => {
         return JSON.parse(cachedData.data)
     }
 
+    const analyticsUid = uid.replaceAll("'", "''")
     const data = await getFromAnalytics(
         `SELECT ${getParams([
             AKeys.ip, AKeys.country, AKeys.region, AKeys.city, AKeys.colo, AKeys.latitude, AKeys.longitude, AKeys.browser, AKeys.device, AKeys.language
-        ])}, timestamp from ANALYTICS WHERE index1 = '${uid}' and timestamp >= toDateTime(${
+        ])}, timestamp from ANALYTICS WHERE index1 = '${analyticsUid}' and timestamp >= toDateTime(${
             Math.round((currentShorten?.created_at ?? new Date()).getTime() / 1000)
         })`,
         event
@@ -109,7 +112,7 @@ export default defineEventHandler(async (event: H3Event) => {
         })
 
         return returnData
-    } catch (e) {
+    } catch {
         throw createError({
             status: 400,
             message: `Could not parse analytics \n "${config.analyticsCache}""`,

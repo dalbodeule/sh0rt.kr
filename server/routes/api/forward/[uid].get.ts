@@ -17,7 +17,7 @@ export interface IUIDGetResponse {
 }
 
 export default defineEventHandler(async (event) => {
-    const db = useDrizzle()
+    const db = useDrizzle(event.context.cloudflare.env.DB)
 
     const uid = getRouterParam(event, 'uid') ?? ''
     if(!uid) throw createError({

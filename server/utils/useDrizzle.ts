@@ -5,8 +5,8 @@ export { sql, eq, and, or } from 'drizzle-orm'
 
 export const tables = schema
 
-export function useDrizzle() {
-  return drizzle(hubDatabase(), { schema })
+export function useDrizzle(db: D1Database) {
+  return drizzle(db, { schema })
 }
 
 export type User = typeof schema.users.$inferSelect

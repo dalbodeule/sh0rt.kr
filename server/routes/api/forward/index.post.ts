@@ -21,7 +21,7 @@ export default defineEventHandler(async (event: H3Event) => {
     })
 
     const request = await readBody(event) as IUIDPostRequest
-    if(!request.uid || !request.forward || !request.expires || !request.token) throw createError({
+    if(!request.uid || !/^[a-zA-Z0-9]{3,20}$/.test(request.uid) || !request.forward || !request.expires || !request.token) throw createError({
         status: 403,
         message: 'Body is wrong',
     })
@@ -32,24 +32,30 @@ export default defineEventHandler(async (event: H3Event) => {
         message: 'Captcha is wrong',
     })
 
-    const db = useDrizzle()
+    const db = useDrizzle(event.context.cloudflare.env.DB)
 
-    const result = await db.query.urls.findFirst({
-        where: and(
-            eq(urls.uid, request.uid),
-            gte(urls.expires, new Date())
-        )
-    })
+    const result = await db.query.urls.findFirst({ where: eq(urls.uid, request.uid) })
 
     if(result) throw createError({
         status: 403,
         statusMessage: "Invalid uid"
     })
 
+    const expires = dayjs(request.expires).endOf('day')
+    if (!expires.isValid() || !expires.isAfter(dayjs())) throw createError({ status: 400, message: 'Invalid expiration date' })
+
+    let parsedForward: URL
+    try {
+        parsedForward = new URL(request.forward)
+        if (!['http:', 'https:'].includes(parsedForward.protocol)) throw new Error('unsupported protocol')
+    } catch {
+        throw createError({ status: 400, message: 'Invalid forward URL' })
+    }
+
     const url_id = await db.insert(urls).values({
         uid: request.uid!,
-        forward: request.forward,
-        expires: dayjs(request.expires).toDate()
+        forward: parsedForward.toString(),
+        expires: expires.toDate()
     }).returning()
 
     await db.insert(usersToUrls).values({ user: user.user.id, url: url_id[0].id})

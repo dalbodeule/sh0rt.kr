@@ -9,7 +9,7 @@ export default async function(event: H3Event, provider: string, user: {
     name: string,
     avatar_url: string,
 } ) {
-    const db = useDrizzle()
+    const db = useDrizzle(event.context.cloudflare.env.DB)
 
     let db_user = await db.query.users.findFirst({
         where: and(
@@ -45,8 +45,7 @@ export default async function(event: H3Event, provider: string, user: {
             eq(users.vendor, provider))
     })
 
-    if(!db_user || (db_user.login_limit?.getTime() ?? 0 > Math.round(Date.now() / 1000))) {
-        console.log("asdfs")
+    if(!db_user || (db_user.login_limit?.getTime() ?? 0) > Date.now()) {
         return
     }
 

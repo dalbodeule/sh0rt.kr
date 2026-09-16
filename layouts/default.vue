@@ -2,22 +2,15 @@
 import SiteFooter from "~/components/SiteFooter.vue";
 import SiteHeader from "~/components/SiteHeader.vue";
 
-useHead({
-  htmlAttrs: {
-    class: 'theme-light'
-  }
-})
+useHead({ htmlAttrs: { lang: 'ko' } })
 </script>
 
 <template>
-  <div>
+  <div class="min-h-screen bg-slate-50">
     <SiteHeader />
-    <div class="container" style="margin-top: 20px; min-height: 80vh;">
+    <div class="mx-auto min-h-[80vh] max-w-7xl px-4 py-5">
       <NuxtPage />
     </div>
     <SiteFooter />
   </div>
 </template>
-
-<style src="~/node_modules/bulma/bulma.scss"></style>
-<style src="~/node_modules/bulma/sass/themes/light.scss"></style>

@@ -18,12 +18,10 @@ export const users = sqliteTable('users', {
     updated_at: int('updated_at', { mode: "timestamp" }).notNull().default(sql`(STRFTIME('%s'))`),
     login_limit: int('login_limit', { mode: "timestamp" }),
     role: int('role').notNull().default(UserRole.USER),
-    ddns_key: text('ddns_key', { length: 64 })
 })
 
 export const usersRelations = relations(users, ({ many }) => ({
     usersToUrls: many(usersToUrls),
-    usersToDomains: many(usersToDomains),
 }))
 
 export const urls = sqliteTable('urls', {
@@ -60,42 +58,4 @@ export const analyticsCache = sqliteTable('analyticsCache', {
     uid: text('uid', { length: 10 }).notNull(),
     data: text('data').notNull(),
     created_at: int('created_at', { mode: 'timestamp' }).default(sql`(STRFTIME('%s'))`),
-})
-
-export const domains = sqliteTable('domains', {
-    id: int('id').primaryKey({ autoIncrement: true }),
-    domain: text('domain', { length: 20 }).notNull(),
-    tld: text('tld', { length: 20 }).notNull().default('space-mc.com'),
-    created_at: int('created_at', { mode: "timestamp" }).notNull().default(sql`(STRFTIME('%s'))`),
-    updated_at: int('updated_at', { mode: "timestamp" }).notNull().default(sql`(STRFTIME('%s'))`),
-    expires: int('expires', { mode: "timestamp" }).notNull().default(sql`(STRFTIME('%s'))`),
-})
-
-export const domainRelations = relations(domains, ({ many }) => ({
-    UsersToDomains: many(usersToDomains),
-}))
-
-export const usersToDomains = sqliteTable('usersToDomains', {
-    user: int('user').notNull().references(() => users.id),
-    domain: int('domain').notNull().references(() => domains.id)
-})
-
-export const usersToDomainsRelations = relations(usersToDomains, ({ one }) => ({
-    Users: one(users, {
-        fields: [usersToDomains.user],
-        references: [users.id]
-    }),
-    Domains: one(domains, {
-        fields: [usersToDomains.domain],
-        references: [domains.id]
-    })
-}))
-
-export const records = sqliteTable('records', {
-    id: int('id').primaryKey({ autoIncrement: true }),
-    domain: int('domain').references(() => domains.id),
-    type: text('type', { length: 8 }).notNull(),
-    name: text('name', { length: 255 }).notNull(),
-    value: text('value', { length: 1024 }).notNull(),
-    cfid: text('cfid', { length: 32}).notNull()
 })

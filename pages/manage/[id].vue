@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { GChart } from 'vue-google-charts';
 import type { GoogleChartWrapperChartType } from 'vue-google-charts/dist/types';
-import { setLocale } from '@vee-validate/i18n';
 import dayjs from 'dayjs';
 import { Status } from '~/common/enums';
 import type { IUIDPostRequest } from '~/server/routes/api/forward/index.post';
 import type { IAnalyticsResponse, IManageResponse } from '~/server/routes/api/manage/[id].get';
 
 const route = useRoute();
+const { t } = useI18n();
 const manageId = String(route.params.id);
 const config = useRuntimeConfig();
 const { loggedIn } = useUserSession();
@@ -41,7 +41,7 @@ const onSubmit = async () => {
     status.value = Status.SUCCESS;
   } catch (error: unknown) {
     status.value = Status.ERROR;
-    errorMessage.value = error instanceof Error ? error.message : '수정하지 못했습니다.';
+    errorMessage.value = error instanceof Error ? error.message : t('create.error');
   }
 };
 
@@ -51,28 +51,25 @@ const chartOptions = {
   backgroundColor: 'transparent',
 };
 const hasRows = (data?: [string, string | number][]) => Boolean(data && data.length > 1);
-const charts: {
-  key: keyof IAnalyticsResponse;
-  title: string;
-  type: GoogleChartWrapperChartType;
-}[] = [
-  { key: 'country', title: '국가', type: 'GeoChart' },
-  { key: 'browser', title: '브라우저', type: 'PieChart' },
-  { key: 'os', title: '운영체제', type: 'PieChart' },
-  { key: 'device', title: '기기', type: 'PieChart' },
-  { key: 'language', title: '언어', type: 'PieChart' },
-  { key: 'requestDomain', title: '접속 도메인', type: 'PieChart' },
-  { key: 'requestPath', title: '접속 URI', type: 'PieChart' },
-  { key: 'sourceDomain', title: '유입 도메인', type: 'PieChart' },
-  { key: 'sourcePath', title: '유입 URI', type: 'PieChart' },
-];
+const charts = computed<
+  { key: keyof IAnalyticsResponse; title: string; type: GoogleChartWrapperChartType }[]
+>(() => [
+  { key: 'country', title: t('detail.country'), type: 'GeoChart' },
+  { key: 'browser', title: t('detail.browser'), type: 'PieChart' },
+  { key: 'os', title: t('detail.os'), type: 'PieChart' },
+  { key: 'device', title: t('detail.device'), type: 'PieChart' },
+  { key: 'language', title: t('detail.language'), type: 'PieChart' },
+  { key: 'requestDomain', title: t('detail.requestDomain'), type: 'PieChart' },
+  { key: 'requestPath', title: t('detail.requestPath'), type: 'PieChart' },
+  { key: 'sourceDomain', title: t('detail.sourceDomain'), type: 'PieChart' },
+  { key: 'sourcePath', title: t('detail.sourcePath'), type: 'PieChart' },
+]);
 
 useSeoMeta({
   title: `sh0rt.kr :: /${uid} 관리`,
-  description: '단축주소와 방문 통계 관리',
+  description: t('detail.stats'),
   robots: { all: false },
 });
-setLocale('ko');
 </script>
 
 <template>
@@ -92,13 +89,18 @@ setLocale('ko');
     </header>
 
     <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-      <h2 class="mb-6 text-xl font-bold">링크 설정</h2>
-      <ShorterField submit-text="변경사항 저장" :is-new="false" :lock="false" @submit="onSubmit" />
+      <h2 class="mb-6 text-xl font-bold">{{ t('detail.settings') }}</h2>
+      <ShorterField
+        :submit-text="t('detail.save')"
+        :is-new="false"
+        :lock="false"
+        @submit="onSubmit"
+      />
       <p
         v-if="status === Status.SUCCESS"
         class="mt-4 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800"
       >
-        변경사항을 저장했습니다.
+        {{ t('detail.saved') }}
       </p>
       <p
         v-if="status === Status.ERROR"
@@ -116,10 +118,9 @@ setLocale('ko');
 
     <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
       <div class="mb-6">
-        <h2 class="text-xl font-bold">방문 통계</h2>
+        <h2 class="text-xl font-bold">{{ t('detail.stats') }}</h2>
         <p class="mt-1 text-sm text-slate-500">
-          최근 90일, 최대 10,000건을 집계하며 최대 30분간 캐시됩니다. 방문자 IP는 비밀값과 함께 해시
-          처리됩니다.
+          {{ t('detail.statsDescription') }}
         </p>
       </div>
       <div v-if="analytics" class="grid gap-5 lg:grid-cols-2">
@@ -139,13 +140,13 @@ setLocale('ko');
               class="h-[300px] w-full overflow-hidden"
             />
             <p v-else class="flex h-52 items-center justify-center text-sm text-slate-400">
-              아직 데이터가 없습니다.
+              {{ t('detail.noData') }}
             </p>
           </ClientOnly>
         </article>
       </div>
       <p v-else class="rounded-xl bg-slate-50 p-8 text-center text-sm text-slate-500">
-        통계를 불러올 수 없거나 아직 방문 데이터가 없습니다.
+        {{ t('detail.loadError') }}
       </p>
     </section>
   </main>

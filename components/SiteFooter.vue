@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const { t } = useI18n();
+</script>
+
 <template>
   <footer class="mt-12 border-t border-slate-200 bg-white px-4 py-8 text-sm text-slate-500">
     <div
@@ -8,9 +12,9 @@
         {{ new Date().getFullYear() }} dalbodeule
       </p>
       <div class="flex justify-center gap-4">
-        <NuxtLink class="hover:text-slate-900" to="/report">악성 링크 신고</NuxtLink
-        ><NuxtLink class="hover:text-slate-900" to="/privacy">개인정보 처리방침</NuxtLink
-        ><NuxtLink class="hover:text-slate-900" to="/policy">이용약관</NuxtLink>
+        <NuxtLink class="hover:text-slate-900" to="/report">{{ t('footer.report') }}</NuxtLink
+        ><NuxtLink class="hover:text-slate-900" to="/privacy">{{ t('footer.privacy') }}</NuxtLink
+        ><NuxtLink class="hover:text-slate-900" to="/policy">{{ t('footer.policy') }}</NuxtLink>
       </div>
     </div>
   </footer>

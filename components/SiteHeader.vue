@@ -2,7 +2,8 @@
 import { UserRole } from '~/common/userRole';
 const show = ref(false);
 const router = useRouter();
-const { loggedIn, user, ready, clear, fetch: fetchUser } = useUserSession();
+const { loggedIn, user, clear } = useUserSession();
+const { t } = useI18n();
 watch(
   () => router.currentRoute.value.fullPath,
   () => {
@@ -13,8 +14,6 @@ const logout = async () => {
   await clear();
   await navigateTo('/');
 };
-
-if (!ready.value) await fetchUser();
 </script>
 
 <template>
@@ -25,22 +24,23 @@ if (!ready.value) await fetchUser();
         to="/"
         ><img class="h-9 w-9 rounded-xl" src="/favicon.png" alt="sh0rt.kr 로고" />sh0rt.kr</NuxtLink
       >
-      <nav class="hidden items-center gap-1 md:flex" aria-label="주 메뉴">
+      <nav class="hidden items-center gap-1 md:flex" :aria-label="t('nav.main')">
+        <LocaleSwitcher />
         <NuxtLink
           v-if="loggedIn"
           class="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
           to="/create"
-          >링크 만들기</NuxtLink
+          >{{ t('nav.create') }}</NuxtLink
         ><NuxtLink
           v-if="loggedIn"
           class="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
           to="/manage"
-          >내 링크</NuxtLink
+          >{{ t('nav.manage') }}</NuxtLink
         ><NuxtLink
           v-if="user && user.role >= UserRole.MODERATOR"
           class="rounded-lg px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-50"
           to="/admin/user"
-          >관리자</NuxtLink
+          >{{ t('nav.admin') }}</NuxtLink
         >
         <template v-if="loggedIn"
           ><span class="mx-2 h-5 w-px bg-slate-200" /><span
@@ -53,19 +53,19 @@ if (!ready.value) await fetchUser();
             class="rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100"
             @click="logout"
           >
-            로그아웃
+            {{ t('common.logout') }}
           </button></template
         ><NuxtLink
           v-else
           class="rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white hover:bg-slate-800"
           to="/login"
-          >로그인</NuxtLink
+          >{{ t('common.login') }}</NuxtLink
         >
       </nav>
       <button
         type="button"
         class="flex h-10 w-10 items-center justify-center rounded-lg text-xl text-slate-700 hover:bg-slate-100 md:hidden"
-        aria-label="메뉴"
+        :aria-label="t('nav.menu')"
         :aria-expanded="show"
         @click="show = !show"
       >
@@ -75,35 +75,38 @@ if (!ready.value) await fetchUser();
     <nav
       v-if="show"
       class="space-y-1 border-t border-slate-100 px-4 py-3 md:hidden"
-      aria-label="모바일 메뉴"
+      :aria-label="t('nav.mobile')"
     >
+      <div class="mb-2">
+        <LocaleSwitcher />
+      </div>
       <NuxtLink
         v-if="loggedIn"
         class="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-slate-100"
         to="/create"
-        >링크 만들기</NuxtLink
+        >{{ t('nav.create') }}</NuxtLink
       ><NuxtLink
         v-if="loggedIn"
         class="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-slate-100"
         to="/manage"
-        >내 링크</NuxtLink
+        >{{ t('nav.manage') }}</NuxtLink
       ><NuxtLink
         v-if="user && user.role >= UserRole.MODERATOR"
         class="block rounded-lg px-3 py-2.5 text-sm font-semibold text-blue-700 hover:bg-blue-50"
         to="/admin/user"
-        >관리자</NuxtLink
+        >{{ t('nav.admin') }}</NuxtLink
       ><button
         v-if="loggedIn"
         type="button"
         class="block w-full rounded-lg px-3 py-2.5 text-left text-sm text-slate-600 hover:bg-slate-100"
         @click="logout"
       >
-        로그아웃</button
+        {{ t('common.logout') }}</button
       ><NuxtLink
         v-else
         class="block rounded-lg bg-slate-950 px-3 py-2.5 text-center text-sm font-bold text-white"
         to="/login"
-        >로그인</NuxtLink
+        >{{ t('common.login') }}</NuxtLink
       >
     </nav>
   </header>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { t } = useI18n();
 defineProps<{ page: number; pages: number }>();
 defineEmits<{ change: [page: number] }>();
 </script>
@@ -9,14 +10,14 @@ defineEmits<{ change: [page: number] }>();
       class="rounded-lg border px-4 py-2 disabled:opacity-40"
       @click="$emit('change', page - 1)"
     >
-      이전</button
+      {{ t('manage.previous') }}</button
     ><span class="text-sm text-slate-600">{{ page }} / {{ pages }}</span
     ><button
       :disabled="page >= pages"
       class="rounded-lg border px-4 py-2 disabled:opacity-40"
       @click="$emit('change', page + 1)"
     >
-      다음
+      {{ t('manage.next') }}
     </button>
   </nav>
 </template>

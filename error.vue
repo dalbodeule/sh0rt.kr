@@ -6,27 +6,30 @@ const props = defineProps<{
     message?: string;
   };
 }>();
+const { t } = useI18n();
 
 const isNotFound = computed(() => props.error.statusCode === 404);
 const isUnauthorized = computed(() => props.error.statusCode === 401);
 const isForbidden = computed(() => props.error.statusCode === 403);
 const statusCode = computed(() => props.error.statusCode || 500);
 const title = computed(() => {
-  if (isNotFound.value) return '페이지를 찾을 수 없어요';
-  if (isUnauthorized.value) return '로그인이 필요해요';
-  if (isForbidden.value) return '접근 권한이 없어요';
-  return '잠시 문제가 생겼어요';
+  if (isNotFound.value) return t('error.notFoundTitle');
+  if (isUnauthorized.value) return t('error.unauthorizedTitle');
+  if (isForbidden.value) return t('error.forbiddenTitle');
+  return t('error.serverTitle');
 });
 const description = computed(() =>
   isNotFound.value
-    ? '요청하신 페이지가 없거나 주소가 변경되었을 수 있어요.'
+    ? t('error.notFoundDescription')
     : isUnauthorized.value
-      ? '이 페이지를 이용하려면 먼저 로그인해 주세요.'
+      ? t('error.unauthorizedDescription')
       : isForbidden.value
-        ? '현재 계정으로는 이 페이지를 이용할 수 없어요.'
-        : '서버에서 요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.',
+        ? t('error.forbiddenDescription')
+        : t('error.serverDescription')
 );
-const primaryActionLabel = computed(() => (isUnauthorized.value ? '로그인하러 가기' : '홈으로 돌아가기'));
+const primaryActionLabel = computed(() =>
+  isUnauthorized.value ? t('error.login') : t('common.goHome')
+);
 
 const clearErrorAndContinue = () => clearError({ redirect: isUnauthorized.value ? '/login' : '/' });
 </script>
@@ -61,6 +64,13 @@ const clearErrorAndContinue = () => clearError({ redirect: isUnauthorized.value 
             @click="clearErrorAndContinue"
           >
             {{ primaryActionLabel }}
+          </button>
+          <button
+            class="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-100"
+            type="button"
+            @click="clearError()"
+          >
+            {{ t('common.retry') }}
           </button>
         </div>
       </section>

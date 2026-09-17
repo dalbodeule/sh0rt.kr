@@ -1,7 +1,14 @@
 export default defineNuxtPlugin((nuxtApp) => {
   const session = useUserSession();
+  const { show } = useAppNotice();
   nuxtApp.hook('app:mounted', async () => {
-    if (!session.ready.value) await session.fetch();
+    try {
+      if (!session.ready.value) await session.fetch();
+    } catch (error) {
+      console.error('Failed to initialize the user session.', error);
+      return;
+    }
+
     if (!session.loggedIn.value) return;
     try {
       await $fetch('/api/session/status');
@@ -11,7 +18,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         (error as { statusCode?: number }).statusCode;
       if (status !== 403) return;
       await session.clear();
-      window.alert('계정 제한 상태이므로 접속할 수 없습니다. 자동으로 로그아웃되었습니다.');
+      show(nuxtApp.$i18n.t('session.restricted'), 'error');
       await navigateTo('/login');
     }
   });

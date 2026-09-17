@@ -17,7 +17,9 @@ interface Paged<T> {
   total: number;
 }
 definePageMeta({ middleware: 'admin' });
-useSeoMeta({ title: 'sh0rt.kr :: 단축주소 관리', robots: { all: false } });
+const { t } = useI18n();
+const { confirm } = useAppNotice();
+useSeoMeta({ title: `sh0rt.kr :: ${t('admin.urlTitle')}`, robots: { all: false } });
 const route = useRoute();
 const data = ref<Paged<AdminUrl>>({ items: [], page: 1, pageSize: 20, total: 0 });
 const errorMessage = ref('');
@@ -37,7 +39,7 @@ const load = async () => {
       query: { page: data.value.page, ...queryValues(filters) },
     });
   } catch {
-    errorMessage.value = '단축주소 목록을 불러오지 못했습니다.';
+    errorMessage.value = t('manage.loadError');
   }
 };
 const search = () => {
@@ -45,7 +47,7 @@ const search = () => {
   void load();
 };
 const deleteUrl = async (target: AdminUrl) => {
-  if (!window.confirm(`/${target.uid} 단축주소를 삭제할까요?`)) return;
+  if (!(await confirm(t('admin.deleteConfirm', { uid: target.uid })))) return;
   await $fetch(`/api/admin/url/${target.id}`, { method: 'DELETE' });
   await load();
 };
@@ -66,7 +68,7 @@ await load();
   <main class="space-y-7 py-4">
     <header>
       <p class="text-sm font-semibold text-blue-600">ADMIN CONSOLE / URL</p>
-      <h1 class="mt-1 text-3xl font-bold text-slate-950">단축주소 관리</h1>
+      <h1 class="mt-1 text-3xl font-bold text-slate-950">{{ t('admin.urlTitle') }}</h1>
     </header>
     <AdminStats /><AdminNav />
     <p v-if="errorMessage" class="rounded-xl bg-red-50 p-4 text-red-700">{{ errorMessage }}</p>
@@ -76,21 +78,21 @@ await load();
     >
       <input
         v-model="filters.q"
-        placeholder="단축/연결주소"
+        :placeholder="t('admin.urlSearch')"
         class="rounded-lg border px-3 py-2 md:col-span-2"
       /><input
         v-model="filters.ownerQuery"
-        placeholder="소유자 이름/이메일"
+        :placeholder="t('admin.ownerSearch')"
         class="rounded-lg border px-3 py-2"
       /><select v-model="filters.status" class="rounded-lg border px-3 py-2">
-        <option value="">모든 상태</option>
-        <option value="active">활성</option>
-        <option value="expired">만료</option></select
+        <option value="">{{ t('admin.allStatus') }}</option>
+        <option value="active">{{ t('manage.active') }}</option>
+        <option value="expired">{{ t('manage.expired') }}</option></select
       ><select v-model="filters.spam" class="rounded-lg border px-3 py-2">
-        <option value="">신고 전체</option>
-        <option value="reported">신고 의심</option>
-        <option value="clean">신고 없음</option></select
-      ><button class="rounded-lg bg-slate-900 px-4 text-white">검색</button>
+        <option value="">{{ t('admin.reportedAll') }}</option>
+        <option value="reported">{{ t('admin.reported') }}</option>
+        <option value="clean">{{ t('admin.clean') }}</option></select
+      ><button class="rounded-lg bg-slate-900 px-4 text-white">{{ t('admin.search') }}</button>
       <p v-if="filters.userId" class="md:col-span-6 text-sm text-blue-700">
         사용자 #{{ filters.userId }} 필터 적용 중
         <button
@@ -109,11 +111,11 @@ await load();
       <table class="min-w-full text-left text-sm">
         <thead class="bg-slate-50 text-xs text-slate-500">
           <tr>
-            <th class="px-4 py-3">주소</th>
-            <th class="px-4 py-3">소유자</th>
-            <th class="px-4 py-3">대상</th>
-            <th class="px-4 py-3">만료</th>
-            <th class="px-4 py-3">관리</th>
+            <th class="px-4 py-3">{{ t('admin.address') }}</th>
+            <th class="px-4 py-3">{{ t('admin.owner') }}</th>
+            <th class="px-4 py-3">{{ t('admin.target') }}</th>
+            <th class="px-4 py-3">{{ t('admin.expires') }}</th>
+            <th class="px-4 py-3">{{ t('admin.manage') }}</th>
           </tr>
         </thead>
         <tbody class="divide-y">
@@ -127,7 +129,7 @@ await load();
               <span
                 v-if="link.reportCount"
                 class="mt-1 inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700"
-                >신고 {{ link.reportCount }}</span
+                >{{ t('admin.reportCount') }} {{ link.reportCount }}</span
               >
             </td>
             <td class="px-4 py-3">
@@ -141,7 +143,7 @@ await load();
                 class="rounded-lg bg-red-50 px-3 py-1.5 font-semibold text-red-700"
                 @click="deleteUrl(link)"
               >
-                삭제
+                {{ t('admin.delete') }}
               </button>
             </td>
           </tr>

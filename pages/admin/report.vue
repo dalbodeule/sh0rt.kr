@@ -22,7 +22,8 @@ interface Paged<T> {
   total: number;
 }
 definePageMeta({ middleware: 'admin' });
-useSeoMeta({ title: 'sh0rt.kr :: 신고 관리', robots: { all: false } });
+const { t } = useI18n();
+useSeoMeta({ title: `sh0rt.kr :: ${t('admin.reportTitle')}`, robots: { all: false } });
 const data = ref<Paged<Report>>({ items: [], page: 1, pageSize: 20, total: 0 });
 const selected = ref<Report | null>(null);
 const errorMessage = ref('');
@@ -36,7 +37,7 @@ const load = async () => {
       query: { page: data.value.page, ...queryValues(filters) },
     });
   } catch {
-    errorMessage.value = '신고 목록을 불러오지 못했습니다.';
+    errorMessage.value = t('report.error');
   }
 };
 const search = () => {
@@ -68,7 +69,7 @@ await load();
   <main class="space-y-7 py-4">
     <header>
       <p class="text-sm font-semibold text-blue-600">ADMIN CONSOLE / REPORT</p>
-      <h1 class="mt-1 text-3xl font-bold text-slate-950">신고 관리</h1>
+      <h1 class="mt-1 text-3xl font-bold text-slate-950">{{ t('admin.reportTitle') }}</h1>
     </header>
     <AdminStats /><AdminNav />
     <p v-if="errorMessage" class="rounded-xl bg-red-50 p-4 text-red-700">{{ errorMessage }}</p>
@@ -78,19 +79,19 @@ await load();
     >
       <input
         v-model="filters.q"
-        placeholder="UID, 발신자, 제목, 내용"
+        :placeholder="t('admin.reportSearch')"
         class="rounded-lg border px-3 py-2 md:col-span-2"
       /><select v-model="filters.status" class="rounded-lg border px-3 py-2">
-        <option value="">모든 상태</option>
-        <option value="open">접수</option>
-        <option value="reviewing">검토 중</option>
-        <option value="resolved">처리 완료</option>
-        <option value="dismissed">기각</option></select
+        <option value="">{{ t('admin.allStatus') }}</option>
+        <option value="open">{{ t('admin.received') }}</option>
+        <option value="reviewing">{{ t('admin.reviewing') }}</option>
+        <option value="resolved">{{ t('admin.resolved') }}</option>
+        <option value="dismissed">{{ t('admin.dismissed') }}</option></select
       ><select v-model="filters.source" class="rounded-lg border px-3 py-2">
-        <option value="">모든 경로</option>
-        <option value="web">웹</option>
-        <option value="email">이메일</option></select
-      ><button class="rounded-lg bg-slate-900 px-4 text-white">검색</button>
+        <option value="">{{ t('admin.allSources') }}</option>
+        <option value="web">{{ t('admin.web') }}</option>
+        <option value="email">{{ t('admin.email') }}</option></select
+      ><button class="rounded-lg bg-slate-900 px-4 text-white">{{ t('admin.search') }}</button>
     </form>
     <div class="space-y-3">
       <article
@@ -102,14 +103,15 @@ await load();
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p class="font-bold">
-              #{{ report.id }} · {{ report.uid ? `/${report.uid}` : '링크 미확인' }}
+              #{{ report.id }} · {{ report.uid ? `/${report.uid}` : t('admin.noLink') }}
               <span class="ml-2 rounded-full bg-slate-100 px-2 py-1 text-xs">{{
                 report.source
               }}</span>
             </p>
             <p class="mt-1 text-xs text-slate-500">
               {{ dayjs(report.created_at).format('YYYY-MM-DD HH:mm') }} ·
-              {{ report.sender || report.reporter_email || '익명' }} · {{ report.reason }}
+              {{ report.sender || report.reporter_email || t('admin.anonymous') }} ·
+              {{ report.reason }}
             </p>
           </div>
           <select
@@ -118,19 +120,19 @@ await load();
             @click.stop
             @change="update(report, ($event.target as HTMLSelectElement).value)"
           >
-            <option value="open">접수</option>
-            <option value="reviewing">검토 중</option>
-            <option value="resolved">처리 완료</option>
-            <option value="dismissed">기각</option>
+            <option value="open">{{ t('admin.received') }}</option>
+            <option value="reviewing">{{ t('admin.reviewing') }}</option>
+            <option value="resolved">{{ t('admin.resolved') }}</option>
+            <option value="dismissed">{{ t('admin.dismissed') }}</option>
           </select>
         </div>
         <p v-if="report.subject" class="mt-4 font-semibold">{{ report.subject }}</p>
         <pre
           class="mt-3 max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-xl bg-slate-50 p-4 text-sm"
-          >{{ report.body_text || report.details || '상세 내용 없음' }}</pre>
+          >{{ report.body_text || report.details || t('report.details') }}</pre>
       </article>
       <p v-if="!data.items.length" class="rounded-xl bg-slate-100 p-6 text-slate-500">
-        신고가 없습니다.
+        {{ t('admin.noReports') }}
       </p>
     </div>
     <PaginationNav
@@ -155,46 +157,48 @@ await load();
           <div>
             <p class="text-sm font-semibold text-blue-600">REPORT #{{ selected.id }}</p>
             <h2 class="mt-1 text-xl font-bold">
-              {{ selected.uid ? `/${selected.uid}` : '링크 미확인' }}
+              {{ selected.uid ? `/${selected.uid}` : t('admin.noLink') }}
             </h2>
           </div>
-          <button class="rounded-lg border px-3 py-1" @click="selected = null">닫기</button>
+          <button class="rounded-lg border px-3 py-1" @click="selected = null">
+            {{ t('admin.close') }}
+          </button>
         </div>
         <dl class="mt-5 grid gap-3 rounded-xl bg-slate-50 p-4 text-sm sm:grid-cols-2">
           <div>
-            <dt class="text-slate-500">신고 유형</dt>
+            <dt class="text-slate-500">{{ t('report.reason') }}</dt>
             <dd class="font-semibold">{{ selected.reason }}</dd>
           </div>
           <div>
-            <dt class="text-slate-500">접수 경로</dt>
+            <dt class="text-slate-500">{{ t('admin.allSources') }}</dt>
             <dd class="font-semibold">{{ selected.source }}</dd>
           </div>
           <div>
-            <dt class="text-slate-500">신고자</dt>
+            <dt class="text-slate-500">{{ t('admin.owner') }}</dt>
             <dd class="break-all font-semibold">
-              {{ selected.sender || selected.reporter_email || '익명' }}
+              {{ selected.sender || selected.reporter_email || t('admin.anonymous') }}
             </dd>
           </div>
           <div>
-            <dt class="text-slate-500">대상 주소</dt>
-            <dd class="break-all font-semibold">{{ selected.forward || '확인되지 않음' }}</dd>
+            <dt class="text-slate-500">{{ t('admin.target') }}</dt>
+            <dd class="break-all font-semibold">{{ selected.forward || t('admin.noLink') }}</dd>
           </div>
         </dl>
         <p v-if="selected.subject" class="mt-5 font-semibold">{{ selected.subject }}</p>
         <pre
           class="mt-3 max-h-80 overflow-auto whitespace-pre-wrap break-words rounded-xl border p-4 text-sm"
-          >{{ selected.body_text || selected.details || '상세 내용 없음' }}</pre>
+          >{{ selected.body_text || selected.details || t('report.details') }}</pre>
         <div class="mt-6 flex justify-end gap-2">
           <button
             class="rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 font-semibold text-amber-900"
             @click="updateSelected('dismissed')"
           >
-            기각</button
+            {{ t('admin.dismissed') }}</button
           ><button
             class="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white"
             @click="updateSelected('resolved')"
           >
-            처리 완료
+            {{ t('admin.resolved') }}
           </button>
         </div>
       </section>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const props = defineProps<{ value: string }>();
+const { t } = useI18n();
 const canvas = ref<HTMLCanvasElement | null>(null);
 const ready = ref(false);
 const error = ref(false);
@@ -35,7 +36,7 @@ onMounted(render);
 
 <template>
   <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-    <h2 class="text-lg font-bold text-slate-900">QR코드</h2>
+    <h2 class="text-lg font-bold text-slate-900">{{ t('qr.alt') }}</h2>
     <p class="mt-1 break-all text-sm text-slate-500">{{ value }}</p>
     <div class="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-end">
       <div class="rounded-xl border border-slate-200 bg-white p-2">
@@ -44,7 +45,7 @@ onMounted(render);
           class="h-auto max-w-full"
           width="256"
           height="256"
-          aria-label="단축주소 QR코드"
+          :aria-label="t('qr.alt')"
         />
       </div>
       <button
@@ -53,9 +54,9 @@ onMounted(render);
         :disabled="!ready"
         @click="download"
       >
-        이미지 다운로드
+        {{ t('qr.download') }}
       </button>
     </div>
-    <p v-if="error" class="mt-3 text-sm text-red-600">QR코드를 생성하지 못했습니다.</p>
+    <p v-if="error" class="mt-3 text-sm text-red-600">{{ t('create.error') }}</p>
   </section>
 </template>

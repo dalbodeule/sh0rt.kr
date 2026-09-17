@@ -8,6 +8,7 @@ interface Stats {
   openReports: number;
 }
 const { data } = await useFetch<{ stats: Stats }>('/api/admin/overview');
+const { t } = useI18n();
 const stats = computed(
   () =>
     data.value?.stats ?? {
@@ -24,12 +25,12 @@ const stats = computed(
   <section class="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
     <article
       v-for="item in [
-        ['사용자', stats.users],
-        ['전체 링크', stats.urls],
-        ['활성 링크', stats.activeUrls],
-        ['만료 링크', stats.expiredUrls],
-        ['전체 신고', stats.reports],
-        ['처리 필요', stats.openReports],
+        [t('admin.users'), stats.users],
+        [t('home.urls'), stats.urls],
+        [t('manage.active'), stats.activeUrls],
+        [t('manage.expired'), stats.expiredUrls],
+        [t('admin.reports'), stats.reports],
+        [t('admin.received'), stats.openReports],
       ]"
       :key="String(item[0])"
       class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"

@@ -19,8 +19,9 @@ interface ListResponse {
 }
 const config = useRuntimeConfig();
 const { loggedIn } = useUserSession();
+const { t } = useI18n();
 if (!loggedIn.value) await navigateTo('/');
-useSeoMeta({ title: 'sh0rt.kr :: 내 링크', robots: { all: false } });
+useSeoMeta({ title: `sh0rt.kr :: ${t('manage.title')}`, robots: { all: false } });
 
 const page = ref(1);
 const q = ref('');
@@ -49,7 +50,7 @@ const load = async () => {
       },
     });
   } catch {
-    errorMessage.value = '목록을 불러오지 못했습니다.';
+    errorMessage.value = t('manage.loadError');
   } finally {
     loading.value = false;
   }
@@ -69,14 +70,14 @@ await load();
   <main class="space-y-7 py-4">
     <header>
       <p class="text-sm font-semibold text-blue-600">MY LINKS</p>
-      <h1 class="mt-1 text-3xl font-bold text-slate-950">내 단축주소</h1>
+      <h1 class="mt-1 text-3xl font-bold text-slate-950">{{ t('manage.title') }}</h1>
     </header>
     <section class="grid gap-4 sm:grid-cols-3">
       <article
         v-for="item in [
-          ['전체', data.stats.total],
-          ['활성', data.stats.active],
-          ['만료', data.stats.expired],
+          [t('manage.all'), data.stats.total],
+          [t('manage.active'), data.stats.active],
+          [t('manage.expired'), data.stats.expired],
         ]"
         :key="String(item[0])"
         class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
@@ -91,18 +92,22 @@ await load();
     >
       <input
         v-model="q"
-        placeholder="단축주소 또는 연결주소 검색"
+        :placeholder="t('manage.searchPlaceholder')"
         class="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-2.5"
       /><select v-model="status" class="rounded-xl border border-slate-300 px-4 py-2.5">
-        <option value="all">전체 상태</option>
-        <option value="active">활성</option>
-        <option value="expired">만료</option></select
-      ><button class="rounded-xl bg-slate-900 px-5 py-2.5 font-semibold text-white">검색</button>
+        <option value="all">{{ t('manage.allStatus') }}</option>
+        <option value="active">{{ t('manage.active') }}</option>
+        <option value="expired">{{ t('manage.expired') }}</option></select
+      ><button class="rounded-xl bg-slate-900 px-5 py-2.5 font-semibold text-white">
+        {{ t('manage.search') }}
+      </button>
     </form>
     <p v-if="errorMessage" class="rounded-xl bg-red-50 p-4 text-red-700">{{ errorMessage }}</p>
-    <p v-else-if="loading" class="rounded-xl bg-slate-100 p-6 text-slate-500">불러오는 중…</p>
+    <p v-else-if="loading" class="rounded-xl bg-slate-100 p-6 text-slate-500">
+      {{ t('manage.loading') }}
+    </p>
     <p v-else-if="!data.items.length" class="rounded-xl bg-slate-100 p-6 text-slate-600">
-      조건에 맞는 단축주소가 없습니다.
+      {{ t('manage.empty') }}
     </p>
     <div v-else class="grid gap-5 md:grid-cols-2">
       <article
@@ -121,20 +126,20 @@ await load();
           ><span
             v-if="isExpired(url.expires)"
             class="shrink-0 rounded-full bg-amber-200 px-2.5 py-1 text-xs font-bold text-amber-900"
-            >만료</span
+            >{{ t('manage.expired') }}</span
           >
         </div>
         <dl class="mt-4 space-y-2 text-sm text-slate-600">
           <div class="flex gap-3">
-            <dt class="w-16 shrink-0 font-medium text-slate-900">연결주소</dt>
+            <dt class="w-16 shrink-0 font-medium text-slate-900">{{ t('manage.target') }}</dt>
             <dd class="break-all">{{ url.forward }}</dd>
           </div>
           <div class="flex gap-3">
-            <dt class="w-16 shrink-0 font-medium text-slate-900">생성일</dt>
+            <dt class="w-16 shrink-0 font-medium text-slate-900">{{ t('manage.created') }}</dt>
             <dd>{{ dayjs(url.created_at).format('YYYY-MM-DD') }}</dd>
           </div>
           <div class="flex gap-3">
-            <dt class="w-16 shrink-0 font-medium text-slate-900">만료일</dt>
+            <dt class="w-16 shrink-0 font-medium text-slate-900">{{ t('manage.expires') }}</dt>
             <dd>{{ dayjs(url.expires).format('YYYY-MM-DD') }}</dd>
           </div>
         </dl>
@@ -142,7 +147,7 @@ await load();
           v-if="!isExpired(url.expires)"
           :to="`/manage/${url.manage_id}`"
           class="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-          >관리하기</NuxtLink
+          >{{ t('manage.manage') }}</NuxtLink
         >
       </article>
     </div>
@@ -152,14 +157,14 @@ await load();
         class="rounded-lg border px-4 py-2 disabled:opacity-40"
         @click="changePage(page - 1)"
       >
-        이전</button
+        {{ t('manage.previous') }}</button
       ><span class="text-sm text-slate-600">{{ page }} / {{ totalPages }}</span
       ><button
         :disabled="page >= totalPages"
         class="rounded-lg border px-4 py-2 disabled:opacity-40"
         @click="changePage(page + 1)"
       >
-        다음
+        {{ t('manage.next') }}
       </button>
     </nav>
   </main>

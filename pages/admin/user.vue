@@ -20,7 +20,8 @@ interface Paged<T> {
 }
 const { loggedIn, user, fetch: fetchUserSession } = useUserSession();
 definePageMeta({ middleware: 'admin' });
-useSeoMeta({ title: 'sh0rt.kr :: 사용자 관리', robots: { all: false } });
+const { t } = useI18n();
+useSeoMeta({ title: `sh0rt.kr :: ${t('admin.userTitle')}`, robots: { all: false } });
 const filters = reactive({ q: '', vendor: '', status: '', joinedFrom: '', joinedTo: '' });
 const data = ref<Paged<AdminUser>>({ items: [], page: 1, pageSize: 20, total: 0 });
 const errorMessage = ref('');
@@ -40,7 +41,7 @@ const load = async () => {
       query: { page: data.value.page, ...queryValues(filters) },
     });
   } catch {
-    errorMessage.value = '사용자 목록을 불러오지 못했습니다.';
+    errorMessage.value = t('manage.loadError');
   }
 };
 const search = () => {
@@ -55,7 +56,7 @@ const updateUser = async (
     await $fetch(`/api/admin/user/${target.id}`, { method: 'PATCH', body: changes });
     await load();
   } catch {
-    errorMessage.value = '사용자 변경에 실패했습니다.';
+    errorMessage.value = t('manage.loadError');
   }
 };
 const applySuspension = async () => {
@@ -90,7 +91,7 @@ await load();
   <main class="space-y-7 py-4">
     <header>
       <p class="text-sm font-semibold text-blue-600">ADMIN CONSOLE / USER</p>
-      <h1 class="mt-1 text-3xl font-bold text-slate-950">사용자 관리</h1>
+      <h1 class="mt-1 text-3xl font-bold text-slate-950">{{ t('admin.userTitle') }}</h1>
     </header>
     <AdminStats /><AdminNav />
     <p v-if="errorMessage" role="alert" class="rounded-xl bg-red-50 p-4 text-red-700">
@@ -102,34 +103,34 @@ await load();
     >
       <input
         v-model="filters.q"
-        placeholder="이름 또는 이메일"
+        :placeholder="t('admin.nameEmail')"
         class="rounded-lg border px-3 py-2 md:col-span-2"
       /><select v-model="filters.vendor" class="rounded-lg border px-3 py-2">
-        <option value="">모든 OAuth</option>
+        <option value="">{{ t('admin.allOAuth') }}</option>
         <option value="github">GitHub</option>
         <option value="google">Google</option></select
       ><select v-model="filters.status" class="rounded-lg border px-3 py-2">
-        <option value="">모든 상태</option>
-        <option value="active">정상</option>
-        <option value="suspended">정지</option></select
+        <option value="">{{ t('admin.allStatus') }}</option>
+        <option value="active">{{ t('admin.normal') }}</option>
+        <option value="suspended">{{ t('admin.suspended') }}</option></select
       ><input v-model="filters.joinedFrom" type="date" class="rounded-lg border px-3 py-2" />
       <div class="flex gap-2">
         <input
           v-model="filters.joinedTo"
           type="date"
           class="min-w-0 flex-1 rounded-lg border px-3 py-2"
-        /><button class="rounded-lg bg-slate-900 px-4 text-white">검색</button>
+        /><button class="rounded-lg bg-slate-900 px-4 text-white">{{ t('admin.search') }}</button>
       </div>
     </form>
     <div class="overflow-x-auto rounded-2xl border bg-white">
       <table class="min-w-full text-left text-sm">
         <thead class="bg-slate-50 text-xs text-slate-500">
           <tr>
-            <th class="px-4 py-3">사용자</th>
-            <th class="px-4 py-3">가입일</th>
-            <th class="px-4 py-3">링크</th>
+            <th class="px-4 py-3">{{ t('admin.users') }}</th>
+            <th class="px-4 py-3">{{ t('manage.created') }}</th>
+            <th class="px-4 py-3">{{ t('admin.urls') }}</th>
             <th class="px-4 py-3">권한</th>
-            <th class="px-4 py-3">상태</th>
+            <th class="px-4 py-3">{{ t('admin.allStatus') }}</th>
           </tr>
         </thead>
         <tbody class="divide-y">
@@ -146,7 +147,7 @@ await load();
             <td class="px-4 py-3">{{ dayjs(member.created_at).format('YYYY-MM-DD') }}</td>
             <td class="px-4 py-3">
               <button class="font-semibold text-blue-600" @click="openLinks(member)">
-                {{ member.urlCount }}개 보기
+                {{ member.urlCount }} {{ t('admin.urls') }}
               </button>
             </td>
             <td class="px-4 py-3">
@@ -158,9 +159,9 @@ await load();
                   updateUser(member, { role: Number(($event.target as HTMLSelectElement).value) })
                 "
               >
-                <option :value="UserRole.USER">사용자</option>
+                <option :value="UserRole.USER">{{ t('admin.users') }}</option>
                 <option :value="UserRole.MODERATOR">운영자</option>
-                <option :value="UserRole.ADMIN">관리자</option>
+                <option :value="UserRole.ADMIN">{{ t('nav.admin') }}</option>
               </select>
             </td>
             <td class="px-4 py-3">
@@ -236,8 +237,10 @@ await load();
             class="rounded-lg border px-4 py-2"
             @click="suspensionTarget = null"
           >
-            취소</button
-          ><button class="rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white">적용</button>
+            {{ t('admin.cancel') }}</button
+          ><button class="rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white">
+            {{ t('admin.apply') }}
+          </button>
         </div>
       </form>
     </div>

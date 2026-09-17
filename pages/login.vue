@@ -1,15 +1,21 @@
 <script setup lang="ts">
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faGithub, faGoogle } from '@fortawesome/free-brands-svg-icons';
-const methods = [
-  { url: '/auth/google', display: 'Google로 계속하기', icon: faGoogle },
-  { url: '/auth/github', display: 'GitHub로 계속하기', icon: faGithub },
-];
+const { t } = useI18n();
+const { show } = useAppNotice();
+const methods = computed(() => [
+  { url: '/auth/google', display: t('loginPage.google'), icon: faGoogle },
+  { url: '/auth/github', display: t('loginPage.github'), icon: faGithub },
+]);
 const route = useRoute();
 onMounted(() => {
-  if (route.query.restricted === '1') window.alert('계정 제한 상태이므로 로그인할 수 없습니다.');
+  if (route.query.restricted === '1') show(t('loginPage.restricted'), 'error');
 });
-useSeoMeta({ title: 'sh0rt.kr :: 로그인', description: 'sh0rt.kr 로그인', robots: { all: false } });
+useSeoMeta({
+  title: t('loginPage.title'),
+  description: t('loginPage.title'),
+  robots: { all: false },
+});
 </script>
 
 <template>
@@ -19,9 +25,9 @@ useSeoMeta({ title: 'sh0rt.kr :: 로그인', description: 'sh0rt.kr 로그인', 
     >
       <div class="text-center">
         <img src="/favicon.png" alt="" class="mx-auto h-14 w-14 rounded-2xl" />
-        <h1 class="mt-5 text-2xl font-black text-slate-950">sh0rt.kr 로그인</h1>
+        <h1 class="mt-5 text-2xl font-black text-slate-950">{{ t('loginPage.title') }}</h1>
         <p class="mt-2 text-sm leading-6 text-slate-500">
-          링크를 만들고 방문 통계를 확인하려면 로그인하세요.
+          {{ t('loginPage.description') }}
         </p>
       </div>
       <div class="mt-8 space-y-3">
@@ -34,10 +40,9 @@ useSeoMeta({ title: 'sh0rt.kr :: 로그인', description: 'sh0rt.kr 로그인', 
         >
       </div>
       <p class="mt-6 text-center text-xs leading-5 text-slate-400">
-        로그인하면
-        <NuxtLink class="underline hover:text-slate-600" to="/policy">이용약관</NuxtLink>과
-        <NuxtLink class="underline hover:text-slate-600" to="/privacy">개인정보 처리방침</NuxtLink
-        >에 동의하게 됩니다.
+        {{
+          t('loginPage.consent', { terms: t('loginPage.terms'), privacy: t('loginPage.privacy') })
+        }}
       </p>
     </section>
   </main>

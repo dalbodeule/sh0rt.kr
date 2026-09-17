@@ -32,7 +32,8 @@ export default defineEventHandler(async (event: H3Event): Promise<IUIDGetRespons
   }
 
   const expires = dayjs(request.expires).endOf('day');
-  if (!expires.isValid() || !expires.isAfter(dayjs()) || expires.isAfter(dayjs().add(366, 'day'))) {
+  const maximumExpires = dayjs().add(3, 'year').endOf('day');
+  if (!expires.isValid() || !expires.isAfter(dayjs()) || expires.isAfter(maximumExpires)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid expiration date' });
   }
 

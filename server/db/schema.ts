@@ -56,6 +56,25 @@ export const urlsRelations = relations(urls, ({ many }) => ({
   UsersToUrls: many(usersToUrls),
 }));
 
+export const urlBlacklist = sqliteTable(
+  'urlBlacklist',
+  {
+    id: int('id').primaryKey({ autoIncrement: true }),
+    uid: text('uid', { length: 20 }).notNull(),
+    reason: text('reason', { length: 500 }).notNull().default(''),
+    created_by: int('created_by')
+      .notNull()
+      .references(() => users.id),
+    created_at: int('created_at', { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(STRFTIME('%s'))`),
+  },
+  (table) => [
+    uniqueIndex('url_blacklist_uid_unique').on(table.uid),
+    index('url_blacklist_created_at_idx').on(table.created_at),
+  ]
+);
+
 export const usersToUrls = sqliteTable(
   'userToUrls',
   {

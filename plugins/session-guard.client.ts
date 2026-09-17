@@ -1,5 +1,6 @@
 export default defineNuxtPlugin((nuxtApp) => {
   const session = useUserSession();
+  const { $csrfFetch } = useNuxtApp();
   const { show } = useAppNotice();
   nuxtApp.hook('app:mounted', async () => {
     try {
@@ -17,7 +18,8 @@ export default defineNuxtPlugin((nuxtApp) => {
         (error as { response?: { status?: number }; statusCode?: number }).response?.status ??
         (error as { statusCode?: number }).statusCode;
       if (status !== 403) return;
-      await session.clear();
+      await $csrfFetch('/api/_auth/session', { method: 'DELETE' });
+      session.session.value = null;
       show(nuxtApp.$i18n.t('session.restricted'), 'error');
       await navigateTo('/login');
     }

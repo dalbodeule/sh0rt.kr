@@ -8,6 +8,7 @@ import type { IAnalyticsResponse, IManageResponse } from '~/server/routes/api/ma
 
 const route = useRoute();
 const { t } = useI18n();
+const { $csrfFetch } = useNuxtApp();
 const manageId = String(route.params.id);
 const config = useRuntimeConfig();
 const { loggedIn } = useUserSession();
@@ -37,7 +38,10 @@ const onSubmit = async () => {
   status.value = Status.PENDING;
   errorMessage.value = '';
   try {
-    await $fetch(`/api/manage/${manageId}` as string, { method: 'PATCH', body: addrInfo.value });
+    await $csrfFetch(`/api/manage/${manageId}` as string, {
+      method: 'PATCH',
+      body: addrInfo.value,
+    });
     status.value = Status.SUCCESS;
   } catch (error: unknown) {
     status.value = Status.ERROR;

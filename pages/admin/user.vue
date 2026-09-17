@@ -19,6 +19,7 @@ interface Paged<T> {
   total: number;
 }
 const { loggedIn, user, fetch: fetchUserSession } = useUserSession();
+const { $csrfFetch } = useNuxtApp();
 definePageMeta({ middleware: 'admin' });
 const { t } = useI18n();
 useSeoMeta({ title: `sh0rt.kr :: ${t('admin.userTitle')}`, robots: { all: false } });
@@ -53,7 +54,7 @@ const updateUser = async (
   changes: { role?: number; suspendedUntil?: string | null; permanent?: boolean }
 ) => {
   try {
-    await $fetch(`/api/admin/user/${target.id}`, { method: 'PATCH', body: changes });
+    await $csrfFetch(`/api/admin/user/${target.id}`, { method: 'PATCH', body: changes });
     await load();
   } catch {
     errorMessage.value = t('manage.loadError');

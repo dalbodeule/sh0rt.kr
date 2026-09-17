@@ -2,7 +2,8 @@
 import { UserRole } from '~/common/userRole';
 const show = ref(false);
 const router = useRouter();
-const { loggedIn, user, clear } = useUserSession();
+const { loggedIn, user, session } = useUserSession();
+const { $csrfFetch } = useNuxtApp();
 const { t } = useI18n();
 watch(
   () => router.currentRoute.value.fullPath,
@@ -11,7 +12,8 @@ watch(
   }
 );
 const logout = async () => {
-  await clear();
+  await $csrfFetch('/api/_auth/session', { method: 'DELETE' });
+  session.value = null;
   await navigateTo('/');
 };
 </script>
@@ -36,6 +38,11 @@ const logout = async () => {
           class="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
           to="/manage"
           >{{ t('nav.manage') }}</NuxtLink
+        ><NuxtLink
+          v-if="loggedIn"
+          class="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+          to="/account/profile"
+          >{{ t('nav.profile') }}</NuxtLink
         ><NuxtLink
           v-if="user && user.role >= UserRole.MODERATOR"
           class="rounded-lg px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-50"
@@ -90,6 +97,11 @@ const logout = async () => {
         class="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-slate-100"
         to="/manage"
         >{{ t('nav.manage') }}</NuxtLink
+      ><NuxtLink
+        v-if="loggedIn"
+        class="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-slate-100"
+        to="/account/profile"
+        >{{ t('nav.profile') }}</NuxtLink
       ><NuxtLink
         v-if="user && user.role >= UserRole.MODERATOR"
         class="block rounded-lg px-3 py-2.5 text-sm font-semibold text-blue-700 hover:bg-blue-50"

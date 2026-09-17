@@ -1,7 +1,7 @@
 import type { IUIDGetResponse } from '~/server/routes/api/forward/[uid].get';
 import type { H3Event } from 'h3';
-import { analyticsCache, urls, usersToUrls } from '~/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { analyticsCache, urlBlacklist, urls, usersToUrls } from '~/server/db/schema';
+import { eq, sql } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { useDrizzle } from '~/server/utils/useDrizzle';
 import { reservedPaths } from '~/common/reservedPaths';
@@ -51,6 +51,13 @@ export default defineEventHandler(async (event: H3Event) => {
       status: 403,
       statusMessage: 'Invalid uid',
     });
+
+  const blocked = await db.query.urlBlacklist.findFirst({
+    where: sql`lower(${urlBlacklist.uid}) = lower(${request.uid})`,
+  });
+  if (blocked) {
+    throw createError({ statusCode: 403, statusMessage: 'This UID is unavailable' });
+  }
 
   const expires = dayjs(request.expires).endOf('day');
   const maximumExpires = dayjs().add(3, 'year').endOf('day');

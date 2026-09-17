@@ -8,7 +8,8 @@
     "goHome": "Back to home",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "close": "Close"
+    "close": "Close",
+    "loading": "Please wait a moment"
   },
   "error": {
     "notFoundTitle": "We couldn't find that page",
@@ -24,6 +25,7 @@
   "nav": {
     "create": "Create link",
     "manage": "My links",
+    "profile": "My profile",
     "admin": "Admin",
     "menu": "Menu",
     "main": "Main navigation",
@@ -166,7 +168,18 @@
     "dismissed": "Dismissed",
     "noReports": "No reports found.",
     "noLink": "Link not found",
-    "anonymous": "Anonymous"
+    "anonymous": "Anonymous",
+    "actionTitle": "Report actions",
+    "suspendOwner": "Suspend the short-link owner",
+    "suspensionPeriod": "Suspension period",
+    "suspend7d": "7 days",
+    "suspend30d": "30 days",
+    "suspendPermanent": "Permanent",
+    "expireReportedUrl": "Force-expire the short link",
+    "addToBlacklist": "Add the UID to the blacklist",
+    "applyAction": "Apply action",
+    "processing": "Processing…",
+    "actionError": "The report action could not be completed. Please try again."
   },
   "detail": {
     "settings": "Link settings",
@@ -190,5 +203,17 @@
     "policyTitle": "Terms of Service",
     "privacyTitle": "Privacy Policy",
     "koreanNotice": "The legal documents are currently provided in Korean."
+  },
+  "profile": {
+    "title": "Edit profile",
+    "description": "Update the information shown on the service.",
+    "name": "Name or nickname",
+    "nameHelp": "You can enter up to 20 characters.",
+    "email": "Email address",
+    "emailHelp": "Your email address and profile image are managed by the OAuth account used to sign in.",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "saved": "Your profile was updated.",
+    "error": "Unable to update your profile. Check the entered information."
   }
 }

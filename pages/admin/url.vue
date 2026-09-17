@@ -19,6 +19,7 @@ interface Paged<T> {
 definePageMeta({ middleware: 'admin' });
 const { t } = useI18n();
 const { confirm } = useAppNotice();
+const { $csrfFetch } = useNuxtApp();
 useSeoMeta({ title: `sh0rt.kr :: ${t('admin.urlTitle')}`, robots: { all: false } });
 const route = useRoute();
 const data = ref<Paged<AdminUrl>>({ items: [], page: 1, pageSize: 20, total: 0 });
@@ -48,7 +49,7 @@ const search = () => {
 };
 const deleteUrl = async (target: AdminUrl) => {
   if (!(await confirm(t('admin.deleteConfirm', { uid: target.uid })))) return;
-  await $fetch(`/api/admin/url/${target.id}`, { method: 'DELETE' });
+  await $csrfFetch(`/api/admin/url/${target.id}`, { method: 'DELETE' });
   await load();
 };
 

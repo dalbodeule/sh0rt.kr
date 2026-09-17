@@ -5,6 +5,7 @@ import type { IUIDPostRequest, IUIDPostResponse } from '~/server/routes/api/forw
 
 const { loggedIn } = useUserSession();
 const { t } = useI18n();
+const { $csrfFetch } = useNuxtApp();
 if (!loggedIn.value) await navigateTo('/');
 const config = useRuntimeConfig();
 const addrInfo = ref<IUIDPostRequest>({
@@ -23,7 +24,7 @@ const onSubmit = async () => {
   status.value = Status.PENDING;
   errorMessage.value = '';
   try {
-    createdLink.value = await $fetch<IUIDPostResponse>('/api/forward', {
+    createdLink.value = await $csrfFetch<IUIDPostResponse>('/api/forward', {
       method: 'POST',
       body: addrInfo.value,
     });

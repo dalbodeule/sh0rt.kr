@@ -8,7 +8,8 @@
     "goHome": "홈으로 돌아가기",
     "cancel": "취소",
     "confirm": "확인",
-    "close": "닫기"
+    "close": "닫기",
+    "loading": "잠시만 기다려 주세요"
   },
   "error": {
     "notFoundTitle": "페이지를 찾을 수 없어요",
@@ -24,6 +25,7 @@
   "nav": {
     "create": "링크 만들기",
     "manage": "내 링크",
+    "profile": "내 정보",
     "admin": "관리자",
     "menu": "메뉴",
     "main": "주 메뉴",
@@ -56,6 +58,8 @@
     "description": "링크를 만들고 방문 통계를 확인하려면 로그인하세요.",
     "google": "Google로 계속하기",
     "github": "GitHub로 계속하기",
+    "twitch": "Twitch로 계속하기",
+    "chzzk": "치지직으로 계속하기",
     "terms": "이용약관",
     "privacy": "개인정보 처리방침",
     "consent": "로그인하면 {terms}과 {privacy}에 동의하게 됩니다.",
@@ -166,7 +170,18 @@
     "dismissed": "기각",
     "noReports": "신고가 없습니다.",
     "noLink": "링크 미확인",
-    "anonymous": "익명"
+    "anonymous": "익명",
+    "actionTitle": "신고 처리",
+    "suspendOwner": "단축주소 소유자 제재",
+    "suspensionPeriod": "제재 기간",
+    "suspend7d": "7일",
+    "suspend30d": "30일",
+    "suspendPermanent": "영구 정지",
+    "expireReportedUrl": "단축주소 강제 만료",
+    "addToBlacklist": "UID를 블랙리스트에 추가",
+    "applyAction": "처리 적용",
+    "processing": "처리 중…",
+    "actionError": "신고 처리를 완료하지 못했습니다. 다시 시도해 주세요."
   },
   "detail": {
     "settings": "링크 설정",
@@ -190,5 +205,18 @@
     "policyTitle": "서비스 이용약관",
     "privacyTitle": "개인정보처리방침",
     "koreanNotice": "법률 문서는 현재 한국어 원문으로 제공됩니다."
+  },
+  "profile": {
+    "title": "개인정보 수정",
+    "description": "서비스에서 표시되는 내 정보를 수정할 수 있습니다.",
+    "name": "이름 또는 닉네임",
+    "nameHelp": "최대 20자까지 입력할 수 있습니다.",
+    "email": "이메일 주소",
+    "provider": "로그인 제공자",
+    "emailHelp": "이메일 주소와 프로필 이미지는 로그인에 사용한 OAuth 계정에서 관리됩니다.",
+    "save": "변경사항 저장",
+    "saving": "저장 중…",
+    "saved": "개인정보를 수정했습니다.",
+    "error": "개인정보를 수정하지 못했습니다. 입력 내용을 확인해 주세요."
   }
 }

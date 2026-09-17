@@ -8,7 +8,8 @@
     "goHome": "ホームに戻る",
     "cancel": "キャンセル",
     "confirm": "確認",
-    "close": "閉じる"
+    "close": "閉じる",
+    "loading": "少々お待ちください"
   },
   "error": {
     "notFoundTitle": "ページが見つかりません",
@@ -24,6 +25,7 @@
   "nav": {
     "create": "リンク作成",
     "manage": "マイリンク",
+    "profile": "プロフィール",
     "admin": "管理者",
     "menu": "メニュー",
     "main": "メインメニュー",
@@ -56,6 +58,8 @@
     "description": "リンクを作成してアクセス分析を見るにはログインしてください。",
     "google": "Googleで続ける",
     "github": "GitHubで続ける",
+    "twitch": "Twitchで続ける",
+    "chzzk": "CHZZKで続ける",
     "terms": "利用規約",
     "privacy": "プライバシーポリシー",
     "consent": "ログインすると{terms}と{privacy}に同意したことになります。",
@@ -164,7 +168,18 @@
     "dismissed": "却下",
     "noReports": "報告はありません。",
     "noLink": "リンク未確認",
-    "anonymous": "匿名"
+    "anonymous": "匿名",
+    "actionTitle": "報告への対応",
+    "suspendOwner": "短縮リンクの所有者を停止",
+    "suspensionPeriod": "停止期間",
+    "suspend7d": "7日間",
+    "suspend30d": "30日間",
+    "suspendPermanent": "永久停止",
+    "expireReportedUrl": "短縮リンクを強制的に期限切れにする",
+    "addToBlacklist": "UIDをブラックリストに追加",
+    "applyAction": "対応を適用",
+    "processing": "処理中…",
+    "actionError": "報告への対応を完了できませんでした。もう一度お試しください。"
   },
   "detail": {
     "settings": "リンク設定",
@@ -188,5 +203,18 @@
     "policyTitle": "利用規約",
     "privacyTitle": "プライバシーポリシー",
     "koreanNotice": "法的文書は現在韓国語の原文で提供されています。"
+  },
+  "profile": {
+    "title": "プロフィールの編集",
+    "description": "サービス上で表示される情報を変更できます。",
+    "name": "名前またはニックネーム",
+    "nameHelp": "20文字以内で入力してください。",
+    "email": "メールアドレス",
+    "provider": "ログインプロバイダー",
+    "emailHelp": "メールアドレスとプロフィール画像は、ログインに使用したOAuthアカウントで管理されます。",
+    "save": "変更を保存",
+    "saving": "保存中…",
+    "saved": "プロフィールを更新しました。",
+    "error": "プロフィールを更新できませんでした。入力内容を確認してください。"
   }
 }

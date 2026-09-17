@@ -14,6 +14,9 @@ interface Report {
   body_text: string | null;
   status: string;
   created_at: string;
+  ownerId: number | null;
+  ownerName: string | null;
+  ownerEmail: string | null;
 }
 interface Paged<T> {
   items: T[];
@@ -27,6 +30,15 @@ useSeoMeta({ title: `sh0rt.kr :: ${t('admin.reportTitle')}`, robots: { all: fals
 const data = ref<Paged<Report>>({ items: [], page: 1, pageSize: 20, total: 0 });
 const selected = ref<Report | null>(null);
 const errorMessage = ref('');
+const { $csrfFetch } = useNuxtApp();
+const actionError = ref('');
+const actionPending = ref(false);
+const actionOptions = reactive({
+  suspendUser: false,
+  suspension: '7d' as '7d' | '30d' | 'permanent',
+  expireUrl: true,
+  blacklist: false,
+});
 const filters = reactive({ q: '', status: 'open', source: '' });
 const pages = computed(() => Math.max(1, Math.ceil(data.value.total / data.value.pageSize)));
 const queryValues = (value: Record<string, string>) =>
@@ -45,13 +57,39 @@ const search = () => {
   void load();
 };
 const update = async (report: Report, status: string) => {
-  await $fetch(`/api/admin/report/${report.id}`, { method: 'PATCH', body: { status } });
+  await $csrfFetch(`/api/admin/report/${report.id}`, { method: 'PATCH', body: { status } });
   await load();
 };
-const updateSelected = async (status: string) => {
-  if (!selected.value) return;
-  await update(selected.value, status);
-  selected.value = null;
+const openReport = (report: Report) => {
+  selected.value = report;
+  actionError.value = '';
+  actionOptions.suspendUser = false;
+  actionOptions.suspension = '7d';
+  actionOptions.expireUrl = Boolean(report.uid);
+  actionOptions.blacklist = false;
+};
+const applyReportAction = async (status: 'resolved' | 'dismissed', applyMeasures = true) => {
+  if (!selected.value || actionPending.value) return;
+  actionPending.value = true;
+  actionError.value = '';
+  try {
+    await $csrfFetch(`/api/admin/report/${selected.value.id}/action`, {
+      method: 'POST',
+      body: {
+        status,
+        suspendUser: applyMeasures && actionOptions.suspendUser,
+        suspension: actionOptions.suspension,
+        expireUrl: applyMeasures && actionOptions.expireUrl,
+        blacklist: applyMeasures && actionOptions.blacklist,
+      },
+    });
+    selected.value = null;
+    await load();
+  } catch {
+    actionError.value = t('admin.actionError');
+  } finally {
+    actionPending.value = false;
+  }
 };
 
 const { loggedIn, user, fetch: fetchUserSession } = useUserSession();
@@ -98,7 +136,7 @@ await load();
         v-for="report in data.items"
         :key="report.id"
         class="cursor-pointer rounded-2xl border bg-white p-5 transition hover:border-blue-300 hover:shadow-sm"
-        @click="selected = report"
+        @click="openReport(report)"
       >
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -176,7 +214,7 @@ await load();
           <div>
             <dt class="text-slate-500">{{ t('admin.owner') }}</dt>
             <dd class="break-all font-semibold">
-              {{ selected.sender || selected.reporter_email || t('admin.anonymous') }}
+              {{ selected.ownerName || selected.ownerEmail || t('admin.noLink') }}
             </dd>
           </div>
           <div>
@@ -188,18 +226,48 @@ await load();
         <pre
           class="mt-3 max-h-80 overflow-auto whitespace-pre-wrap break-words rounded-xl border p-4 text-sm"
           >{{ selected.body_text || selected.details || t('report.details') }}</pre>
-        <div class="mt-6 flex justify-end gap-2">
-          <button
-            class="rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 font-semibold text-amber-900"
-            @click="updateSelected('dismissed')"
-          >
-            {{ t('admin.dismissed') }}</button
-          ><button
-            class="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white"
-            @click="updateSelected('resolved')"
-          >
-            {{ t('admin.resolved') }}
-          </button>
+        <div class="mt-6 space-y-4 rounded-xl border border-slate-200 p-4">
+          <h3 class="font-bold text-slate-900">{{ t('admin.actionTitle') }}</h3>
+          <label v-if="selected.ownerId" class="flex items-center gap-2 text-sm">
+            <input v-model="actionOptions.suspendUser" type="checkbox" class="h-4 w-4" />
+            {{ t('admin.suspendOwner') }}
+          </label>
+          <label v-if="actionOptions.suspendUser" class="block text-sm">
+            <span class="font-semibold text-slate-700">{{ t('admin.suspensionPeriod') }}</span>
+            <select
+              v-model="actionOptions.suspension"
+              class="mt-2 w-full rounded-lg border px-3 py-2"
+            >
+              <option value="7d">{{ t('admin.suspend7d') }}</option>
+              <option value="30d">{{ t('admin.suspend30d') }}</option>
+              <option value="permanent">{{ t('admin.suspendPermanent') }}</option>
+            </select>
+          </label>
+          <label v-if="selected.uid" class="flex items-center gap-2 text-sm">
+            <input v-model="actionOptions.expireUrl" type="checkbox" class="h-4 w-4" />
+            {{ t('admin.expireReportedUrl') }}
+          </label>
+          <label v-if="selected.uid" class="flex items-center gap-2 text-sm">
+            <input v-model="actionOptions.blacklist" type="checkbox" class="h-4 w-4" />
+            {{ t('admin.addToBlacklist') }}
+          </label>
+          <p v-if="actionError" role="alert" class="text-sm text-red-700">{{ actionError }}</p>
+          <div class="flex flex-wrap justify-end gap-2">
+            <button
+              class="rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 font-semibold text-amber-900"
+              :disabled="actionPending"
+              @click="void applyReportAction('dismissed', false)"
+            >
+              {{ t('admin.dismissed') }}
+            </button>
+            <button
+              class="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white disabled:opacity-50"
+              :disabled="actionPending"
+              @click="void applyReportAction('resolved')"
+            >
+              {{ actionPending ? t('admin.processing') : t('admin.applyAction') }}
+            </button>
+          </div>
         </div>
       </section>
     </div>

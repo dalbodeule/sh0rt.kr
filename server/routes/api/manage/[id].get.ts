@@ -67,6 +67,7 @@ export default defineEventHandler(async (event: H3Event): Promise<IManageRespons
 
   const link: IUIDGetResponse = {
     id: currentShorten.id,
+    tld: currentShorten.tld,
     uid: currentShorten.uid,
     forward: currentShorten.forward,
     created_at: currentShorten.created_at,
@@ -78,7 +79,10 @@ export default defineEventHandler(async (event: H3Event): Promise<IManageRespons
     .delete(analyticsCache)
     .where(lte(analyticsCache.created_at, new Date(Date.now() - CACHE_TTL)));
   const cachedData = await db.query.analyticsCache.findFirst({
-    where: eq(analyticsCache.uid, currentShorten.uid),
+    where: and(
+      eq(analyticsCache.tld, currentShorten.tld),
+      eq(analyticsCache.uid, currentShorten.uid)
+    ),
   });
   if (cachedData) {
     try {
@@ -98,6 +102,7 @@ export default defineEventHandler(async (event: H3Event): Promise<IManageRespons
   }
 
   try {
+    const analyticsTld = currentShorten.tld.replaceAll("'", "''");
     const analyticsUid = currentShorten.uid.replaceAll("'", "''");
     const startTime = Math.max(currentShorten.created_at.getTime(), Date.now() - MAX_ANALYTICS_AGE);
     const rawData = await getFromAnalytics(
@@ -118,7 +123,7 @@ export default defineEventHandler(async (event: H3Event): Promise<IManageRespons
         AKeys.sourcePath,
         AKeys.requestDomain,
         AKeys.requestPath,
-      ])}, timestamp FROM ANALYTICS WHERE index1 = '${analyticsUid}' AND timestamp >= toDateTime(${Math.floor(startTime / 1000)}) LIMIT 10000`,
+      ])}, timestamp FROM ANALYTICS WHERE index1 = '${analyticsTld}' AND index2 = '${analyticsUid}' AND timestamp >= toDateTime(${Math.floor(startTime / 1000)}) LIMIT 10000`,
       event
     );
     const parsedData = JSON.parse(rawData) as IAnalytics;
@@ -137,11 +142,12 @@ export default defineEventHandler(async (event: H3Event): Promise<IManageRespons
     await db
       .insert(analyticsCache)
       .values({
+        tld: currentShorten.tld,
         uid: currentShorten.uid,
         data: JSON.stringify(analytics),
       })
       .onConflictDoUpdate({
-        target: analyticsCache.uid,
+        target: [analyticsCache.tld, analyticsCache.uid],
         set: { data: JSON.stringify(analytics), created_at: new Date() },
       });
     return { link, analytics };

@@ -5,9 +5,21 @@ import type { IUIDPostRequest, IUIDPostResponse } from '~/server/routes/api/forw
 
 const { loggedIn } = useUserSession();
 const { t } = useI18n();
+const { $csrfFetch } = useNuxtApp();
 if (!loggedIn.value) await navigateTo('/');
 const config = useRuntimeConfig();
+const defaultTld =
+  String(config.public.shortLinkDomains ?? '')
+    .split(',')
+    .map((domain) =>
+      domain
+        .trim()
+        .toLowerCase()
+        .replace(/^www\./, '')
+    )
+    .find(Boolean) ?? 'sh0rt.kr';
 const addrInfo = ref<IUIDPostRequest>({
+  tld: defaultTld,
   uid: '',
   forward: '',
   expires: dayjs().add(3, 'year').format('YYYY-MM-DD'),
@@ -16,6 +28,9 @@ const addrInfo = ref<IUIDPostRequest>({
 const status = ref(Status.DEFAULT);
 const errorMessage = ref('');
 const createdLink = ref<IUIDPostResponse>();
+const publicBaseUrl = computed(() =>
+  createdLink.value?.tld ? `https://${createdLink.value.tld}` : config.public.baseUrl
+);
 provide('addrInfo', addrInfo);
 provide('status', status);
 
@@ -23,7 +38,7 @@ const onSubmit = async () => {
   status.value = Status.PENDING;
   errorMessage.value = '';
   try {
-    createdLink.value = await $fetch<IUIDPostResponse>('/api/forward', {
+    createdLink.value = await $csrfFetch<IUIDPostResponse>('/api/forward', {
       method: 'POST',
       body: addrInfo.value,
     });
@@ -62,10 +77,8 @@ useSeoMeta({
       class="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-900"
     >
       <p class="font-bold">{{ t('create.success') }}</p>
-      <a
-        class="mt-1 block break-all text-sm underline"
-        :href="`${config.public.baseUrl}/${addrInfo.uid}`"
-        >{{ config.public.baseUrl }}/{{ addrInfo.uid }}</a
+      <a class="mt-1 block break-all text-sm underline" :href="`${publicBaseUrl}/${addrInfo.uid}`"
+        >{{ publicBaseUrl }}/{{ addrInfo.uid }}</a
       >
       <p class="mt-1 text-sm">
         {{ t('create.expires') }} {{ dayjs(addrInfo.expires).format('YYYY-MM-DD') }}
@@ -78,7 +91,7 @@ useSeoMeta({
     </div>
     <QRCodeGenerator
       v-if="status === Status.SUCCESS"
-      :value="`${config.public.baseUrl}/${addrInfo.uid}`"
+      :value="`${publicBaseUrl}/${addrInfo.uid}`"
       class="mt-5"
     />
     <p

@@ -17,6 +17,17 @@ import { reservedPaths } from '~/common/reservedPaths';
 const config = useRuntimeConfig();
 const { t } = useI18n();
 const { locale } = useI18n();
+const shortLinkDomains = computed(() =>
+  String(config.public.shortLinkDomains ?? '')
+    .split(',')
+    .map((domain) =>
+      domain
+        .trim()
+        .toLowerCase()
+        .replace(/^www\./, '')
+    )
+    .filter((domain, index, domains) => domain && domains.indexOf(domain) === index)
+);
 
 const emit = defineEmits<{ submit: [] }>();
 const props = defineProps<{ submitText: string; isNew: boolean; lock: boolean }>();
@@ -47,6 +58,7 @@ defineRule('unique', async (value: string) => {
   try {
     const data = await $fetch(`${config.public.baseUrl}/api/forward/${value}`, {
       method: 'GET',
+      query: addrInfo.value.tld ? { tld: addrInfo.value.tld } : undefined,
     });
     return !data;
   } catch {
@@ -116,10 +128,21 @@ const schema = {
         t('shorter.short')
       }}</label>
       <div class="flex flex-col gap-2 sm:flex-row">
+        <select
+          v-if="shortLinkDomains.length > 1"
+          v-model="addrInfo.tld"
+          class="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          :disabled="!isNew || props.lock"
+          aria-label="TLD"
+        >
+          <option v-for="domain in shortLinkDomains" :key="domain" :value="domain">
+            {{ domain }}
+          </option>
+        </select>
         <div class="flex min-w-0 flex-1">
           <span
             class="flex items-center rounded-l-xl border border-r-0 border-slate-300 bg-slate-50 px-3 text-sm text-slate-500"
-            >{{ config.public.baseUrl }}/</span
+            >https://{{ addrInfo.tld || shortLinkDomains[0] || 'sh0rt.kr' }}/</span
           ><Field
             id="short-uid"
             v-model="addrInfo.uid"

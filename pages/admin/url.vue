@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import { UserRole } from '~/common/userRole';
 interface AdminUrl {
   id: number;
+  tld: string;
   uid: string;
   forward: string;
   expires: string;
@@ -19,6 +20,7 @@ interface Paged<T> {
 definePageMeta({ middleware: 'admin' });
 const { t } = useI18n();
 const { confirm } = useAppNotice();
+const { $csrfFetch } = useNuxtApp();
 useSeoMeta({ title: `sh0rt.kr :: ${t('admin.urlTitle')}`, robots: { all: false } });
 const route = useRoute();
 const data = ref<Paged<AdminUrl>>({ items: [], page: 1, pageSize: 20, total: 0 });
@@ -48,7 +50,7 @@ const search = () => {
 };
 const deleteUrl = async (target: AdminUrl) => {
   if (!(await confirm(t('admin.deleteConfirm', { uid: target.uid })))) return;
-  await $fetch(`/api/admin/url/${target.id}`, { method: 'DELETE' });
+  await $csrfFetch(`/api/admin/url/${target.id}`, { method: 'DELETE' });
   await load();
 };
 
@@ -125,7 +127,7 @@ await load();
             :class="new Date(link.expires).getTime() <= Date.now() ? 'bg-amber-50' : ''"
           >
             <td class="px-4 py-3">
-              <p class="font-semibold text-blue-600">/{{ link.uid }}</p>
+              <p class="font-semibold text-blue-600">{{ link.tld }}/{{ link.uid }}</p>
               <span
                 v-if="link.reportCount"
                 class="mt-1 inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700"

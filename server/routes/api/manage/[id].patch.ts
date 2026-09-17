@@ -61,6 +61,7 @@ export default defineEventHandler(async (event: H3Event): Promise<IUIDGetRespons
 
   return {
     id: result.id,
+    tld: result.tld,
     uid: result.uid,
     forward: parsedForward.toString(),
     created_at: result.created_at,

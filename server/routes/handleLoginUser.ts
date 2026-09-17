@@ -13,7 +13,7 @@ export default async function (
     avatar_url: string;
   }
 ): Promise<boolean> {
-  if (!['google', 'github'].includes(provider) || !user.accountId.trim()) {
+  if (!['google', 'github', 'twitch', 'chzzk'].includes(provider) || !user.accountId.trim()) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid OAuth profile' });
   }
 

@@ -8,8 +8,8 @@ import type { IAnalyticsResponse, IManageResponse } from '~/server/routes/api/ma
 
 const route = useRoute();
 const { t } = useI18n();
+const { $csrfFetch } = useNuxtApp();
 const manageId = String(route.params.id);
-const config = useRuntimeConfig();
 const { loggedIn } = useUserSession();
 if (!loggedIn.value) await navigateTo('/');
 
@@ -21,7 +21,9 @@ try {
 }
 
 const uid = managed.link.uid;
+const publicBaseUrl = `https://${managed.link.tld}`;
 const addrInfo = ref<IUIDPostRequest>({
+  tld: managed.link.tld,
   uid,
   forward: managed.link.forward,
   expires: dayjs(managed.link.expires).format('YYYY-MM-DD'),
@@ -37,7 +39,10 @@ const onSubmit = async () => {
   status.value = Status.PENDING;
   errorMessage.value = '';
   try {
-    await $fetch(`/api/manage/${manageId}` as string, { method: 'PATCH', body: addrInfo.value });
+    await $csrfFetch(`/api/manage/${manageId}` as string, {
+      method: 'PATCH',
+      body: addrInfo.value,
+    });
     status.value = Status.SUCCESS;
   } catch (error: unknown) {
     status.value = Status.ERROR;
@@ -80,11 +85,11 @@ useSeoMeta({
         /{{ uid }} 관리
       </h1>
       <a
-        :href="`${config.public.baseUrl}/${uid}`"
+        :href="`${publicBaseUrl}/${uid}`"
         target="_blank"
         rel="noopener"
         class="mt-2 inline-block break-all text-sm text-blue-600 hover:underline"
-        >{{ config.public.baseUrl }}/{{ uid }} ↗</a
+        >{{ publicBaseUrl }}/{{ uid }} ↗</a
       >
     </header>
 
@@ -112,7 +117,7 @@ useSeoMeta({
     </section>
 
     <ClientOnly>
-      <QRCodeGenerator :value="`${config.public.baseUrl}/${uid}`" />
+      <QRCodeGenerator :value="`${publicBaseUrl}/${uid}`" />
       <template #fallback><div class="h-80 animate-pulse rounded-2xl bg-slate-100" /></template>
     </ClientOnly>
 

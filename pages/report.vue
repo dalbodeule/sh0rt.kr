@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const form = reactive({ uid: '', email: '', reason: 'spam', details: '', token: '' });
 const { t } = useI18n();
+const { $csrfFetch } = useNuxtApp();
 const submitting = ref(false);
 const submitted = ref(false);
 const errorMessage = ref('');
@@ -13,7 +14,7 @@ const submit = async () => {
   submitting.value = true;
   errorMessage.value = '';
   try {
-    await $fetch('/api/report', { method: 'POST', body: form });
+    await $csrfFetch('/api/report', { method: 'POST', body: form });
     submitted.value = true;
   } catch {
     errorMessage.value = t('report.error');

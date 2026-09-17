@@ -46,6 +46,7 @@ export default defineEventHandler(async (event) => {
     db
       .select({
         id: urls.id,
+        tld: urls.tld,
         uid: urls.uid,
         forward: urls.forward,
         created_at: urls.created_at,

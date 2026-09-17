@@ -1,6 +1,7 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { reports, urls } from '~/server/db/schema';
 import { useDrizzle } from '~/server/utils/useDrizzle';
+import { getConfiguredShortLinkDomains, getShortLinkDomain } from '~/server/utils/shortLinkDomain';
 
 interface ReportBody {
   uid?: string;
@@ -12,10 +13,20 @@ interface ReportBody {
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<ReportBody>(event);
-  const uid = body.uid
-    ?.trim()
-    .replace(/^https?:\/\/(?:www\.)?sh0rt\.kr\//i, '')
-    .replace(/\/?(?:\?.*)?$/, '');
+  const rawUid = body.uid?.trim() ?? '';
+  let tld = getShortLinkDomain(event);
+  let uid = rawUid;
+  if (/^https?:\/\//i.test(rawUid)) {
+    try {
+      const parsed = new URL(rawUid);
+      tld = parsed.hostname.toLowerCase();
+      if (!getConfiguredShortLinkDomains(event).includes(tld))
+        throw new Error('unsupported domain');
+      uid = parsed.pathname.replace(/^\//, '').replace(/\/$/, '');
+    } catch {
+      throw createError({ statusCode: 400, statusMessage: 'Invalid report URL' });
+    }
+  }
   const email = body.email?.trim() || null;
   const reason = body.reason?.trim();
   const details = body.details?.trim() || '';
@@ -37,13 +48,14 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: 'Captcha verification failed' });
   const db = useDrizzle(event.context.cloudflare.env.DB);
   const target = await db
-    .select({ id: urls.id, uid: urls.uid, forward: urls.forward })
+    .select({ id: urls.id, tld: urls.tld, uid: urls.uid, forward: urls.forward })
     .from(urls)
-    .where(eq(urls.uid, uid))
+    .where(and(eq(urls.tld, tld), eq(urls.uid, uid)))
     .limit(1);
   if (!target[0]) throw createError({ statusCode: 404, statusMessage: 'Short URL not found' });
   await db.insert(reports).values({
     url_id: target[0].id,
+    tld: target[0].tld,
     uid: target[0].uid,
     forward: target[0].forward,
     reporter_email: email,

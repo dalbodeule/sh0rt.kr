@@ -32,6 +32,7 @@ export const urls = sqliteTable(
   'urls',
   {
     id: int('id').primaryKey({ autoIncrement: true }),
+    tld: text('tld', { length: 255 }).notNull(),
     uid: text('uid', { length: 20 }).notNull(),
     manage_id: text('manage_id', { length: 36 }).notNull(),
     forward: text('forward', { length: 4096 }).notNull(),
@@ -46,7 +47,7 @@ export const urls = sqliteTable(
       .default(sql`(STRFTIME('%s'))`),
   },
   (table) => [
-    uniqueIndex('urls_uid_unique').on(table.uid),
+    uniqueIndex('urls_tld_uid_unique').on(table.tld, table.uid),
     uniqueIndex('urls_manage_id_unique').on(table.manage_id),
     index('urls_expires_idx').on(table.expires),
   ]
@@ -106,11 +107,12 @@ export const analyticsCache = sqliteTable(
   'analyticsCache',
   {
     id: int('id').primaryKey({ autoIncrement: true }),
+    tld: text('tld', { length: 255 }).notNull(),
     uid: text('uid', { length: 20 }).notNull(),
     data: text('data').notNull(),
     created_at: int('created_at', { mode: 'timestamp' }).default(sql`(STRFTIME('%s'))`),
   },
-  (table) => [uniqueIndex('analytics_cache_uid_unique').on(table.uid)]
+  (table) => [uniqueIndex('analytics_cache_tld_uid_unique').on(table.tld, table.uid)]
 );
 
 export const reports = sqliteTable(
@@ -118,6 +120,7 @@ export const reports = sqliteTable(
   {
     id: int('id').primaryKey({ autoIncrement: true }),
     url_id: int('url_id'),
+    tld: text('tld', { length: 255 }),
     uid: text('uid', { length: 20 }),
     forward: text('forward', { length: 4096 }),
     reporter_email: text('reporter_email', { length: 255 }),

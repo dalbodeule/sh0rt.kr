@@ -55,6 +55,9 @@ useSeoMeta({
         <div>
           <p class="font-bold text-slate-950">{{ user?.name }}</p>
           <p class="text-sm text-slate-500">{{ user?.email }}</p>
+          <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-blue-600">
+            {{ t('profile.provider') }}: {{ user?.vendor }}
+          </p>
         </div>
       </div>
 

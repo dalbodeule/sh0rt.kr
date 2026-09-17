@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faGithub, faGoogle } from '@fortawesome/free-brands-svg-icons';
 const { t } = useI18n();
 const { show } = useAppNotice();
 const methods = computed(() => [
-  { url: '/auth/google', display: t('loginPage.google'), icon: faGoogle },
-  { url: '/auth/github', display: t('loginPage.github'), icon: faGithub },
+  { url: '/auth/google', display: t('loginPage.google'), image: '/google.png' },
+  { url: '/auth/github', display: t('loginPage.github'), image: '/github.png' },
+  { url: '/auth/twitch', display: t('loginPage.twitch'), image: '/twitch.png' },
+  { url: '/auth/chzzk', display: t('loginPage.chzzk'), image: '/chzzk.png' },
 ]);
 const route = useRoute();
 onMounted(() => {
@@ -36,7 +36,9 @@ useSeoMeta({
           :key="method.url"
           :href="method.url"
           class="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-800 transition hover:border-slate-400 hover:bg-slate-50"
-          ><FontAwesomeIcon :icon="method.icon" class="h-5 w-5" />{{ method.display }}</a
+          ><img v-if="method.image" :src="method.image" class="h-5 w-5 rounded" alt="" />{{
+            method.display
+          }}</a
         >
       </div>
       <p class="mt-6 text-center text-xs leading-5 text-slate-400">

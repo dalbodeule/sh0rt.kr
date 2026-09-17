@@ -5,6 +5,15 @@ const router = useRouter();
 const { loggedIn, user, session } = useUserSession();
 const { $csrfFetch } = useNuxtApp();
 const { t } = useI18n();
+const providerIcon = computed(() => {
+  const icons: Record<string, string> = {
+    google: '/google.png',
+    github: '/github.png',
+    twitch: '/twitch.png',
+    chzzk: '/chzzk.png',
+  };
+  return user.value?.vendor ? icons[user.value.vendor] : undefined;
+});
 watch(
   () => router.currentRoute.value.fullPath,
   () => {
@@ -52,9 +61,15 @@ const logout = async () => {
         <template v-if="loggedIn"
           ><span class="mx-2 h-5 w-px bg-slate-200" /><span
             class="flex items-center gap-2 px-2 text-sm text-slate-600"
-            ><img class="h-7 w-7 rounded-full bg-slate-100" :src="user?.profile" alt="" />{{
-              user?.name
-            }}</span
+            ><span class="relative flex h-7 w-7 shrink-0"
+              ><img class="h-7 w-7 rounded-full bg-slate-100" :src="user?.profile" alt="" />
+              <img
+                v-if="providerIcon"
+                class="absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full bg-white p-0.5 shadow-sm"
+                :src="providerIcon"
+                :alt="user?.vendor"
+                :title="user?.vendor" /></span
+            >{{ user?.name }}</span
           ><button
             type="button"
             class="rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100"
@@ -84,6 +99,17 @@ const logout = async () => {
       class="space-y-1 border-t border-slate-100 px-4 py-3 md:hidden"
       :aria-label="t('nav.mobile')"
     >
+      <div v-if="loggedIn" class="mb-2 flex items-center gap-2 border-b border-slate-100 px-3 pb-3">
+        <span class="relative flex h-8 w-8 shrink-0"
+          ><img class="h-8 w-8 rounded-full bg-slate-100" :src="user?.profile" alt="" />
+          <img
+            v-if="providerIcon"
+            class="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-white p-0.5 shadow-sm"
+            :src="providerIcon"
+            :alt="user?.vendor"
+            :title="user?.vendor" /></span
+        ><span class="text-sm font-semibold text-slate-700">{{ user?.name }}</span>
+      </div>
       <div class="mb-2">
         <LocaleSwitcher />
       </div>

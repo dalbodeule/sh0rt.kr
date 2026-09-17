@@ -1,13 +1,15 @@
 import type { IUIDGetResponse } from '~/server/routes/api/forward/[uid].get';
 import type { H3Event } from 'h3';
 import { analyticsCache, urlBlacklist, urls, usersToUrls } from '~/server/db/schema';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { useDrizzle } from '~/server/utils/useDrizzle';
 import { reservedPaths } from '~/common/reservedPaths';
 import { requireActiveUser } from '~/server/utils/requireRole';
+import { getShortLinkDomain } from '~/server/utils/shortLinkDomain';
 
 export interface IUIDPostRequest {
+  tld?: string;
   uid: string | undefined;
   forward: string | undefined;
   expires: string | undefined;
@@ -43,8 +45,11 @@ export default defineEventHandler(async (event: H3Event) => {
     });
 
   const db = useDrizzle(event.context.cloudflare.env.DB);
+  const tld = getShortLinkDomain(event, request.tld);
 
-  const result = await db.query.urls.findFirst({ where: eq(urls.uid, request.uid) });
+  const result = await db.query.urls.findFirst({
+    where: and(eq(urls.tld, tld), eq(urls.uid, request.uid)),
+  });
 
   if (result)
     throw createError({
@@ -82,6 +87,7 @@ export default defineEventHandler(async (event: H3Event) => {
     inserted = await db
       .insert(urls)
       .values({
+        tld,
         uid: request.uid,
         manage_id: crypto.randomUUID(),
         forward: parsedForward.toString(),
@@ -100,10 +106,13 @@ export default defineEventHandler(async (event: H3Event) => {
 
   await db.insert(usersToUrls).values({ user: user.id, url: created.id });
 
-  await db.delete(analyticsCache).where(eq(analyticsCache.uid, request.uid));
+  await db
+    .delete(analyticsCache)
+    .where(and(eq(analyticsCache.tld, tld), eq(analyticsCache.uid, request.uid)));
 
   const responseData: IUIDPostResponse = {
     id: created.id,
+    tld: created.tld,
     uid: created.uid,
     manage_id: created.manage_id,
     forward: created.forward,

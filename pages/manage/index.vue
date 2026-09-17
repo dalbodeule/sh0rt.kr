@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 
 interface LinkItem {
   id: number;
+  tld: string;
   uid: string;
   manage_id: string;
   forward: string;
@@ -17,7 +18,6 @@ interface ListResponse {
   total: number;
   stats: { total: number; active: number; expired: number };
 }
-const config = useRuntimeConfig();
 const { loggedIn } = useUserSession();
 const { t } = useI18n();
 if (!loggedIn.value) await navigateTo('/');
@@ -121,8 +121,8 @@ await load();
         <div class="flex items-start justify-between gap-3">
           <a
             class="break-all font-semibold text-blue-600 hover:underline"
-            :href="`${config.public.baseUrl}/${url.uid}`"
-            >{{ config.public.baseUrl }}/{{ url.uid }}</a
+            :href="`https://${url.tld}/${url.uid}`"
+            >https://{{ url.tld }}/{{ url.uid }}</a
           ><span
             v-if="isExpired(url.expires)"
             class="shrink-0 rounded-full bg-amber-200 px-2.5 py-1 text-xs font-bold text-amber-900"

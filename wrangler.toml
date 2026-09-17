@@ -25,6 +25,8 @@ binding = "ASSETS"
 [vars]
 NUXT_OAUTH_GITHUB_CLIENT_ID = "Ov23liTsdN0bOgaldNIM"
 NUXT_OAUTH_GOOGLE_CLIENT_ID = "963112485410-ll8cb0642a68olkr3m3o10nmddq1j4sv.apps.googleusercontent.com"
+NUXT_OAUTH_CHZZK_CLIENT_ID = "c084e949-d337-4735-af2b-42db0c68c18d"
+NUXT_OAUTH_TWITCH_CLIENT_ID = "j8eszmagvnvbrz92h5w0ix40d4eu8g"
 NUXT_PUBLIC_BASE_URL = "https://sh0rt.kr"
 NUXT_REPORT_DOMAINS = "sh0rt.kr"
 

@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { UserRole, reports, urlBlacklist, urls, users, usersToUrls } from '~/server/db/schema';
 import { requireRole } from '~/server/utils/requireRole';
 import { useDrizzle } from '~/server/utils/useDrizzle';
@@ -37,7 +37,11 @@ export default defineEventHandler(async (event) => {
     targetUrl = await db.query.urls.findFirst({ where: eq(urls.id, report.url_id) });
   }
   if (!targetUrl && report.uid) {
-    targetUrl = await db.query.urls.findFirst({ where: eq(urls.uid, report.uid) });
+    targetUrl = await db.query.urls.findFirst({
+      where: report.tld
+        ? and(eq(urls.tld, report.tld), eq(urls.uid, report.uid))
+        : eq(urls.uid, report.uid),
+    });
   }
 
   if ((body.expireUrl || body.blacklist) && !targetUrl) {

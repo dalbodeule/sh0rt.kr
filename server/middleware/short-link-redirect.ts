@@ -5,6 +5,7 @@ import { urls } from '~/server/db/schema';
 import { useDrizzle } from '~/server/utils/useDrizzle';
 import sha256 from '~/server/utils/sha256';
 import { reservedPaths } from '~/common/reservedPaths';
+import { getShortLinkDomain } from '~/server/utils/shortLinkDomain';
 
 export default defineEventHandler(async (event) => {
   if (getMethod(event) !== 'GET' && getMethod(event) !== 'HEAD') return;
@@ -17,9 +18,15 @@ export default defineEventHandler(async (event) => {
   if (!env?.DB) return;
 
   const db = useDrizzle(env.DB);
+  let tld: string;
+  try {
+    tld = getShortLinkDomain(event);
+  } catch {
+    return;
+  }
   const result = await db.query.urls.findFirst({
     columns: { forward: true },
-    where: and(eq(urls.uid, uid), gte(urls.expires, new Date())),
+    where: and(eq(urls.tld, tld), eq(urls.uid, uid), gte(urls.expires, new Date())),
   });
   if (!result) return;
 
@@ -55,7 +62,7 @@ export default defineEventHandler(async (event) => {
       }
 
       env.ANALYTICS.writeDataPoint({
-        indexes: [uid],
+        indexes: [tld, uid],
         blobs: [
           ipHash,
           cf?.country ?? 'unknown',

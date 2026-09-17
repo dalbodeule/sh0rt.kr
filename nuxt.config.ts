@@ -37,9 +37,18 @@ export default defineNuxtConfig({
         clientId: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       },
+      twitch: {
+        clientId: process.env.TWITCH_CLIENT_ID,
+        clientSecret: process.env.TWITCH_CLIENT_SECRET,
+      },
+      chzzk: {
+        clientId: process.env.CHZZK_CLIENT_ID,
+        clientSecret: process.env.CHZZK_CLIENT_SECRET,
+      },
     },
     public: {
       baseUrl: process.env.BASE_URL,
+      shortLinkDomains: process.env.NUXT_REPORT_DOMAINS ?? '',
     },
     reportDomains: process.env.NUXT_REPORT_DOMAINS ?? '',
   },

@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import { UserRole } from '~/common/userRole';
 interface AdminUrl {
   id: number;
+  tld: string;
   uid: string;
   forward: string;
   expires: string;
@@ -126,7 +127,7 @@ await load();
             :class="new Date(link.expires).getTime() <= Date.now() ? 'bg-amber-50' : ''"
           >
             <td class="px-4 py-3">
-              <p class="font-semibold text-blue-600">/{{ link.uid }}</p>
+              <p class="font-semibold text-blue-600">{{ link.tld }}/{{ link.uid }}</p>
               <span
                 v-if="link.reportCount"
                 class="mt-1 inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700"

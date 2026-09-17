@@ -3,6 +3,9 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=26.0.0"
+  },
   "scripts": {
     "build": "nuxt build --preset=cloudflare_module",
     "dev": "nuxt dev --dotenv .env.nuxt",

@@ -56,7 +56,7 @@ defineRule('unique', async (value: string) => {
   if (reservedPaths.has(value.toLowerCase())) return false;
 
   try {
-    const data = await $fetch(`${config.public.baseUrl}/api/forward/${value}`, {
+    const data = await $fetch(`/api/forward/${value}`, {
       method: 'GET',
       query: addrInfo.value.tld ? { tld: addrInfo.value.tld } : undefined,
     });

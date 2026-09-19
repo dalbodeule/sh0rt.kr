@@ -61,7 +61,10 @@ export default defineEventHandler(async (event: H3Event): Promise<IManageRespons
     with: { UsersToUrls: true },
   });
 
-  if (!currentShorten || activeUser.id !== currentShorten.UsersToUrls[0]?.user) {
+  if (
+    !currentShorten ||
+    !currentShorten.UsersToUrls.some((owner) => owner.user === activeUser.id)
+  ) {
     throw createError({ statusCode: 404, statusMessage: 'Not found' });
   }
 
@@ -79,10 +82,7 @@ export default defineEventHandler(async (event: H3Event): Promise<IManageRespons
     .delete(analyticsCache)
     .where(lte(analyticsCache.created_at, new Date(Date.now() - CACHE_TTL)));
   const cachedData = await db.query.analyticsCache.findFirst({
-    where: and(
-      eq(analyticsCache.tld, currentShorten.tld),
-      eq(analyticsCache.uid, currentShorten.uid)
-    ),
+    where: eq(analyticsCache.manage_id, currentShorten.manage_id),
   });
   if (cachedData) {
     try {
@@ -102,8 +102,7 @@ export default defineEventHandler(async (event: H3Event): Promise<IManageRespons
   }
 
   try {
-    const analyticsTld = currentShorten.tld.replaceAll("'", "''");
-    const analyticsUid = currentShorten.uid.replaceAll("'", "''");
+    const analyticsManageId = currentShorten.manage_id.replaceAll("'", "''");
     const startTime = Math.max(currentShorten.created_at.getTime(), Date.now() - MAX_ANALYTICS_AGE);
     const rawData = await getFromAnalytics(
       `SELECT ${getParams([
@@ -123,7 +122,7 @@ export default defineEventHandler(async (event: H3Event): Promise<IManageRespons
         AKeys.sourcePath,
         AKeys.requestDomain,
         AKeys.requestPath,
-      ])}, timestamp FROM ANALYTICS WHERE index1 = '${analyticsTld}' AND index2 = '${analyticsUid}' AND timestamp >= toDateTime(${Math.floor(startTime / 1000)}) LIMIT 10000`,
+      ])}, timestamp FROM ANALYTICS WHERE index1 = '${analyticsManageId}' AND timestamp >= toDateTime(${Math.floor(startTime / 1000)}) LIMIT 10000`,
       event
     );
     const parsedData = JSON.parse(rawData) as IAnalytics;
@@ -142,12 +141,13 @@ export default defineEventHandler(async (event: H3Event): Promise<IManageRespons
     await db
       .insert(analyticsCache)
       .values({
+        manage_id: currentShorten.manage_id,
         tld: currentShorten.tld,
         uid: currentShorten.uid,
         data: JSON.stringify(analytics),
       })
       .onConflictDoUpdate({
-        target: [analyticsCache.tld, analyticsCache.uid],
+        target: analyticsCache.manage_id,
         set: { data: JSON.stringify(analytics), created_at: new Date() },
       });
     return { link, analytics };

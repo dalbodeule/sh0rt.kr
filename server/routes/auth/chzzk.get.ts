@@ -1,4 +1,4 @@
-import { getCookie, getQuery, getRequestURL, sendRedirect, setCookie } from 'h3';
+import { deleteCookie, getCookie, getQuery, getRequestURL, sendRedirect, setCookie } from 'h3';
 import handleLoginUser from '~/server/routes/handleLoginUser';
 import { getChzzkUserInfo } from '~/server/utils/chzzk';
 
@@ -19,7 +19,15 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const redirectUri = `${getRequestURL(event).origin}/auth/chzzk`;
   const state = getCookie(event, STATE_COOKIE);
-  if (!query.code) {
+  const code = typeof query.code === 'string' ? query.code : undefined;
+  const callbackState = typeof query.state === 'string' ? query.state : undefined;
+  if (!code) {
+    if (typeof query.error === 'string') {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'CHZZK OAuth authorization was rejected',
+      });
+    }
     const nextState = crypto.randomUUID();
     setCookie(event, STATE_COOKIE, nextState, {
       httpOnly: true,
@@ -36,9 +44,10 @@ export default defineEventHandler(async (event) => {
     }).toString();
     return sendRedirect(event, authorization.toString());
   }
-  if (!state || query.state !== state || typeof query.code !== 'string') {
+  if (!state || callbackState !== state) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid CHZZK OAuth state' });
   }
+  deleteCookie(event, STATE_COOKIE, { path: '/auth/chzzk' });
 
   const tokenResponse = await $fetch<{
     accessToken?: string;
@@ -49,7 +58,7 @@ export default defineEventHandler(async (event) => {
       grantType: 'authorization_code',
       clientId: config.clientId,
       clientSecret: config.clientSecret,
-      code: query.code,
+      code,
       state,
     },
   });
@@ -75,8 +84,8 @@ export default defineEventHandler(async (event) => {
       config.clientSecret
     );
     channelImageUrl = channelResponse.content.data[0]?.channelImageUrl;
-  } catch (error) {
-    console.warn('Could not get CHZZK channel image', error);
+  } catch {
+    console.warn('Could not get CHZZK channel image');
   }
   const accepted = await handleLoginUser(event, 'chzzk', {
     accountId: profile.channelId,

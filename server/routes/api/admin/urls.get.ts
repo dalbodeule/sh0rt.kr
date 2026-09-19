@@ -9,15 +9,17 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const { page, pageSize, offset } = getPagination(query);
   const filters: SQL[] = [];
-  const q = typeof query.q === 'string' ? query.q.trim() : '';
+  const q = typeof query.q === 'string' ? query.q.trim().slice(0, 200) : '';
   if (q) {
     const term = `%${q.toLowerCase()}%`;
     filters.push(or(like(sql`lower(${urls.uid})`, term), like(sql`lower(${urls.forward})`, term))!);
   }
   const requestedOwnerId = typeof query.userId === 'string' ? query.userId : query.ownerId;
-  if (typeof requestedOwnerId === 'string' && Number.isInteger(Number(requestedOwnerId)))
-    filters.push(eq(users.id, Number(requestedOwnerId)));
-  const ownerQuery = typeof query.ownerQuery === 'string' ? query.ownerQuery.trim() : '';
+  const ownerId = Number(requestedOwnerId);
+  if (typeof requestedOwnerId === 'string' && Number.isSafeInteger(ownerId) && ownerId > 0)
+    filters.push(eq(users.id, ownerId));
+  const ownerQuery =
+    typeof query.ownerQuery === 'string' ? query.ownerQuery.trim().slice(0, 200) : '';
   if (ownerQuery) {
     const term = `%${ownerQuery.toLowerCase()}%`;
     filters.push(

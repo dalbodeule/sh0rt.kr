@@ -51,8 +51,9 @@ function ensureCsrfToken(event: H3Event) {
 }
 
 export default defineEventHandler((event: H3Event) => {
-  const csrfToken = ensureCsrfToken(event);
   if (!event.path.startsWith('/api/')) return;
+
+  const csrfToken = ensureCsrfToken(event);
 
   if (!STATE_CHANGING_METHODS.has(event.method)) return;
 

@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
     filters.push(eq(reports.status, query.status));
   if (typeof query.source === 'string' && ['web', 'email'].includes(query.source))
     filters.push(eq(reports.source, query.source));
-  const q = typeof query.q === 'string' ? query.q.trim() : '';
+  const q = typeof query.q === 'string' ? query.q.trim().slice(0, 200) : '';
   if (q) {
     const term = `%${q.toLowerCase()}%`;
     filters.push(

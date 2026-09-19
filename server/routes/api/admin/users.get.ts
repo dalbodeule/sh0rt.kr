@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const { page, pageSize, offset } = getPagination(query);
   const filters: SQL[] = [];
-  const q = typeof query.q === 'string' ? query.q.trim() : '';
+  const q = typeof query.q === 'string' ? query.q.trim().slice(0, 200) : '';
   if (q) {
     const term = `%${q.toLowerCase()}%`;
     filters.push(

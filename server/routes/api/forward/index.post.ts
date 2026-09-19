@@ -1,6 +1,6 @@
 import type { IUIDGetResponse } from '~/server/routes/api/forward/[uid].get';
 import type { H3Event } from 'h3';
-import { analyticsCache, urlBlacklist, urls, usersToUrls } from '~/server/db/schema';
+import { urlBlacklist, urls, usersToUrls } from '~/server/db/schema';
 import { and, eq, sql } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { useDrizzle } from '~/server/utils/useDrizzle';
@@ -75,6 +75,8 @@ export default defineEventHandler(async (event: H3Event) => {
     parsedForward = new URL(request.forward);
     if (
       !['http:', 'https:'].includes(parsedForward.protocol) ||
+      parsedForward.username ||
+      parsedForward.password ||
       parsedForward.toString().length > 4096
     )
       throw new Error('unsupported URL');
@@ -82,18 +84,21 @@ export default defineEventHandler(async (event: H3Event) => {
     throw createError({ status: 400, message: 'Invalid forward URL' });
   }
 
-  let inserted: (typeof urls.$inferSelect)[];
+  const manageId = crypto.randomUUID();
   try {
-    inserted = await db
-      .insert(urls)
-      .values({
+    await db.batch([
+      db.insert(urls).values({
         tld,
         uid: request.uid,
-        manage_id: crypto.randomUUID(),
+        manage_id: manageId,
         forward: parsedForward.toString(),
         expires: expires.toDate(),
-      })
-      .returning();
+      }),
+      db.insert(usersToUrls).values({
+        user: user.id,
+        url: sql<number>`(select ${urls.id} from ${urls} where ${urls.manage_id} = ${manageId})`,
+      }),
+    ]);
   } catch (error) {
     if (error instanceof Error && /unique/i.test(error.message)) {
       throw createError({ statusCode: 409, statusMessage: 'UID already exists' });
@@ -101,14 +106,8 @@ export default defineEventHandler(async (event: H3Event) => {
     throw error;
   }
 
-  const created = inserted[0];
+  const created = await db.query.urls.findFirst({ where: eq(urls.manage_id, manageId) });
   if (!created) throw createError({ statusCode: 500, statusMessage: 'Could not create URL' });
-
-  await db.insert(usersToUrls).values({ user: user.id, url: created.id });
-
-  await db
-    .delete(analyticsCache)
-    .where(and(eq(analyticsCache.tld, tld), eq(analyticsCache.uid, request.uid)));
 
   const responseData: IUIDPostResponse = {
     id: created.id,

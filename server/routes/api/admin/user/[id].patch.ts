@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     suspendedUntil?: string | null;
     permanent?: boolean;
   }>(event);
-  if (!Number.isInteger(id) || id <= 0)
+  if (!Number.isSafeInteger(id) || id <= 0)
     throw createError({ statusCode: 400, statusMessage: 'Invalid user id' });
   if (id === admin.id)
     throw createError({ statusCode: 400, statusMessage: 'You cannot modify your own account' });

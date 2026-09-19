@@ -24,6 +24,8 @@ export default defineEventHandler(async (event: H3Event): Promise<IUIDGetRespons
     parsedForward = new URL(request.forward);
     if (
       !['http:', 'https:'].includes(parsedForward.protocol) ||
+      parsedForward.username ||
+      parsedForward.password ||
       parsedForward.toString().length > 4096
     )
       throw new Error('unsupported URL');
@@ -45,7 +47,11 @@ export default defineEventHandler(async (event: H3Event): Promise<IUIDGetRespons
     where: and(eq(urls.manage_id, manageId), gte(urls.expires, new Date())),
     with: { UsersToUrls: true },
   });
-  if (!result || result.UsersToUrls[0]?.user !== user.id || request.uid !== result.uid) {
+  if (
+    !result ||
+    !result.UsersToUrls.some((owner) => owner.user === user.id) ||
+    request.uid !== result.uid
+  ) {
     throw createError({ statusCode: 404, statusMessage: 'Not found' });
   }
 

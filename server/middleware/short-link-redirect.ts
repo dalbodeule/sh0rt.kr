@@ -7,6 +7,18 @@ import sha256 from '~/server/utils/sha256';
 import { reservedPaths } from '~/common/reservedPaths';
 import { getShortLinkDomain } from '~/server/utils/shortLinkDomain';
 
+const ANALYTICS_BLOB_MAX_BYTES = 128;
+const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
+
+const limitAnalyticsBlob = (value: unknown) => {
+  const text = String(value ?? 'unknown');
+  const bytes = textEncoder.encode(text);
+  return bytes.byteLength <= ANALYTICS_BLOB_MAX_BYTES
+    ? text
+    : textDecoder.decode(bytes.slice(0, ANALYTICS_BLOB_MAX_BYTES));
+};
+
 export default defineEventHandler(async (event) => {
   if (getMethod(event) !== 'GET' && getMethod(event) !== 'HEAD') return;
 
@@ -25,7 +37,7 @@ export default defineEventHandler(async (event) => {
     return;
   }
   const result = await db.query.urls.findFirst({
-    columns: { forward: true },
+    columns: { manage_id: true, forward: true },
     where: and(eq(urls.tld, tld), eq(urls.uid, uid), gte(urls.expires, new Date())),
   });
   if (!result) return;
@@ -43,7 +55,10 @@ export default defineEventHandler(async (event) => {
       const cf = event.context.cf as Partial<IncomingRequestCfProperties> | undefined;
       const rawIp =
         getHeader(event, 'cf-connecting-ip') ?? getRequestIP(event, { xForwardedFor: true }) ?? '';
-      const ipHash = rawIp ? await sha256(`${rawIp}\0${env.NUXT_SESSION_PASSWORD}`) : 'unknown';
+      const ipHash =
+        rawIp && env.NUXT_SESSION_PASSWORD
+          ? await sha256(`${rawIp}\0${env.NUXT_SESSION_PASSWORD}`)
+          : 'unknown';
       const browser = ua.getBrowser();
       const os = ua.getOS();
       const requestUrl = getRequestURL(event);
@@ -62,7 +77,7 @@ export default defineEventHandler(async (event) => {
       }
 
       env.ANALYTICS.writeDataPoint({
-        indexes: [tld, uid],
+        indexes: [result.manage_id],
         blobs: [
           ipHash,
           cf?.country ?? 'unknown',
@@ -80,7 +95,7 @@ export default defineEventHandler(async (event) => {
           sourcePath,
           requestUrl.hostname.toLowerCase(),
           requestUrl.pathname,
-        ],
+        ].map(limitAnalyticsBlob),
       });
     } catch (error) {
       console.warn('Could not record redirect analytics', error);

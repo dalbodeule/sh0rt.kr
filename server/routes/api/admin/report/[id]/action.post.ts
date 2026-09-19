@@ -1,5 +1,5 @@
 import { and, eq } from 'drizzle-orm';
-import { UserRole, reports, urlBlacklist, urls, users, usersToUrls } from '~/server/db/schema';
+import { UserRole, reports, urls, users, usersToUrls } from '~/server/db/schema';
 import { requireRole } from '~/server/utils/requireRole';
 import { useDrizzle } from '~/server/utils/useDrizzle';
 
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
   const id = Number(getRouterParam(event, 'id'));
   const body = await readBody<ReportActionBody>(event);
 
-  if (!Number.isInteger(id) || id <= 0) {
+  if (!Number.isSafeInteger(id) || id <= 0) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid report id' });
   }
   if (!body || !['resolved', 'dismissed'].includes(body.status ?? '')) {
@@ -28,7 +28,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid suspension period' });
   }
 
-  const db = useDrizzle(event.context.cloudflare.env.DB);
+  const rawBinding = event.context.cloudflare.env.DB;
+  const db = useDrizzle(rawBinding);
+  const binding = rawBinding as D1Database;
   const report = await db.query.reports.findFirst({ where: eq(reports.id, id) });
   if (!report) throw createError({ statusCode: 404, statusMessage: 'Report not found' });
 
@@ -64,22 +66,24 @@ export default defineEventHandler(async (event) => {
   }
 
   const now = new Date();
+  const nowSeconds = Math.floor(now.getTime() / 1000);
+  const statements: D1PreparedStatement[] = [];
   if (body.expireUrl && targetUrl) {
-    await db
-      .update(urls)
-      .set({ expires: new Date(0), updated_at: now })
-      .where(eq(urls.id, targetUrl.id));
+    statements.push(
+      binding
+        .prepare('UPDATE urls SET expires = ?, updated_at = ? WHERE id = ?')
+        .bind(nowSeconds, nowSeconds, targetUrl.id)
+    );
   }
 
   if (body.blacklist && targetUrl) {
-    await db
-      .insert(urlBlacklist)
-      .values({
-        uid: targetUrl.uid,
-        reason: `Report #${report.id}: ${report.reason}`,
-        created_by: admin.id,
-      })
-      .onConflictDoNothing({ target: urlBlacklist.uid });
+    statements.push(
+      binding
+        .prepare(
+          'INSERT INTO urlBlacklist (uid, reason, created_by, created_at) VALUES (?, ?, ?, ?) ON CONFLICT(uid) DO NOTHING'
+        )
+        .bind(targetUrl.uid, `Report #${report.id}: ${report.reason}`, admin.id, nowSeconds)
+    );
   }
 
   if (body.suspendUser && owner) {
@@ -87,16 +91,19 @@ export default defineEventHandler(async (event) => {
       body.suspension === 'permanent'
         ? new Date('9999-12-31T23:59:59.000Z')
         : new Date(Date.now() + (body.suspension === '30d' ? 30 : 7) * 86400000);
-    await db
-      .update(users)
-      .set({ login_limit: loginLimit, updated_at: now })
-      .where(eq(users.id, owner.id));
+    statements.push(
+      binding
+        .prepare('UPDATE users SET login_limit = ?, updated_at = ? WHERE id = ?')
+        .bind(Math.floor(loginLimit.getTime() / 1000), nowSeconds, owner.id)
+    );
   }
 
-  await db
-    .update(reports)
-    .set({ status: body.status, updated_at: now })
-    .where(eq(reports.id, report.id));
+  statements.push(
+    binding
+      .prepare('UPDATE reports SET status = ?, updated_at = ? WHERE id = ?')
+      .bind(body.status, nowSeconds, report.id)
+  );
+  await binding.batch(statements);
 
   return {
     success: true,

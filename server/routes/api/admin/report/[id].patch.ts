@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   await requireRole(event, UserRole.MODERATOR);
   const id = Number(getRouterParam(event, 'id'));
   const body = await readBody<{ status?: string }>(event);
-  if (!Number.isInteger(id) || id <= 0)
+  if (!Number.isSafeInteger(id) || id <= 0)
     throw createError({ statusCode: 400, statusMessage: 'Invalid report id' });
   if (!body.status || !['open', 'reviewing', 'resolved', 'dismissed'].includes(body.status))
     throw createError({ statusCode: 400, statusMessage: 'Invalid report status' });

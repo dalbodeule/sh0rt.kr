@@ -87,6 +87,10 @@
     "created": "생성일",
     "expires": "만료일",
     "manage": "관리하기",
+    "delete": "단축주소 삭제",
+    "deleteConfirm": "이 단축주소를 만료 처리할까요? 기록은 보존됩니다.",
+    "deleting": "삭제 처리 중…",
+    "deleteError": "단축주소를 삭제하지 못했습니다.",
     "previous": "이전",
     "next": "다음",
     "loadError": "목록을 불러오지 못했습니다."

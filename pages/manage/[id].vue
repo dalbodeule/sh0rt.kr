@@ -32,6 +32,7 @@ const addrInfo = ref<IUIDPostRequest>({
 const status = ref(Status.DEFAULT);
 const errorMessage = ref('');
 const analytics = ref<IAnalyticsResponse | null>(managed.analytics);
+const deleting = ref(false);
 provide('addrInfo', addrInfo);
 provide('status', status);
 
@@ -47,6 +48,19 @@ const onSubmit = async () => {
   } catch (error: unknown) {
     status.value = Status.ERROR;
     errorMessage.value = error instanceof Error ? error.message : t('create.error');
+  }
+};
+
+const onDelete = async () => {
+  if (!window.confirm(t('manage.deleteConfirm'))) return;
+  deleting.value = true;
+  try {
+    await $csrfFetch(`/api/manage/${manageId}` as string, { method: 'DELETE' });
+    await navigateTo('/manage');
+  } catch (error: unknown) {
+    deleting.value = false;
+    errorMessage.value = error instanceof Error ? error.message : t('manage.deleteError');
+    status.value = Status.ERROR;
   }
 };
 
@@ -87,7 +101,7 @@ useSeoMeta({
       <a
         :href="`${publicBaseUrl}/${uid}`"
         target="_blank"
-        rel="noopener"
+        rel="noopener noreferrer"
         class="mt-2 inline-block break-all text-sm text-blue-600 hover:underline"
         >{{ publicBaseUrl }}/{{ uid }} ↗</a
       >
@@ -114,6 +128,14 @@ useSeoMeta({
       >
         {{ errorMessage }}
       </p>
+      <button
+        type="button"
+        class="mt-5 rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50"
+        :disabled="deleting"
+        @click="onDelete"
+      >
+        {{ deleting ? t('manage.deleting') : t('manage.delete') }}
+      </button>
     </section>
 
     <ClientOnly>

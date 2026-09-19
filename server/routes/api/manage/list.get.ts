@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const { page, pageSize, offset } = getPagination(query);
   const filters: SQL[] = [eq(usersToUrls.user, user.id)];
-  const q = typeof query.q === 'string' ? query.q.trim() : '';
+  const q = typeof query.q === 'string' ? query.q.trim().slice(0, 200) : '';
   if (q) {
     const term = `%${q.toLowerCase()}%`;
     filters.push(or(like(sql`lower(${urls.uid})`, term), like(sql`lower(${urls.forward})`, term))!);

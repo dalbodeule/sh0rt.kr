@@ -107,12 +107,13 @@ export const analyticsCache = sqliteTable(
   'analyticsCache',
   {
     id: int('id').primaryKey({ autoIncrement: true }),
+    manage_id: text('manage_id', { length: 36 }),
     tld: text('tld', { length: 255 }).notNull(),
     uid: text('uid', { length: 20 }).notNull(),
     data: text('data').notNull(),
     created_at: int('created_at', { mode: 'timestamp' }).default(sql`(STRFTIME('%s'))`),
   },
-  (table) => [uniqueIndex('analytics_cache_tld_uid_unique').on(table.tld, table.uid)]
+  (table) => [uniqueIndex('analytics_cache_manage_id_unique').on(table.manage_id)]
 );
 
 export const reports = sqliteTable(

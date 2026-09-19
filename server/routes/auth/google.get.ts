@@ -14,8 +14,8 @@ export default defineOAuthGoogleEventHandler({
 
     return sendRedirect(event, accepted ? '/' : '/login?restricted=1');
   },
-  async onError(event, error) {
-    console.log(error);
+  async onError(event) {
+    console.warn('Google OAuth login failed');
     return sendRedirect(event, '/');
   },
 });

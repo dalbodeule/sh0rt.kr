@@ -120,6 +120,13 @@
       "when": 1789552100000,
       "tag": "0016_add_tld_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1789552200000,
+      "tag": "0017_scope_analytics_cache",
+      "breakpoints": true
     }
   ]
 }

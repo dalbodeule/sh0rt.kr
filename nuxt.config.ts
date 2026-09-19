@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineNuxtConfig({
   devtools: { enabled: true },
   srcDir: '.',
-  compatibilityDate: '2026-09-16',
+  compatibilityDate: '2026-09-18',
   dir: {
     app: 'app',
   },
@@ -51,6 +51,7 @@ export default defineNuxtConfig({
       shortLinkDomains: process.env.NUXT_REPORT_DOMAINS ?? '',
     },
     reportDomains: process.env.NUXT_REPORT_DOMAINS ?? '',
+    reportEmails: process.env.NUXT_REPORT_EMAILS ?? '',
   },
   turnstile: {
     secretKey: process.env.TURNSTILE_SECRET_KEY,

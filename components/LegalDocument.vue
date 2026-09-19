@@ -6,6 +6,25 @@ const { locale } = useI18n();
 const source = ref('');
 const loading = ref(true);
 const loadError = ref(false);
+const renderer = new marked.Renderer();
+
+// Legal documents are static, but stripping raw HTML keeps a compromised document
+// from becoming executable content in the application shell.
+renderer.html = () => '';
+renderer.link = ({ href, title, text }) => {
+  const value = href.trim();
+  try {
+    const url = new URL(value, 'https://sh0rt.kr');
+    if (!['http:', 'https:', 'mailto:'].includes(url.protocol)) return text;
+  } catch {
+    return text;
+  }
+
+  const escapeAttribute = (attribute: string) =>
+    attribute.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  const titleAttribute = title ? ` title="${escapeAttribute(title)}"` : '';
+  return `<a href="${escapeAttribute(value)}"${titleAttribute} rel="noopener noreferrer">${text}</a>`;
+};
 
 const load = async () => {
   loading.value = true;
@@ -27,6 +46,7 @@ const rendered = computed(() =>
   marked.parse(source.value ?? '', {
     async: false,
     breaks: true,
+    renderer,
   })
 );
 </script>

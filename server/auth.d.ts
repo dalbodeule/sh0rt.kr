@@ -11,6 +11,10 @@ declare module '#auth-utils' {
     updated_at: Date;
     role: UserRole;
   }
+
+  interface SecureSessionData {
+    refreshedAt?: number;
+  }
 }
 
 export {};

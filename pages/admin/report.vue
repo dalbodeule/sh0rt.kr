@@ -13,6 +13,13 @@ interface Report {
   subject: string | null;
   body_text: string | null;
   status: string;
+  ai_status: string;
+  ai_likely_abuse: number | null;
+  ai_category: string | null;
+  ai_severity: number | null;
+  ai_confidence: number | null;
+  ai_checked_at: string | null;
+  ai_error: string | null;
   created_at: string;
   ownerId: number | null;
   ownerName: string | null;
@@ -33,6 +40,7 @@ const errorMessage = ref('');
 const { $csrfFetch } = useNuxtApp();
 const actionError = ref('');
 const actionPending = ref(false);
+const aiPending = ref(false);
 const actionOptions = reactive({
   suspendUser: false,
   suspension: '7d' as '7d' | '30d' | 'permanent',
@@ -67,6 +75,20 @@ const openReport = (report: Report) => {
   actionOptions.suspension = '7d';
   actionOptions.expireUrl = Boolean(report.uid);
   actionOptions.blacklist = false;
+};
+const reviewWithAi = async () => {
+  if (!selected.value || aiPending.value) return;
+  aiPending.value = true;
+  actionError.value = '';
+  try {
+    await $csrfFetch(`/api/admin/report/${selected.value.id}/ai`, { method: 'POST' });
+    await load();
+    selected.value = data.value.items.find((item) => item.id === selected.value?.id) ?? null;
+  } catch {
+    actionError.value = t('admin.aiError');
+  } finally {
+    aiPending.value = false;
+  }
 };
 const applyReportAction = async (status: 'resolved' | 'dismissed', applyMeasures = true) => {
   if (!selected.value || actionPending.value) return;
@@ -220,6 +242,51 @@ await load();
           <div>
             <dt class="text-slate-500">{{ t('admin.target') }}</dt>
             <dd class="break-all font-semibold">{{ selected.forward || t('admin.noLink') }}</dd>
+          </div>
+          <div class="sm:col-span-2">
+            <dt class="text-slate-500">{{ t('admin.aiReview') }}</dt>
+            <dd class="mt-1 flex flex-wrap items-center gap-2 font-semibold">
+              <span
+                :class="[
+                  'rounded-full px-2 py-1 text-xs',
+                  selected.ai_likely_abuse === 1
+                    ? 'bg-red-100 text-red-700'
+                    : selected.ai_likely_abuse === 0
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : selected.ai_status === 'failed'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-slate-100 text-slate-700',
+                ]"
+              >
+                {{
+                  selected.ai_status === 'completed'
+                    ? selected.ai_likely_abuse === 1
+                      ? t('admin.aiLikelyAbuse')
+                      : t('admin.aiNeedsReview')
+                    : selected.ai_status === 'processing'
+                      ? t('admin.aiProcessing')
+                      : selected.ai_status === 'unavailable'
+                        ? t('admin.aiUnavailable')
+                        : selected.ai_status === 'failed'
+                          ? t('admin.aiFailed')
+                          : t('admin.aiNotChecked')
+                }}
+              </span>
+              <span v-if="selected.ai_category" class="text-sm text-slate-600">
+                {{ t(`report.${selected.ai_category}`) }} · {{ t('admin.aiConfidence') }}
+                {{ selected.ai_confidence ?? 0 }}%
+              </span>
+              <span v-if="selected.ai_status === 'failed'" class="text-sm font-normal text-red-700">
+                {{ t('admin.aiError') }}
+              </span>
+              <button
+                class="rounded-lg border px-3 py-1 text-sm font-medium"
+                :disabled="aiPending"
+                @click="void reviewWithAi"
+              >
+                {{ aiPending ? t('admin.processing') : t('admin.aiRecheck') }}
+              </button>
+            </dd>
           </div>
         </dl>
         <p v-if="selected.subject" class="mt-5 font-semibold">{{ selected.subject }}</p>

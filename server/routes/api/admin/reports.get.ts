@@ -45,6 +45,13 @@ export default defineEventHandler(async (event) => {
         subject: reports.subject,
         body_text: reports.body_text,
         status: reports.status,
+        ai_status: reports.ai_status,
+        ai_likely_abuse: reports.ai_likely_abuse,
+        ai_category: reports.ai_category,
+        ai_severity: reports.ai_severity,
+        ai_confidence: reports.ai_confidence,
+        ai_checked_at: reports.ai_checked_at,
+        ai_error: reports.ai_error,
         created_at: reports.created_at,
         updated_at: reports.updated_at,
         ownerId: sql<number | null>`(

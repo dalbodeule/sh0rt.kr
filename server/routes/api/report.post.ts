@@ -2,6 +2,7 @@ import { and, eq } from 'drizzle-orm';
 import { reports, urls } from '~/server/db/schema';
 import { useDrizzle } from '~/server/utils/useDrizzle';
 import { getConfiguredShortLinkDomains, getShortLinkDomain } from '~/server/utils/shortLinkDomain';
+import { scheduleReportAiReview } from '~/server/utils/reportAi';
 
 interface ReportBody {
   uid?: string;
@@ -53,16 +54,22 @@ export default defineEventHandler(async (event) => {
     .where(and(eq(urls.tld, tld), eq(urls.uid, uid)))
     .limit(1);
   if (!target[0]) throw createError({ statusCode: 404, statusMessage: 'Short URL not found' });
-  await db.insert(reports).values({
-    url_id: target[0].id,
-    tld: target[0].tld,
-    uid: target[0].uid,
-    forward: target[0].forward,
-    reporter_email: email,
-    reason,
-    details,
-    source: 'web',
-    status: 'open',
-  });
-  return { success: true };
+  const created = await db
+    .insert(reports)
+    .values({
+      url_id: target[0].id,
+      tld: target[0].tld,
+      uid: target[0].uid,
+      forward: target[0].forward,
+      reporter_email: email,
+      reason,
+      details,
+      source: 'web',
+      status: 'open',
+    })
+    .returning({ id: reports.id });
+  const report = created[0];
+  if (!report) throw createError({ statusCode: 500, statusMessage: 'Report was not created' });
+  scheduleReportAiReview(event, report.id);
+  return { success: true, reportId: report.id };
 });

@@ -179,7 +179,17 @@
     "addToBlacklist": "UIDをブラックリストに追加",
     "applyAction": "対応を適用",
     "processing": "処理中…",
-    "actionError": "報告への対応を完了できませんでした。もう一度お試しください。"
+    "actionError": "報告への対応を完了できませんでした。もう一度お試しください。",
+    "aiReview": "AI補助チェック",
+    "aiLikelyAbuse": "悪用の可能性が高い",
+    "aiNeedsReview": "追加確認が必要",
+    "aiProcessing": "AIチェック中",
+    "aiUnavailable": "AI利用不可",
+    "aiFailed": "AIチェック失敗",
+    "aiNotChecked": "未チェック",
+    "aiConfidence": "信頼度",
+    "aiRecheck": "AIで再チェック",
+    "aiError": "AIチェックを完了できませんでした。"
   },
   "detail": {
     "settings": "リンク設定",

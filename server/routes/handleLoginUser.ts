@@ -79,6 +79,9 @@ export default async function (
       updated_at: db_user!.updated_at,
       role: db_user!.role,
     },
+    secure: {
+      refreshedAt: Date.now(),
+    },
   });
   return true;
 }

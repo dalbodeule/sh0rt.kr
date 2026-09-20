@@ -185,7 +185,17 @@
     "addToBlacklist": "UID를 블랙리스트에 추가",
     "applyAction": "처리 적용",
     "processing": "처리 중…",
-    "actionError": "신고 처리를 완료하지 못했습니다. 다시 시도해 주세요."
+    "actionError": "신고 처리를 완료하지 못했습니다. 다시 시도해 주세요.",
+    "aiReview": "AI 보조 점검",
+    "aiLikelyAbuse": "어뷰징 가능성 높음",
+    "aiNeedsReview": "추가 검토 필요",
+    "aiProcessing": "AI 점검 중",
+    "aiUnavailable": "AI 연결 안 됨",
+    "aiFailed": "AI 점검 실패",
+    "aiNotChecked": "점검 대기",
+    "aiConfidence": "신뢰도",
+    "aiRecheck": "AI 재점검",
+    "aiError": "AI 점검을 완료하지 못했습니다."
   },
   "detail": {
     "settings": "링크 설정",

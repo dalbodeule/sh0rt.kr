@@ -181,7 +181,17 @@
     "addToBlacklist": "Add the UID to the blacklist",
     "applyAction": "Apply action",
     "processing": "Processing…",
-    "actionError": "The report action could not be completed. Please try again."
+    "actionError": "The report action could not be completed. Please try again.",
+    "aiReview": "AI-assisted review",
+    "aiLikelyAbuse": "Likely abusive",
+    "aiNeedsReview": "Needs review",
+    "aiProcessing": "AI review in progress",
+    "aiUnavailable": "AI unavailable",
+    "aiFailed": "AI review failed",
+    "aiNotChecked": "Not checked",
+    "aiConfidence": "Confidence",
+    "aiRecheck": "Run AI review",
+    "aiError": "The AI review could not be completed."
   },
   "detail": {
     "settings": "Link settings",

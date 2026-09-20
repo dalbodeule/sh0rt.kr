@@ -132,6 +132,13 @@ export const reports = sqliteTable(
     subject: text('subject', { length: 500 }),
     body_text: text('body_text', { length: 20000 }),
     status: text('status', { length: 20 }).notNull().default('open'),
+    ai_status: text('ai_status', { length: 20 }).notNull().default('pending'),
+    ai_likely_abuse: int('ai_likely_abuse'),
+    ai_category: text('ai_category', { length: 20 }),
+    ai_severity: int('ai_severity'),
+    ai_confidence: int('ai_confidence'),
+    ai_checked_at: int('ai_checked_at', { mode: 'timestamp' }),
+    ai_error: text('ai_error', { length: 255 }),
     created_at: int('created_at', { mode: 'timestamp' })
       .notNull()
       .default(sql`(STRFTIME('%s'))`),

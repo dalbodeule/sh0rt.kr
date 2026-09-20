@@ -40,6 +40,9 @@ migrations_dir = "server/db/migrations"
 binding = "ANALYTICS"
 dataset = "ANALYTICS"
 
+[ai]
+binding = "AI"
+
 [observability.logs]
 enabled = false
 invocation_logs = true

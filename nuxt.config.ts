@@ -27,6 +27,12 @@ export default defineNuxtConfig({
     analyticsApiToken: process.env.ANALYTICS_API_TOKEN,
     session: {
       password: process.env.SESSION_PASSWORD ?? '',
+      // Keep the sealed token bounded while renewing the browser's idle timeout.
+      maxAge: 60 * 60 * 24 * 365,
+      cookie: {
+        maxAge: 60 * 60 * 24 * 30,
+        expires: undefined,
+      },
     },
     oauth: {
       github: {

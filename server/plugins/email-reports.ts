@@ -2,6 +2,7 @@ import PostalMime from 'postal-mime';
 import { and, eq } from 'drizzle-orm';
 import { reports, urls } from '~/server/db/schema';
 import { useDrizzle } from '~/server/utils/useDrizzle';
+import { analyzeReportWithAi } from '~/server/utils/reportAi';
 
 const MAX_REPORT_EMAIL_SIZE = 2 * 1024 * 1024;
 
@@ -56,18 +57,31 @@ export default defineNitroPlugin((nitroApp) => {
           .limit(1)
       : [];
 
-    await db.insert(reports).values({
-      url_id: target[0]?.id ?? null,
-      tld: target[0]?.tld ?? tld,
-      uid: target[0]?.uid ?? uid,
-      forward: target[0]?.forward ?? null,
-      reason: 'email',
-      details: '',
-      source: 'email',
-      sender: payload.message.from.slice(0, 255),
-      subject: (parsed.subject || '').slice(0, 500),
-      body_text: text,
-      status: 'open',
-    });
+    const created = await db
+      .insert(reports)
+      .values({
+        url_id: target[0]?.id ?? null,
+        tld: target[0]?.tld ?? tld,
+        uid: target[0]?.uid ?? uid,
+        forward: target[0]?.forward ?? null,
+        reason: 'email',
+        details: '',
+        source: 'email',
+        sender: payload.message.from.slice(0, 255),
+        subject: (parsed.subject || '').slice(0, 500),
+        body_text: text,
+        status: 'open',
+      })
+      .returning({ id: reports.id });
+    const report = created[0];
+    if (report) {
+      await analyzeReportWithAi(
+        report.id,
+        payload.env as {
+          DB: D1Database;
+          AI?: { run: (model: string, input: unknown) => Promise<unknown> };
+        }
+      );
+    }
   });
 });

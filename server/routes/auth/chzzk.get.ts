@@ -49,29 +49,45 @@ export default defineEventHandler(async (event) => {
   }
   deleteCookie(event, STATE_COOKIE, { path: '/auth/chzzk' });
 
-  const tokenResponse = await $fetch<{
-    accessToken?: string;
-    content?: { accessToken?: string };
-  }>(TOKEN_URL, {
-    method: 'POST',
-    body: {
-      grantType: 'authorization_code',
-      clientId: config.clientId,
-      clientSecret: config.clientSecret,
-      code,
-      state,
-    },
-  });
+  let tokenResponse: { accessToken?: string; content?: { accessToken?: string } };
+  try {
+    tokenResponse = await $fetch<{
+      accessToken?: string;
+      content?: { accessToken?: string };
+    }>(TOKEN_URL, {
+      method: 'POST',
+      signal: AbortSignal.timeout(10_000),
+      body: {
+        grantType: 'authorization_code',
+        clientId: config.clientId,
+        clientSecret: config.clientSecret,
+        code,
+        state,
+      },
+    });
+  } catch {
+    throw createError({ statusCode: 502, statusMessage: 'CHZZK token request failed' });
+  }
   const token = tokenResponse.content ?? tokenResponse;
   if (!token.accessToken)
     throw createError({ statusCode: 502, statusMessage: 'Could not get CHZZK token' });
-  const profileResponse = await $fetch<{
+  let profileResponse: {
     channelId?: string;
     channelName?: string;
     content?: { channelId?: string; channelName?: string };
-  }>(USER_URL, {
-    headers: { Authorization: `Bearer ${token.accessToken}` },
-  });
+  };
+  try {
+    profileResponse = await $fetch<{
+      channelId?: string;
+      channelName?: string;
+      content?: { channelId?: string; channelName?: string };
+    }>(USER_URL, {
+      signal: AbortSignal.timeout(10_000),
+      headers: { Authorization: `Bearer ${token.accessToken}` },
+    });
+  } catch {
+    throw createError({ statusCode: 502, statusMessage: 'CHZZK profile request failed' });
+  }
   const profile = profileResponse.content ?? profileResponse;
   if (!profile.channelId || !profile.channelName) {
     throw createError({ statusCode: 502, statusMessage: 'Could not get CHZZK profile' });

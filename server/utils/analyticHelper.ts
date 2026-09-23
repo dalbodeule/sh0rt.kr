@@ -77,6 +77,7 @@ export async function getFromAnalytics(query: string, event: H3Event) {
     `https://api.cloudflare.com/client/v4/accounts/${config.analyticsAccountId}/analytics_engine/sql`,
     {
       method: 'POST',
+      signal: AbortSignal.timeout(10_000),
       headers: {
         Authorization: `Bearer ${config.analyticsApiToken}`,
       },

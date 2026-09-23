@@ -7,12 +7,12 @@ const { loggedIn, user, fetch: fetchUserSession } = useUserSession();
   await fetchUserSession();
 
   if (
-    !loggedIn ||
+    !loggedIn.value ||
     !(user.value?.role === UserRole.MODERATOR || user.value?.role === UserRole.ADMIN)
   ) {
-    navigateTo('/');
+    return navigateTo('/');
   }
 
-  navigateTo('/admin/user');
+  return navigateTo('/admin/user');
 })();
 </script>

@@ -50,10 +50,10 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Reported URL not found' });
   }
 
-  let owner: { id: number } | undefined;
+  let owner: { id: number; role: UserRole } | undefined;
   if (targetUrl) {
     owner = await db
-      .select({ id: users.id })
+      .select({ id: users.id, role: users.role })
       .from(usersToUrls)
       .innerJoin(users, eq(usersToUrls.user, users.id))
       .where(eq(usersToUrls.url, targetUrl.id))
@@ -63,6 +63,14 @@ export default defineEventHandler(async (event) => {
 
   if (body.suspendUser && !owner) {
     throw createError({ statusCode: 404, statusMessage: 'URL owner not found' });
+  }
+  if (
+    body.suspendUser &&
+    owner &&
+    admin.role < UserRole.ADMIN &&
+    owner.role >= UserRole.MODERATOR
+  ) {
+    throw createError({ statusCode: 403, statusMessage: 'Elevated accounts require an admin' });
   }
 
   const now = new Date();

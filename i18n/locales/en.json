@@ -9,7 +9,8 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "close": "Close",
-    "loading": "Please wait a moment"
+    "loading": "Please wait a moment",
+    "language": "Language"
   },
   "error": {
     "notFoundTitle": "We couldn't find that page",
@@ -87,6 +88,10 @@
     "created": "Created",
     "expires": "Expires",
     "manage": "Manage",
+    "delete": "Delete short link",
+    "deleteConfirm": "Expire this short link? Its records will be preserved.",
+    "deleting": "Expiring…",
+    "deleteError": "Unable to expire the short link.",
     "previous": "Previous",
     "next": "Next",
     "loadError": "Unable to load the list."
@@ -190,6 +195,10 @@
     "aiFailed": "AI review failed",
     "aiNotChecked": "Not checked",
     "aiConfidence": "Confidence",
+    "aiSeverity": "Severity",
+    "aiSeverityLow": "Low",
+    "aiSeverityModerate": "Moderate",
+    "aiSeverityHigh": "High",
     "aiRecheck": "Run AI review",
     "aiError": "The AI review could not be completed."
   },

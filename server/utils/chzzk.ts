@@ -24,6 +24,7 @@ export const getChzzkUserInfo = async (
     `${CHZZK_API_URL}/open/v1/channels?channelIds=${encodeURIComponent(userId)}`,
     {
       method: 'GET',
+      signal: AbortSignal.timeout(10_000),
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',

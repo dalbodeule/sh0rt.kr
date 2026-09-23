@@ -2,7 +2,8 @@
 import SiteFooter from '~/components/SiteFooter.vue';
 import SiteHeader from '~/components/SiteHeader.vue';
 
-useHead({ htmlAttrs: { lang: 'ko' } });
+const { locale } = useI18n();
+useHead(() => ({ htmlAttrs: { lang: locale.value } }));
 </script>
 
 <template>

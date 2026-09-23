@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 import { reports, urls } from '~/server/db/schema';
 import { useDrizzle } from '~/server/utils/useDrizzle';
-import { getConfiguredShortLinkDomains, getShortLinkDomain } from '~/server/utils/shortLinkDomain';
+import { getShortLinkDomain } from '~/server/utils/shortLinkDomain';
 import { scheduleReportAiReview } from '~/server/utils/reportAi';
 
 interface ReportBody {
@@ -20,9 +20,7 @@ export default defineEventHandler(async (event) => {
   if (/^https?:\/\//i.test(rawUid)) {
     try {
       const parsed = new URL(rawUid);
-      tld = parsed.hostname.toLowerCase();
-      if (!getConfiguredShortLinkDomains(event).includes(tld))
-        throw new Error('unsupported domain');
+      tld = getShortLinkDomain(event, parsed.hostname);
       uid = parsed.pathname.replace(/^\//, '').replace(/\/$/, '');
     } catch {
       throw createError({ statusCode: 400, statusMessage: 'Invalid report URL' });

@@ -9,7 +9,8 @@
     "cancel": "취소",
     "confirm": "확인",
     "close": "닫기",
-    "loading": "잠시만 기다려 주세요"
+    "loading": "잠시만 기다려 주세요",
+    "language": "언어 선택"
   },
   "error": {
     "notFoundTitle": "페이지를 찾을 수 없어요",
@@ -194,6 +195,10 @@
     "aiFailed": "AI 점검 실패",
     "aiNotChecked": "점검 대기",
     "aiConfidence": "신뢰도",
+    "aiSeverity": "심각도",
+    "aiSeverityLow": "낮음",
+    "aiSeverityModerate": "중간",
+    "aiSeverityHigh": "높음",
     "aiRecheck": "AI 재점검",
     "aiError": "AI 점검을 완료하지 못했습니다."
   },

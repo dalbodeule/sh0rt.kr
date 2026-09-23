@@ -34,6 +34,18 @@ type ReportAiReview = {
 
 const clampPercent = (value: number) => Math.max(0, Math.min(100, Math.round(value * 100)));
 
+const sanitizeUrlForAi = (value: string | null) => {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    url.search = '';
+    url.hash = '';
+    return url.toString();
+  } catch {
+    return null;
+  }
+};
+
 const getAnswers = (response: unknown): Record<string, AiAnswer> => {
   if (!response || typeof response !== 'object') throw new Error('Invalid AI response');
   const answers = (response as { answers?: unknown }).answers;
@@ -77,7 +89,7 @@ export async function analyzeReportWithAi(
         report_type: report.reason,
         report_details: report.details || report.body_text || '',
         reported_url: report.tld && report.uid ? `https://${report.tld}/${report.uid}` : null,
-        destination_url: report.forward,
+        destination_url: sanitizeUrlForAi(report.forward),
       },
       questions: {
         likely_abuse: {

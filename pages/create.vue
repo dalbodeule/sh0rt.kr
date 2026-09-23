@@ -3,9 +3,10 @@ import dayjs from 'dayjs';
 import { Status } from '~/common/enums';
 import type { IUIDPostRequest, IUIDPostResponse } from '~/server/routes/api/forward/index.post';
 
-const { loggedIn } = useUserSession();
+const { loggedIn, fetch: fetchUserSession } = useUserSession();
 const { t } = useI18n();
 const { $csrfFetch } = useNuxtApp();
+await fetchUserSession();
 if (!loggedIn.value) await navigateTo('/');
 const config = useRuntimeConfig();
 const defaultTld =

@@ -58,13 +58,13 @@ const { loggedIn, user, fetch: fetchUserSession } = useUserSession();
 await fetchUserSession();
 
 if (
-  !loggedIn ||
+  !loggedIn.value ||
   !(user.value?.role === UserRole.MODERATOR || user.value?.role === UserRole.ADMIN)
 ) {
-  navigateTo('/');
+  await navigateTo('/');
+} else {
+  await load();
 }
-
-await load();
 </script>
 <template>
   <main class="space-y-7 py-4">

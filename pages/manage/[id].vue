@@ -10,7 +10,8 @@ const route = useRoute();
 const { t } = useI18n();
 const { $csrfFetch } = useNuxtApp();
 const manageId = String(route.params.id);
-const { loggedIn } = useUserSession();
+const { loggedIn, fetch: fetchUserSession } = useUserSession();
+await fetchUserSession();
 if (!loggedIn.value) await navigateTo('/');
 
 let managed: IManageResponse;

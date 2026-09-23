@@ -18,8 +18,9 @@ interface ListResponse {
   total: number;
   stats: { total: number; active: number; expired: number };
 }
-const { loggedIn } = useUserSession();
+const { loggedIn, fetch: fetchUserSession } = useUserSession();
 const { t } = useI18n();
+await fetchUserSession();
 if (!loggedIn.value) await navigateTo('/');
 useSeoMeta({ title: `sh0rt.kr :: ${t('manage.title')}`, robots: { all: false } });
 

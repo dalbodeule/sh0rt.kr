@@ -118,12 +118,13 @@ const { loggedIn, user, fetch: fetchUserSession } = useUserSession();
 await fetchUserSession();
 
 if (
-  !loggedIn ||
+  !loggedIn.value ||
   !(user.value?.role === UserRole.MODERATOR || user.value?.role === UserRole.ADMIN)
 ) {
-  navigateTo('/');
+  await navigateTo('/');
+} else {
+  await load();
 }
-await load();
 </script>
 <template>
   <main class="space-y-7 py-4">
@@ -273,8 +274,15 @@ await load();
                 }}
               </span>
               <span v-if="selected.ai_category" class="text-sm text-slate-600">
-                {{ t(`report.${selected.ai_category}`) }} · {{ t('admin.aiConfidence') }}
-                {{ selected.ai_confidence ?? 0 }}%
+                {{ t(`report.${selected.ai_category}`) }} · {{ t('admin.aiSeverity') }}
+                {{
+                  selected.ai_severity === 2
+                    ? t('admin.aiSeverityHigh')
+                    : selected.ai_severity === 1
+                      ? t('admin.aiSeverityModerate')
+                      : t('admin.aiSeverityLow')
+                }}
+                · {{ t('admin.aiConfidence') }} {{ selected.ai_confidence ?? 0 }}%
               </span>
               <span v-if="selected.ai_status === 'failed'" class="text-sm font-normal text-red-700">
                 {{ t('admin.aiError') }}

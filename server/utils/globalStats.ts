@@ -11,7 +11,9 @@ export interface PublicStats {
   updatedAt: string;
 }
 
-export async function refreshGlobalStats(binding: unknown): Promise<PublicStats> {
+let refreshPromise: Promise<PublicStats> | null = null;
+
+async function refreshGlobalStatsUncached(binding: unknown): Promise<PublicStats> {
   const db = useDrizzle(binding);
   const now = new Date();
   const [userCount, urlCounts, reportCount] = await Promise.all([
@@ -45,4 +47,13 @@ export async function refreshGlobalStats(binding: unknown): Promise<PublicStats>
       set: { data: JSON.stringify(stats), updated_at: now },
     });
   return stats;
+}
+
+export function refreshGlobalStats(binding: unknown): Promise<PublicStats> {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = refreshGlobalStatsUncached(binding).finally(() => {
+    refreshPromise = null;
+  });
+  return refreshPromise;
 }

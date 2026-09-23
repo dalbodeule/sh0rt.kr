@@ -7,24 +7,31 @@ const source = ref('');
 const loading = ref(true);
 const loadError = ref(false);
 const renderer = new marked.Renderer();
+const stripHtmlTags = (value: string) =>
+  value
+    .replace(/<[^>]*>/g, '')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 
 // Legal documents are static, but stripping raw HTML keeps a compromised document
 // from becoming executable content in the application shell.
 renderer.html = () => '';
 renderer.link = ({ href, title, text }) => {
+  const safeText = stripHtmlTags(text);
   const value = href.trim();
   try {
     const url = new URL(value, 'https://sh0rt.kr');
-    if (!['http:', 'https:', 'mailto:'].includes(url.protocol)) return text;
+    if (!['http:', 'https:', 'mailto:'].includes(url.protocol)) return safeText;
   } catch {
-    return text;
+    return safeText;
   }
 
   const escapeAttribute = (attribute: string) =>
     attribute.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
   const titleAttribute = title ? ` title="${escapeAttribute(title)}"` : '';
-  return `<a href="${escapeAttribute(value)}"${titleAttribute} rel="noopener noreferrer">${text}</a>`;
+  return `<a href="${escapeAttribute(value)}"${titleAttribute} rel="noopener noreferrer">${safeText}</a>`;
 };
+renderer.image = ({ text }) => stripHtmlTags(text);
 
 const load = async () => {
   loading.value = true;

@@ -41,11 +41,16 @@ export default defineNitroPlugin((nitroApp) => {
     );
     const match = escapedDomains.length
       ? text.match(
-          new RegExp(`https?:\\/\\/(?:${escapedDomains.join('|')})\\/([a-zA-Z0-9]{3,20})`, 'i')
+          new RegExp(
+            `https?:\\/\\/(?:www\\.)?(?:${escapedDomains.join('|')})\\/([a-zA-Z0-9]{3,20})`,
+            'i'
+          )
         )
       : null;
     const uid = match?.[1] ?? null;
-    const tld = match ? new URL(match[0]).hostname.toLowerCase() : (reportDomains[0] ?? null);
+    const tld = match
+      ? new URL(match[0]).hostname.toLowerCase().replace(/^www\./, '')
+      : (reportDomains[0] ?? null);
 
     const db = useDrizzle((payload.env as { DB: D1Database }).DB);
 

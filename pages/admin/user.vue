@@ -80,13 +80,13 @@ const openLinks = (member: AdminUser) =>
 await fetchUserSession();
 
 if (
-  !loggedIn ||
+  !loggedIn.value ||
   !(user.value?.role === UserRole.MODERATOR || user.value?.role === UserRole.ADMIN)
 ) {
-  navigateTo('/');
+  await navigateTo('/');
+} else {
+  await load();
 }
-
-await load();
 </script>
 <template>
   <main class="space-y-7 py-4">
@@ -109,7 +109,9 @@ await load();
       /><select v-model="filters.vendor" class="rounded-lg border px-3 py-2">
         <option value="">{{ t('admin.allOAuth') }}</option>
         <option value="github">GitHub</option>
-        <option value="google">Google</option></select
+        <option value="google">Google</option>
+        <option value="twitch">Twitch</option>
+        <option value="chzzk">치지직</option></select
       ><select v-model="filters.status" class="rounded-lg border px-3 py-2">
         <option value="">{{ t('admin.allStatus') }}</option>
         <option value="active">{{ t('admin.normal') }}</option>

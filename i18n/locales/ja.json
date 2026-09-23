@@ -9,7 +9,8 @@
     "cancel": "キャンセル",
     "confirm": "確認",
     "close": "閉じる",
-    "loading": "少々お待ちください"
+    "loading": "少々お待ちください",
+    "language": "言語選択"
   },
   "error": {
     "notFoundTitle": "ページが見つかりません",
@@ -87,6 +88,10 @@
     "created": "作成日",
     "expires": "有効期限",
     "manage": "管理",
+    "delete": "短縮リンクを削除",
+    "deleteConfirm": "この短縮リンクを期限切れにしますか？記録は保持されます。",
+    "deleting": "期限切れにしています…",
+    "deleteError": "短縮リンクを期限切れにできませんでした。",
     "previous": "前へ",
     "next": "次へ",
     "loadError": "一覧を読み込めませんでした。"
@@ -188,6 +193,10 @@
     "aiFailed": "AIチェック失敗",
     "aiNotChecked": "未チェック",
     "aiConfidence": "信頼度",
+    "aiSeverity": "深刻度",
+    "aiSeverityLow": "低",
+    "aiSeverityModerate": "中",
+    "aiSeverityHigh": "高",
     "aiRecheck": "AIで再チェック",
     "aiError": "AIチェックを完了できませんでした。"
   },

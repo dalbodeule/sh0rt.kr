@@ -3,6 +3,7 @@ const { loggedIn, user, fetch: fetchUserSession } = useUserSession();
 const { t } = useI18n();
 const { $csrfFetch } = useNuxtApp();
 
+await fetchUserSession();
 if (!loggedIn.value) await navigateTo('/login');
 
 const name = ref(user.value?.name ?? '');

@@ -98,7 +98,10 @@ export default defineEventHandler(async (event) => {
         ].map(limitAnalyticsBlob),
       });
     } catch (error) {
-      console.warn('Could not record redirect analytics', error);
+      console.warn(
+        'Could not record redirect analytics',
+        error instanceof Error ? error.name : 'Unknown'
+      );
     }
   }
 

@@ -152,7 +152,7 @@ export default defineEventHandler(async (event: H3Event): Promise<IManageRespons
       });
     return { link, analytics };
   } catch (error) {
-    console.warn('Could not load analytics', error);
+    console.warn('Could not load analytics', error instanceof Error ? error.name : 'Unknown');
     return { link, analytics: null };
   }
 });

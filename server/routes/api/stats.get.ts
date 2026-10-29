@@ -17,7 +17,10 @@ export default defineEventHandler(async (event) => {
       const waitUntil = (event.context as { waitUntil?: (task: Promise<unknown>) => void })
         .waitUntil;
       const refresh = refreshGlobalStats(binding).catch((error) => {
-        console.warn('Could not refresh public stats', error);
+        console.warn(
+          'Could not refresh public stats',
+          error instanceof Error ? error.name : 'Unknown'
+        );
       });
       if (waitUntil) {
         waitUntil(refresh);

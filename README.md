@@ -138,6 +138,23 @@ npx wrangler deploy .output/server/index.mjs --assets .output/public
 배포 전에는 D1 마이그레이션, Worker 비밀값, OAuth 콜백 URL, Turnstile 허용 도메인을 반드시
 확인하세요.
 
+### 관측가능성 사용량 관리
+
+`wrangler.toml`은 Workers 호출 로그를 10%, 트레이스를 1% 샘플링하고 요청 URL의 쿼리 문자열을
+마스킹합니다. 호출 로그는 장애 조사에 도움이 되므로 유지합니다. 샘플링은 요청 시작 시점에
+결정되므로 실패한 요청의 로그와 트레이스도 누락될 수 있습니다. 전체 오류 발생 추이는 Workers
+Metrics에서 확인하고, 오류 조사에 필요한 표본이 부족하면 샘플링 비율을 올리세요.
+
+배포 전후에 Cloudflare 대시보드의 Observability Billable Usage에서 계정 전체의 일별 수집량과
+저장량을 기록하세요. Workers 로그 외의 로그와 트레이스도 같은 포함량을 사용합니다. 변경 후
+최소 7일 동안 요청 수 대비 수집량, 오류율, 조사 가능한 오류 사례 수를 비교하세요. 샘플이
+충분하다면 비율을 더 낮출 수 있고, 부족하다면 해당 항목만 이전 값으로 되돌릴 수 있습니다.
+`head_sampling_rate`는 `[observability.logs]`와 `[observability.traces]`에서 독립적으로 조정합니다.
+
+방문 통계는 `ANALYTICS.writeDataPoint()`로 Analytics Engine에 별도 기록됩니다. 이 데이터는
+링크별 통계에 사용되므로 Workers 로그 샘플링과 함께 줄이지 마세요. Analytics Engine의 사용량은
+데이터 포인트 쓰기와 SQL 조회 건수로 따로 확인하세요.
+
 ## 다국어 및 법률 문서
 
 UI 번역 파일은 다음 경로에서 관리합니다.
